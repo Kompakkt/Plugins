@@ -1,0 +1,29 @@
+{
+  "name": "hello-world",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "plugins/src",
+  "prefix": "lib",
+  "tags": [],
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:package",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "plugins/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "plugins/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "plugins/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
