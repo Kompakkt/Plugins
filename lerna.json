@@ -1,8 +1,11 @@
 {
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
   "version": "independent",
-  "packages": [
-    "plugins/*"
-  ],
-  "npmClient": "pnpm"
+  "packages": ["plugins/*"],
+  "npmClient": "pnpm",
+  "command": {
+    "publish": {
+      "directory": "{workspaceRoot}/dist/{projectRoot}"
+    }
+  }
 }
