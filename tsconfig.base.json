@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@kompakkt/hello-world-plugin": ["plugins/src/index.ts"]
+      "@kompakkt/hello-world-plugin": ["plugins/hello-world/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

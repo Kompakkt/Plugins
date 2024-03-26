@@ -9,7 +9,7 @@ if (!pluginName) {
 }
 
 // Construct the command
-const command = `nx g @nx/angular:lib --importPath '@kompakkt/${pluginName}-plugin' --directory plugins ${pluginName}`;
+const command = `nx g @nx/angular:lib --importPath '@kompakkt/${pluginName}-plugin' --directory plugins/${pluginName} ${pluginName}`;
 
 // Execute the command
 exec(command, (error, stdout, stderr) => {
