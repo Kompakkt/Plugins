@@ -41,6 +41,11 @@
           "codeCoverage": true
         }
       }
+    },
+    "@nx/angular:package": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
     }
   },
   "generators": {
@@ -48,7 +53,25 @@
       "e2eTestRunner": "none",
       "linter": "eslint",
       "style": "scss",
-      "unitTestRunner": "jest"
+      "unitTestRunner": "none"
+    },
+    "@nx/angular:library": {
+      "linter": "eslint",
+      "unitTestRunner": "none",
+      "style": "scss",
+      "standalone": true,
+      "inlineStyle": false,
+      "inlineTemplate": false,
+      "skipTests": true,
+      "publishable": true,
+      "projectNameAndRootFormat": "as-provided"
+    },
+    "@nx/angular:component": {
+      "style": "scss",
+      "standalone": true,
+      "inlineStyle": false,
+      "inlineTemplate": false,
+      "skipTests": true
     }
   }
 }
