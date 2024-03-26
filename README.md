@@ -22,10 +22,10 @@ To build a single plugin, run:
 npx nx build pluginname
 ```
 
-To build all plugins, run the build script:
+To build all plugins, you can run the CI build script:
 
 ```sh
-npm run build
+npm run ci:build
 ```
 
 ## Developing plugins
