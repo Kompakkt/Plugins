@@ -4,7 +4,7 @@
   "license": "AGPL-3.0-only",
   "scripts": {
     "new-plugin": "tsx ./create-new-plugin.ts",
-    "versioning": "lerna version",
+    "versioning": "lerna version --no-push --no-git-tag-version",
     "ci:build": "lerna run build",
     "ci:publish": "lerna publish from-package --no-private --no-verify-access --yes"
   },
