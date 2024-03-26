@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "new-plugin": "tsx ./create-new-plugin.ts",
-    "build": "lerna run build"
+    "build": "lerna run build",
+    "publish": "lerna publish"
   },
   "private": true,
   "dependencies": {
