@@ -1,3 +1,3 @@
-# hello-world
+# HelloWorldPlugin
 
-This library was generated with [Nx](https://nx.dev).
+Example plugin showcasing the usage of the [Kompakkt Extender](https://github.com/Kompakkt/Extender) plugin system.
