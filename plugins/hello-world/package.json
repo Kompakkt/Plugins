@@ -1,6 +1,9 @@
 {
   "name": "@kompakkt/hello-world-plugin",
   "version": "0.0.3",
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@angular/common": "^17.3.0",
     "@angular/core": "^17.3.0"
@@ -9,5 +12,5 @@
     "tslib": "^2.3.0"
   },
   "sideEffects": false,
-  "gitHead": "e7f305e301cd542dd5d2fc1867f87532dc74acca"
+  "gitHead": "8b7cd4e9d0843efe177f4a982d89d10bf695ffaa"
 }

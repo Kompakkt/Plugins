@@ -5,7 +5,7 @@
   "scripts": {
     "new-plugin": "tsx ./create-new-plugin.ts",
     "build": "lerna run build",
-    "publish": "lerna publish --no-private"
+    "ci:publish": "lerna publish --no-private"
   },
   "private": true,
   "dependencies": {
