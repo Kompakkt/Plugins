@@ -8,5 +8,6 @@
   "dependencies": {
     "tslib": "^2.3.0"
   },
-  "sideEffects": false
+  "sideEffects": false,
+  "gitHead": "e7f305e301cd542dd5d2fc1867f87532dc74acca"
 }
