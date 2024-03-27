@@ -1,4 +1,4 @@
-import { Injector, Signal, Type, inject, runInInjectionContext } from '@angular/core';
+import { Injector, Type, inject, runInInjectionContext } from '@angular/core';
 import { ExtenderPluginBaseComponent } from './factory';
 import {
   ExtenderAddonProviderPlugin,
@@ -7,7 +7,7 @@ import {
   ExtenderProviderPlugin,
 } from './provider';
 
-export class ExtenderPluginManager<T extends { data: Signal<unknown> }> {
+export class ExtenderPluginManager<T> {
   readonly plugins: ExtenderProviderPlugin[] = [];
   readonly serviceMap = new Map<string, Type<T>>();
   readonly injectedServicesMap = new Map<string, T>();

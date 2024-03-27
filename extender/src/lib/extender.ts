@@ -1,7 +1,6 @@
 import {
   EnvironmentProviders,
   InjectionToken,
-  Signal,
   Type,
   makeEnvironmentProviders,
 } from '@angular/core';
@@ -11,18 +10,18 @@ import { ExtenderProviderPlugin } from './provider';
 export type ExtenderOptions<T> = {
   componentSet: 'viewerComponents' | 'repoComponents';
   plugins: ExtenderProviderPlugin[];
-  services: Record<string, Type<T & { data: Signal<unknown> }>>;
+  services: Record<string, Type<T>>;
 };
 
-export const PLUGIN_MANAGER = new InjectionToken<
-  ExtenderPluginManager<unknown & { data: Signal<unknown> }>
->('KOMPAKKT_EXTENDER_PLUGIN_MANAGER');
+export const PLUGIN_MANAGER = new InjectionToken<ExtenderPluginManager<unknown>>(
+  'KOMPAKKT_EXTENDER_PLUGIN_MANAGER',
+);
 
 export const PLUGIN_COMPONENT_SET = new InjectionToken<ExtenderOptions<unknown>['componentSet']>(
   'KOMPAKKT_EXTENDER_PLUGIN_COMPONENT_SET',
 );
 
-export const provideExtender = <T extends { data: Signal<unknown> }>({
+export const provideExtender = <T>({
   componentSet,
   plugins,
   services,

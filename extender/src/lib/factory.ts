@@ -1,4 +1,4 @@
-import { Directive, InjectionToken, Signal, Type, input, output } from '@angular/core';
+import { Directive, InjectionToken, Type, input, output } from '@angular/core';
 import { ExtenderPluginManager } from './manager';
 import { ExtenderAddonProviderPlugin } from './provider';
 
@@ -36,7 +36,7 @@ export const createExtenderPlugin = (options: {
 export class ExtenderPluginBaseComponent {
   readonly slotData = input<unknown>();
   readonly event = output<Event>();
-  readonly pluginManager = input<ExtenderPluginManager<unknown & { data: Signal<unknown> }>>();
+  readonly pluginManager = input<ExtenderPluginManager<unknown>>();
 }
 
 export const createExtenderComponent = () => {
