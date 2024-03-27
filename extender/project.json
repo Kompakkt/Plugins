@@ -1,0 +1,29 @@
+{
+  "name": "extender",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "extender/src",
+  "prefix": "lib",
+  "tags": [],
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/angular:package",
+      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+      "options": {
+        "project": "extender/ng-package.json"
+      },
+      "configurations": {
+        "production": {
+          "tsConfig": "extender/tsconfig.lib.prod.json"
+        },
+        "development": {
+          "tsConfig": "extender/tsconfig.lib.json"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

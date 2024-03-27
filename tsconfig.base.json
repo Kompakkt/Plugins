@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@kompakkt/extender": ["extender/src/index.ts"],
       "@kompakkt/hello-world-plugin": ["plugins/hello-world/src/index.ts"]
     }
   },
