@@ -5,10 +5,10 @@
     "type": "git",
     "url": "https://github.com/Kompakkt/Extender.git"
   },
-  "version": "0.0.9",
+  "version": "0.0.10",
   "peerDependencies": {
-    "@angular/common": "^17.3.0",
-    "@angular/core": "^17.3.0"
+    "@angular/common": "^18.1.3",
+    "@angular/core": "^18.1.3"
   },
   "dependencies": {
     "tslib": "^2.3.0"

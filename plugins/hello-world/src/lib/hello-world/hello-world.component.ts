@@ -1,5 +1,5 @@
 import { Component, computed } from '@angular/core';
-import { createExtenderComponent } from '@kompakkt/extender';
+import { createExtenderComponent } from '../../../../../extender/src';
 
 @Component({
   selector: 'lib-hello-world',

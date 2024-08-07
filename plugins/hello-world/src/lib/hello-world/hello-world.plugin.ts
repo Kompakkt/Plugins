@@ -1,4 +1,4 @@
-import { createExtenderPlugin } from '@kompakkt/extender';
+import { createExtenderPlugin } from '../../../../../extender/src';
 import { HelloWorldComponent } from './hello-world.component';
 
 export class HelloWorldPlugin extends createExtenderPlugin({

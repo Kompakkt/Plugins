@@ -11,13 +11,11 @@ export const createExtenderPlugin = (options: {
   version: `${number}.${number}.${number}`;
   viewerComponents?: Record<string, Type<ExtenderPluginBaseComponent>[]>;
   repoComponents?: Record<string, Type<ExtenderPluginBaseComponent>[]>;
-  tokenName?: string;
+  tokenName: string;
 }) => {
-  const providerToken = options.tokenName
-    ? new InjectionToken<ExtenderAddonProviderPlugin>(
-        `KOMPAKKT_EXTENDER_PLUGIN_${options.tokenName}`,
-      )
-    : undefined;
+  const providerToken = new InjectionToken<ExtenderAddonProviderPlugin>(
+    `KOMPAKKT_EXTENDER_PLUGIN_${options.tokenName}`,
+  );
 
   return class extends ExtenderAddonProviderPluginBase implements ExtenderAddonProviderPlugin {
     readonly type = 'addon-provider' as const;

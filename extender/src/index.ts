@@ -1,8 +1,14 @@
 export {
-  ExtenderOptions,
+  type ExtenderOptions,
   PLUGIN_COMPONENT_SET,
   PLUGIN_MANAGER,
   provideExtender,
 } from './lib/extender';
-export { createExtenderComponent, createExtenderPlugin } from './lib/factory';
+export {
+  createExtenderComponent,
+  createExtenderPlugin,
+  type ExtenderPluginBaseComponent,
+} from './lib/factory';
 export { ExtenderSlotDirective } from './lib/slot.directive';
+export { type ExtenderAddonProviderPlugin } from './lib/provider';
+export { type ExtenderPluginManager } from './lib/manager';
