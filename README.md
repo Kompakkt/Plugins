@@ -1,27 +1,38 @@
-# Plugins2
+# Plugins
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.3.
+<p align="center">
+    <img src="https://github.com/Kompakkt/Assets/raw/main/official-plugins-logo.svg" alt="Kompakkt Official Plugins logo" width="600">
+</p>
 
-## Development server
+This is the official repository for Kompakkt Repo and Viewer plugins.
+Plugins depend on the `Extender` library, which is also home in this repository.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+More information about the `Extender` and how to use it can be found in the [`extender/README.md`-file](./extender/README.md).
 
-## Code scaffolding
+## Creating a new plugin
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Run the following command, replacing with the name of your plugin.
 
-## Build
+Note: The full plugin name will be extended to `@kompakkt/pluginname-plugin`.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+```sh
+npm run new-plugin pluginname
+```
 
-## Running unit tests
+## Building plugins
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+To build a single plugin, run:
 
-## Running end-to-end tests
+```sh
+npm run build pluginname
+```
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+To build all plugins, you can run the CI build script:
 
-## Further help
+```sh
+npm run ci:build
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Developing plugins
+
+You can refer to the example 'hello-world' plugin, or to the [`extender/README.md`-file](./extender/README.md) to find out how the plugin system works.
