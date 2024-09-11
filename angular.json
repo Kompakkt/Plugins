@@ -71,6 +71,52 @@
           "defaultConfiguration": "production"
         }
       }
+    },
+    "@kompakkt/plugin-privacy-and-contact": {
+      "projectType": "library",
+      "root": "./plugins/privacy-and-contact",
+      "sourceRoot": "./plugins/privacy-and-contact/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "plugins/privacy-and-contact/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "plugins/privacy-and-contact/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "plugins/privacy-and-contact/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        }
+      }
+    },
+    "@kompakkt/plugin-i18n": {
+      "projectType": "library",
+      "root": "./plugins/i18n",
+      "sourceRoot": "./plugins/i18n/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "plugins/i18n/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "plugins/i18n/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "plugins/i18n/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        }
+      }
     }
   }
 }
