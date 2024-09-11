@@ -26,6 +26,7 @@ export const provideExtender = <T>({
   plugins,
   services,
 }: ExtenderOptions<T>): EnvironmentProviders => {
+  const servicesByPlugins = plugins.map(p => Object.values((p as any).services)).flat();
   return makeEnvironmentProviders([
     {
       provide: PLUGIN_MANAGER,
@@ -35,6 +36,7 @@ export const provideExtender = <T>({
       provide: PLUGIN_COMPONENT_SET,
       useValue: componentSet,
     },
+    servicesByPlugins.map(c => ({ provide: c, useClass: c })),
     ...plugins
       .filter(p => !!(p.constructor as any)?.providerToken)
       .map(p => {

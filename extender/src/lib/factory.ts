@@ -11,6 +11,7 @@ export const createExtenderPlugin = (options: {
   version: `${number}.${number}.${number}`;
   viewerComponents?: Record<string, Type<ExtenderPluginBaseComponent>[]>;
   repoComponents?: Record<string, Type<ExtenderPluginBaseComponent>[]>;
+  services?: Record<string, Type<unknown>>;
   tokenName: string;
 }) => {
   const providerToken = new InjectionToken<ExtenderAddonProviderPlugin>(
@@ -25,6 +26,7 @@ export const createExtenderPlugin = (options: {
     readonly version = options.version;
     readonly viewerComponents = options.viewerComponents ?? {};
     readonly repoComponents = options.repoComponents ?? {};
+    readonly services = options.services ?? {};
 
     static readonly providerToken = providerToken;
   };
