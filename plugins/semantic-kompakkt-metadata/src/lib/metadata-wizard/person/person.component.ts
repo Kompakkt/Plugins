@@ -1,18 +1,22 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatSelectChange } from '@angular/material/select';
-import { FormControl } from '@angular/forms';
+import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatFormField, MatLabel, MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
 import { ContentProviderService } from '../../content-provider.service';
 import { MediaAgent, ContactReference, Institution } from '../metadata';
+import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
+import { MatIconModule } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-person',
   templateUrl: './person.component.html',
   styleUrls: ['./person.component.scss'],
   standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatExpansionModule, MatIconModule, MatFormField, MatLabel, MatSelectModule, MatAutocompleteModule]
 })
 export class PersonComponent implements OnChanges {
   @Input() public entityId!: string;

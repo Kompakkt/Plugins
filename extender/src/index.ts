@@ -2,6 +2,8 @@ export {
   type ExtenderOptions,
   PLUGIN_COMPONENT_SET,
   PLUGIN_MANAGER,
+  EXTENDED_BACKEND_SERVICE,
+  type BackendService,
   provideExtender,
 } from "./lib/extender";
 export {

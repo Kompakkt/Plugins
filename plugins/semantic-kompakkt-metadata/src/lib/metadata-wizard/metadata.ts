@@ -1,4 +1,3 @@
-import { type } from 'os';
 import {
   IDigitalEntity,
   IPhysicalEntity,
@@ -18,7 +17,7 @@ import {
   IPlaceTuple,
   IRelatedMap,
   ObjectId,
-} from 'src/common';
+} from '../../common';
 
 const getObjectId = () => new ObjectId().toString();
 
@@ -34,7 +33,7 @@ const emptyProps = (arr: any[], props?: string[]) =>
 class WikibaseItem implements IWikibaseItem {
   id: string = "";
 
-  label = {};
+  label: Record<string, string> = {};
   internal_id = '';
   title = '';
   description = '';
@@ -71,7 +70,7 @@ class BaseEntity implements IBaseEntity {
   biblioRefs = new Array<IDescriptionValueTuple>();
   other = new Array<IDescriptionValueTuple>();
 
-  label = {};
+  label: Record<string, string> = {};
 
   // persons = new Array<Person>();
   // institutions = new Array<Institution>();
@@ -266,7 +265,7 @@ class DigitalEntity extends BaseEntity implements IDigitalEntity {
     return true;
   }
 
-  public static checkIsValid(entity: DigitalEntity): boolean {
+  public static override checkIsValid(entity: DigitalEntity): boolean {
     return entity.checkValidGeneralInfo() &&
       entity.checkValidRelatedAgents() &&
       entity.checkValidLicence();
@@ -299,7 +298,7 @@ class PhysicalEntity extends BaseEntity implements IPhysicalEntity {
     this.place.setAddress(address);
   }
 
-  public static checkIsValid(entity: PhysicalEntity): boolean {
+  public static override checkIsValid(entity: PhysicalEntity): boolean {
     if (!BaseEntity.checkIsValid(entity)) return false;
 
     if (!entity.place.isValid) return false;
@@ -782,7 +781,7 @@ class FileTuple implements IFile {
 type AnyEntity = DigitalEntity | PhysicalEntity;
 
 export {
-  AnyEntity,
+  type AnyEntity,
   DigitalEntity,
   PhysicalEntity,
   Institution,

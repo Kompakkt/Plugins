@@ -1,10 +1,12 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatAutocomplete, MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
-import { MatStepper, MatStep } from '@angular/material/stepper';
 import { MatDialog } from '@angular/material/dialog';
+import { MatTab, MatTabGroup } from '@angular/material/tabs';
+import { MatIcon } from '@angular/material/icon'
+import { MatRadioButton } from '@angular/material/radio'
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, filter, startWith, withLatestFrom } from 'rxjs/operators';
 
@@ -24,7 +26,11 @@ import {
   WikibaseItem,
   MediaAgent,
 } from '../metadata';
-import { isDigitalEntity, IDigitalEntity, IWikibaseItem, IMediaAgent, isPhysicalEntity } from '../../../common';
+import { isDigitalEntity, IDigitalEntity, IWikibaseItem, IMediaAgent } from '../../../common';
+import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
+import { CommonModule } from '@angular/common';
+import { AutocompleteOptionComponent } from '../../autocomplete/autocomplete-option.component';
+import { createExtenderComponent } from '@kompakkt/extender';
 
 type AnyEntity = DigitalEntity | PhysicalEntity;
 
@@ -33,8 +39,9 @@ type AnyEntity = DigitalEntity | PhysicalEntity;
   templateUrl: './entity.component.html',
   styleUrls: ['./entity.component.scss'],
   standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatAutocompleteModule, MatTab, MatTabGroup, MatFormField, MatLabel, MatError, MatIcon, MatRadioButton, AutocompleteOptionComponent]
 })
-export class EntityComponent implements OnChanges {
+export class EntityComponent extends createExtenderComponent() implements OnChanges  {
   @Input('index')
   public index: number = 1;
   @Output() indexChange = new EventEmitter<number>();
@@ -172,6 +179,7 @@ export class EntityComponent implements OnChanges {
     public content: ContentProviderService,
     public dialog: MatDialog,
   ) {
+    super();
     (window as any)['printEntity'] = () =>
       console.log(this.entitySubject.value);
 
@@ -274,7 +282,7 @@ export class EntityComponent implements OnChanges {
     return this.availableRoles.asObservable();
   }
 
-  public setTouched(element: string) {
+  public setTouched(element: keyof typeof this.touchedElements) {
     this.touchedElements[element] = true;
   }
 
@@ -717,8 +725,8 @@ export class EntityComponent implements OnChanges {
   }
 
   public removeProperty(entity: AnyEntity, property: string, index: number) {
-    if (Array.isArray(entity[property])) {
-      const removed = entity[property].splice(index, 1)[0];
+    if (Array.isArray((entity as any)[property])) {
+      const removed = (entity as any)[property].splice(index, 1)[0];
       if (!removed) {
         return console.warn('No item removed');
       }
@@ -736,7 +744,7 @@ export class EntityComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    const digitalEntity = changes.digitalEntity?.currentValue as
+    const digitalEntity = changes['digitalEntity']?.currentValue as
       | DigitalEntity
       | undefined;
     if (digitalEntity) this.entitySubject.next(digitalEntity);

@@ -1,15 +1,18 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
-import { BackendService } from './';
-import { MediaAgent, Institution, Tag, WikibaseItem } from '~metadata';
+import { EXTENDED_BACKEND_SERVICE } from '@kompakkt/extender';
+import { MediaAgent, Institution, Tag, WikibaseItem } from './metadata-wizard/metadata';
 
 import { map } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest } from 'rxjs';
+import { Collection, IMetadataChoices, ITag } from '../common';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContentProviderService {
+  #backend = inject(EXTENDED_BACKEND_SERVICE);
+
   // Existing server content
   private ServerInstitutions = new BehaviorSubject<Institution[]>([]);
   private ServerTags = new BehaviorSubject<Tag[]>([]);
@@ -26,18 +29,18 @@ export class ContentProviderService {
   // There are no cases where local tags are needed
   // private LocalTags = new BehaviorSubject<Tag[]>([]);
 
-  constructor(private backend: BackendService) {
+  constructor() {
     this.updateContent();
   }
 
   get $Persons() {
-    return combineLatest(this.ServerPersons, this.LocalPersons).pipe(
+    return combineLatest([this.ServerPersons, this.LocalPersons]).pipe(
       map(([serverPersons, localPersons]) => serverPersons.concat(localPersons)),
     );
   }
 
   get $Institutions() {
-    return combineLatest(this.ServerInstitutions, this.LocalInstitutions).pipe(
+    return combineLatest([this.ServerInstitutions, this.LocalInstitutions]).pipe(
       map(([serverInstitutions, localInstitutions]) =>
         serverInstitutions.concat(localInstitutions),
       ),
@@ -82,8 +85,9 @@ export class ContentProviderService {
   }
 
   public async updateMetadataChoices() {
-    this.backend
-      .getMetadataChoices()
+    this.#backend
+      .get(`api/v1/get/findall/${Collection.metadata}`)
+      .then(result => result as IMetadataChoices)
       .then(result => {
         if (result.persons !== undefined && Array.isArray(result.persons)) {
           console.debug("fetched persons");
@@ -170,8 +174,9 @@ export class ContentProviderService {
   // }
   //
   public async updateTags() {
-    this.backend
-      .getAllTags()
+    this.#backend
+      .get(`api/v1/get/findall/${Collection.tag}`)
+      .then(result => result as ITag[])
       .then(result => {
         const map = new Map<string, Tag>();
         for (const tag of result) {

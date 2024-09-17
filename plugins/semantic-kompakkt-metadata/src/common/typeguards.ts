@@ -9,6 +9,8 @@ import {
   IAnnotation,
   IInstitution,
   IContact,
+  IPhysicalEntity,
+  IPerson,
 } from './interfaces';
 
 const isDefined = (value: any) => value != null && value != undefined;
@@ -47,6 +49,15 @@ const GROUP_PROPS = ['name', 'creator', 'owners', 'members'];
 const isTag = (obj: any): obj is ITag => checkProps(TAG_PROPS, obj);
 const TAG_PROPS = ['value'];
 
+
+/**
+ * Checks whether an object is a digital/physical entity
+ * @type {Boolean}
+ */
+const isMetadataEntity = (obj: any): obj is IDigitalEntity | IPhysicalEntity =>
+  checkProps(META_ENTITY_PROPS, obj);
+const META_ENTITY_PROPS = ['title', 'description', 'persons', 'institutions'];
+
 /**
  * Checks whether an object is a digital entity
  * @type {Boolean}
@@ -54,6 +65,15 @@ const TAG_PROPS = ['value'];
 const isDigitalEntity = (obj: any): obj is IDigitalEntity =>
   checkProps(DIG_ENTITY_PROPS, obj);
 const DIG_ENTITY_PROPS = ['description', 'agents'];
+
+
+/**
+ * Checks whether an object is a physical entity
+ * @type {Boolean}
+ */
+const isPhysicalEntity = (obj: any): obj is IPhysicalEntity =>
+  isMetadataEntity(obj) && checkProps(PHY_ENTITY_PROPS, obj);
+const PHY_ENTITY_PROPS = ['place', 'collection'];
 
 /**
  * Checks whether an object is a compilation
@@ -84,6 +104,13 @@ const isAnnotation = (obj: any): obj is IAnnotation => checkProps(ANNO_PROPS, ob
 const ANNO_PROPS = ['body', 'target'];
 
 /**
+ * Checks whether an object is a person
+ * @type {Boolean}
+ */
+const isPerson = (obj: any): obj is IPerson => checkProps(PERSON_PROPS, obj);
+const PERSON_PROPS = ['prename', 'name'];
+
+/**
  * Checks whether an object is an institution
  * @type {Boolean}
  */
@@ -108,11 +135,14 @@ export {
   isUnresolved,
   isGroup,
   isTag,
+  isMetadataEntity,
   isCompilation,
   isEntity,
   isResolvedEntity,
   isAnnotation,
   isDigitalEntity,
+  isPhysicalEntity,
+  isPerson,
   isInstitution,
   isAddress,
   isContact,

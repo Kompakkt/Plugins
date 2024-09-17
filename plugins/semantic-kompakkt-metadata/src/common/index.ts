@@ -1,5 +1,5 @@
-export {
-  ObjectId,
+
+export type {
   IDocument,
   ITypeValueTuple,
   IDimensionTuple,
@@ -14,10 +14,11 @@ export {
   IMediaAgent,
   IMetadataChoices,
   IAnnotationLinkChoices,
+  IPerson,
   IInstitution,
   ITag,
-  // IBaseEntity,
-  // IPhysicalEntity,
+  IBaseEntity,
+  IPhysicalEntity,
   IDigitalEntity,
   IMediaHierarchy,
   IStrippedUserData,
@@ -50,17 +51,22 @@ export {
   ISizedEvent,
 } from './interfaces';
 
+export { ObjectId } from './interfaces';
+
 export { UserRank, Collection, Command, License, Role } from './enums';
 
 export {
   isUnresolved,
   isGroup,
   isTag,
+  isMetadataEntity,
   isCompilation,
   isEntity,
   isResolvedEntity,
   isAnnotation,
   isDigitalEntity,
+  isPhysicalEntity,
+  isPerson,
   isInstitution,
   isAddress,
   isContact,

@@ -1,0 +1,17 @@
+.result {
+  display: flex;
+  flex-direction: column;
+}
+.result-label-id {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.result-label {
+  font-weight: bold;
+}
+
+.result-muted {
+  color: #999;
+  font-size: smaller;
+}

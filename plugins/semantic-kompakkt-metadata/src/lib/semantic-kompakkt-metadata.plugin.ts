@@ -1,4 +1,5 @@
 import { createExtenderPlugin } from "@kompakkt/extender";
+import { EntityComponent } from "./metadata-wizard/entity/entity.component";
 
 export class TemplatePlugin extends createExtenderPlugin({
   name: "Template",
@@ -6,7 +7,9 @@ export class TemplatePlugin extends createExtenderPlugin({
   version: "0.0.1",
   tokenName: "TemplatePlugin",
   viewerComponents: {},
-  repoComponents: {},
+  repoComponents: {
+    "entity-wizard": [EntityComponent]
+  },
 }) {
   // Custom logic
 }

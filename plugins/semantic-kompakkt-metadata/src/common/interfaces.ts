@@ -1,5 +1,5 @@
 // Expose MongoDB ObjectId to be used in Repo and Viewer
-import { ObjectId } from 'bson';
+import ObjectId from 'bson-objectid';
 export { ObjectId };
 
 import { Collection, UserRank } from './enums';
@@ -81,6 +81,17 @@ export interface IRelatedMap<T> {
  * Database model of a person. Makes use of IRelatedMap for roles,
  * institutions and contact references.
  */
+export interface IPerson extends IDocument {
+  prename: string;
+  name: string;
+
+  // relatedEntityId refers to the _id
+  // of the digital or physical entity
+  // a person refers to
+  roles: IRelatedMap<string[]>;
+  institutions: IRelatedMap<Array<IInstitution | IDocument>>;
+  contact_references: IRelatedMap<IContact | IDocument>;
+}
 
 /**
  * Database model of an institution. Makes use of IRelatedMap for roles,
@@ -140,14 +151,36 @@ export interface IMediaHierarchy {
 }
 
 /**
- * Database model of a digital entity. Uses IBaseEntity.
+ * Common interface between IPhysicalEntity and IDigitalEntity.
+ * Should not be used on its own.
  */
-export interface IDigitalEntity extends IDocument {
+export interface IBaseEntity extends IDocument {
+  title: string;
+  description: string;
+
   externalId: ITypeValueTuple[];
   externalLink: IDescriptionValueTuple[];
   biblioRefs: IDescriptionValueTuple[];
   other: IDescriptionValueTuple[];
 
+  persons: IPerson[];
+  institutions: IInstitution[];
+
+  metadata_files: IFile[];
+}
+
+/**
+ * Database model of a physical entity. Uses IBaseEntity.
+ */
+export interface IPhysicalEntity extends IBaseEntity {
+  place: IPlaceTuple;
+  collection: string;
+}
+
+/**
+ * Database model of a digital entity. Uses IBaseEntity.
+ */
+export interface IDigitalEntity extends IBaseEntity {
   label: { [key: string] : string };
   description: string;
 
@@ -175,6 +208,8 @@ export interface IDigitalEntity extends IDocument {
   statement: string;
   objecttype: string;
 
+  phyObjs: IPhysicalEntity[];
+  
   hierarchies: IMediaHierarchy[],
   wikibase_id?: string;
   wikibase_address?: string;
@@ -212,12 +247,14 @@ export interface IUserData extends IDocument {
   prename: string;
   surname: string;
   mail: string;
+
   bot_username: string;
   bot_password: string;
+
   role: UserRank;
 
   data: {
-    [key in Collection]: Array<string | null | any | ObjectId>;
+    [key in Collection]: Array<string | null | any>;
   };
 }
 
@@ -474,6 +511,7 @@ export interface ISocketRoomData {
   recipient: string;
   info: ISocketUserInfo;
 }
+
 
 export interface ISizedEvent {
   width: number;

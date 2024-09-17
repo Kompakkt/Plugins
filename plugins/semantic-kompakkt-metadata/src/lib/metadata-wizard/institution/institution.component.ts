@@ -1,13 +1,19 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { MatSelectChange } from '@angular/material/select';
+import { MatFormField, MatLabel, MatSelect, MatSelectChange, MatSelectModule } from '@angular/material/select';
+import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
+import { MatIcon } from '@angular/material/icon'
 import { BehaviorSubject } from 'rxjs';
 import { Institution, Address } from '../metadata';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { AddressComponent } from '../address/address.component';
 
 @Component({
   selector: 'app-institution',
   templateUrl: './institution.component.html',
   styleUrls: ['./institution.component.scss'],
   standalone: true,
+  imports: [CommonModule, FormsModule, MatFormField, MatLabel, MatSelectModule, MatAccordion, MatExpansionModule, MatIcon, AddressComponent]
 })
 export class InstitutionComponent implements OnChanges {
   @Input() public entityId!: string;
@@ -69,7 +75,7 @@ export class InstitutionComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    const institution = changes.institution?.currentValue as Institution | undefined;
+    const institution = changes['institution']?.currentValue as Institution | undefined;
     if (institution) {
       this.isExisting.next(institution.name.length > 0);
 
