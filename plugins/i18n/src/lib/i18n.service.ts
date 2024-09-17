@@ -41,8 +41,21 @@ export class TranslateService {
         );
     });
 
-    this.selectedLanguage$.subscribe(() => {
+    this.selectedLanguage$.subscribe(language => {
       this.addLocaleToSearchParams();
+
+      const languageRequestedEvent = new CustomEvent('language-requested', {
+        detail: { language },
+      });
+      document.dispatchEvent(languageRequestedEvent);
+    });
+
+    (document as any).addEventListener('language-requested', (event: CustomEvent) => {
+      firstValueFrom(this.selectedLanguage$).then(currentLanguage => {
+        if (currentLanguage === event.detail.language) return;
+        this.requestLanguage(event.detail.language);
+        console.log('Language requested by event', event.detail);
+      });
     });
   }
 

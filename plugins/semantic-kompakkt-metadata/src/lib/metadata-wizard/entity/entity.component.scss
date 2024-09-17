@@ -1,0 +1,276 @@
+@use '@angular/material' as mat;
+@import 'src/theme.scss';
+
+mat-form-field {
+  & + mat-form-field {
+    margin-top: 1rem;
+  }
+}
+
+.file-list {
+  .card + .card {
+    margin-top: 1rem;
+  }
+  .file {
+    display: grid;
+    grid-template-columns: 0 2fr 1fr 1fr;
+    text-align: center;
+    span:first-child {
+      text-align: left;
+    }
+    span:last-child {
+      text-align: right;
+    }
+  }
+}
+
+.role-footnote {
+  margin-top: 1rem;
+}
+
+::ng-deep {
+  div.card {
+    @keyframes card-fade-in {
+      0% {
+        opacity: 0;
+        transform: translateY(-10%);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0%);
+      }
+    }
+    animation: card-fade-in cubic-bezier(0.25, 1, 0.5, 1) both 1 250ms;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    align-items: stretch;
+
+    /*display: grid;
+  align-items: center;
+  grid-template-rows: repeat(3, 1fr);
+  grid-gap: 1rem;*/
+    background: white;
+    padding: 0.75rem 1rem 1rem 1rem;
+    border-radius: 0.5rem;
+
+    transition: filter 250ms ease-in-out;
+    border: solid 0.1rem mat.get-color-from-palette($kompakkt-primary, 500);
+    &:before {
+      content: 'Please fill out all required fields';
+      color: transparent;
+      transition: color 250ms ease-in-out, height 250ms ease-in-out;
+      padding-bottom: 0.5rem;
+      height: 0rem;
+      text-align: center;
+    }
+    &.invalid {
+      border: solid 0.1rem mat.get-color-from-palette($kompakkt-accent, 500);
+      &:before {
+        color: mat.get-color-from-palette($kompakkt-accent, 500);
+        height: 1rem;
+      }
+    }
+
+    position: relative;
+    .actions {
+      position: absolute;
+      top: 0;
+      right: 0;
+      transform: translateX(5%) translateY(-10%);
+      padding: 0.5rem;
+      * {
+        box-shadow: none !important;
+      }
+    }
+
+    mat-form-field {
+      margin-top: 0;
+      & + mat-form-field {
+        margin-top: 1rem;
+      }
+    }
+  }
+}
+
+::ng-deep {
+  .mat-chip-list-wrapper {
+    margin-bottom: 0.5rem;
+  }
+
+  .mat-expansion-panel {
+    .mat-expansion-panel-body {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+    &.single-column .mat-expansion-panel-body {
+      > div.card + div.card {
+        margin-top: 1rem;
+      }
+    }
+    &.grid .mat-expansion-panel-body {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: 1rem;
+    }
+  }
+
+  .mat-expansion-panel-spacing {
+    margin-bottom: 0 !important;
+  }
+
+  .mat-card-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mat-expansion-panel-header {
+    font-size: 1rem !important;
+    line-height: 1rem !important;
+    user-select: none;
+    .mat-icon.required-info {
+      margin-right: 0.5rem;
+      transition: color 250ms;
+    }
+    .mat-expansion-panel-header-title {
+      display: flex;
+      align-items: center;
+      > * + * {
+        margin-left: 0.25rem;
+      }
+      .mat-icon-button {
+        pointer-events: none;
+        transition: opacity 250ms;
+        opacity: 0;
+      }
+    }
+    border-bottom: solid 0.2rem transparent;
+    transition: all 250ms !important;
+    &.mat-expanded {
+      border-color: mat.get-color-from-palette($kompakkt-primary, 500);
+      .mat-expansion-panel-header-title {
+        .mat-icon-button {
+          pointer-events: all;
+          opacity: 1;
+        }
+      }
+    }
+  }
+  &.invalid > .mat-expansion-panel-header.mat-expanded {
+    border-color: mat.get-color-from-palette($kompakkt-accent, 500);
+  }
+
+  .licence-selection {
+    display: flex;
+    flex-direction: column;
+
+    .mat-radio-button + .mat-radio-button {
+      margin-top: 0.5rem;
+    }
+
+    .mat-radio-label-content {
+      display: flex;
+      align-items: center;
+      img {
+        height: 2.5rem;
+        margin-right: 1rem;
+      }
+    }
+  }
+
+  .header-less-tabs.mat-tab-group .mat-tab-header {
+    display: none;
+  }
+
+  .form-fields {
+    display: flex;
+    flex-direction: column;
+    padding: 1em 2em;
+    font-size: 14px;
+  }
+
+  .person-search {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .role-selection {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+
+    .mat-radio-button + .mat-radio-button {
+      margin-top: 0.5rem;
+    }
+
+    .mat-radio-label-content {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .result-separator {
+    width: 100%;
+    border: 1px solid #e7e7e7;
+    margin: 1rem auto;
+  }
+
+  .result-list {
+    display: inline-grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+  }
+}
+
+.spacer {
+  margin-bottom: 1rem;
+}
+
+.invalid {
+  color: mat.get-color-from-palette($kompakkt-warn);;
+}
+
+.mt-2em {
+  margin-top: 2em;
+}
+
+
+.not-touched {
+  filter: grayscale(1) opacity(0.75);
+}
+
+div.card {
+  padding: 0.75rem 1rem;
+
+}
+
+div.card::before{
+  padding-bottom: unset;
+}
+
+div.card .actions{
+  transform: translateX(10%) translateY(-15%);
+}
+
+.mat-option {
+  font-size: 14px;
+  line-height: 1.15rem;
+  border-bottom: 1px solid #e7e7e7;
+}
+
+.error-icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+.error-text {
+  margin-left: 0.5rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+.warning {
+  color: mat.get-color-from-palette($kompakkt-warn);
+}

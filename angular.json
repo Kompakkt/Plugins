@@ -117,6 +117,29 @@
           "defaultConfiguration": "production"
         }
       }
+    },
+    "@kompakkt/plugin-semantic-kompakkt-metadata": {
+      "projectType": "library",
+      "root": "./plugins/semantic-kompakkt-metadata",
+      "sourceRoot": "./plugins/semantic-kompakkt-metadata/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "plugins/semantic-kompakkt-metadata/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "plugins/semantic-kompakkt-metadata/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "plugins/semantic-kompakkt-metadata/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        }
+      }
     }
   }
 }

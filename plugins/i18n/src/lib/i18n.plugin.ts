@@ -1,5 +1,6 @@
 import { createExtenderPlugin } from '@kompakkt/extender';
 import { TranslateService } from './i18n.service';
+import { LanguageDropdownComponent } from './i18n.language-dropdown.component';
 
 export class TranslatePlugin extends createExtenderPlugin({
   name: 'TranslatePlugin',
@@ -7,7 +8,9 @@ export class TranslatePlugin extends createExtenderPlugin({
   version: '0.0.1',
   tokenName: 'TranslatePlugin',
   viewerComponents: {},
-  repoComponents: {},
+  repoComponents: {
+    'language-dropdown': [LanguageDropdownComponent],
+  },
   services: {
     TranslateService: TranslateService,
   },

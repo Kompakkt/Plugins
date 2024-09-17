@@ -1,0 +1,337 @@
+<ng-container *ngIf="digitalEntity$ | async as digitalEntity">
+  <mat-tab-group [(selectedIndex)]="index" class="header-less-tabs" animationDuration="0ms">
+    <mat-tab>
+      <div class="form-fields">
+        <!-- Title -->
+        <mat-form-field
+        (click)="setTouched('title')"
+        (keyup)="setTouched('title')"
+        (change)="setTouched('title')"
+        [ngClass]="{'not-touched': touchedElements['title'] === false}">
+          <mat-label>Title:</mat-label>
+          <input 
+            matInput type="text" 
+            name="title" 
+            placeholder="Enter a title" 
+            [(ngModel)]="digitalEntity.label['en']"
+          required/>
+          
+        </mat-form-field>
+
+        <!-- Description -->
+        <mat-form-field 
+        (click)="setTouched('description')"
+        (keyup)="setTouched('description')"
+        (change)="setTouched('description')"
+        [ngClass]="{'not-touched': touchedElements['description'] === false}">
+          <mat-label>Description:</mat-label>
+          <input matInput type="text" name="description" placeholder="Enter a description"
+            [(ngModel)]="digitalEntity.description" 
+            required />
+          
+        </mat-form-field>
+
+        <!-- display an error if title and decription are matching -->
+        <mat-error *ngIf="digitalEntity.label['en'] === digitalEntity.description">
+          <div class="error-icon">
+            <mat-icon>error</mat-icon>
+          </div>
+          <div class="error-text">
+            Title and description must not be the same.
+          </div>
+        </mat-error>
+
+        <!-- Language -->
+        <!-- <mat-form-field>
+          <mat-label>Language:</mat-label>
+          <mat-select>
+            <mat-option value="option1" *ngFor="let item of locales">{{item}}</mat-option>
+          </mat-select>
+        </mat-form-field> -->
+
+      </div>
+    </mat-tab>
+    <mat-tab>
+      <div class="form-fields">
+        <!-- Person Search -->
+        <mat-form-field>
+          <mat-label>Add related persons or institutions:</mat-label>
+          <input matInput type="text" name="title" placeholder="Search for person or institution"
+            [formControl]="searchPerson" [matAutocomplete]="personAutocomplete" />
+          <mat-icon matSuffix>search</mat-icon>
+          <mat-autocomplete #personAutocomplete="matAutocomplete" [displayWith]="displayPersonName"
+            (optionSelected)="selectPerson($event)">
+            <mat-option *ngFor="let person of filteredPersons$ | async" [value]="person">
+              <app-autocomplete-option [optionItem]="person"></app-autocomplete-option>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+
+        <!-- <mat&#45;radio&#45;button *ngFor="let role of roles$ | async" class="role&#45;selector" [value]="475">{{ role.label['en'] }}</mat&#45;radio&#45;button> -->
+        <mat-checkbox *ngFor="let role of availableRolesKompakkt" [(ngModel)]="role.checked">
+          {{ role.value.concat(role.is_required ? ' *':'')}}
+        </mat-checkbox>
+        <!--
+        <mat-radio-group class="role-selection"
+                         [(ngModel)]="selectedRole"
+                         name="roleSelection"
+        >
+        
+          <mat-radio-button class="role-selector" [value]="475">Creator*</mat-radio-button>
+          <mat-radio-button class="role-selector" [value]="476">Editor</mat-radio-button>
+          <mat-radio-button class="role-selector" [value]="520">Rightsowner*</mat-radio-button>
+          <mat-radio-button class="role-selector" [value]="521">Raw data creator</mat-radio-button>
+          <mat-radio-button class="role-selector" [value]="522">Contact person</mat-radio-button>
+        </mat-radio-group>
+        -->
+        <button mat-flat-button class="mt-2em" color="primary" (click)="addPerson()" id="addPersonButton">
+          Add
+        </button>
+
+        <div class="role-footnote" [ngClass]="validationRelatedAgentsWB() ? '' : 'invalid'">
+          *You <b>must</b> specify at least one agent for each of these roles.
+        </div>
+
+        <hr class="result-separator" *ngIf="digitalEntity.agents.length > 0">
+
+        <div class="">
+          <ng-container *ngFor="let person of digitalEntity.agents">
+            <div class="card spacer">
+              {{ person.label['en'] }} ({{ person.roleTitle }})
+  
+              <div class="actions">
+                <button mat-icon-button color="warn" aria-label="Remove link" (click)="removePerson(person)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+      </div>
+    </mat-tab>
+    <mat-tab>
+      <div class="form-fields">
+        <mat-radio-group class="licence-selection" [(ngModel)]="digitalEntity.licence">
+          <mat-radio-button *ngFor="let licence of availableLicences" [value]="licence.wikibase_item">
+            <img [src]="licence.src" [alt]="licence.title" />
+            <a [href]="licence.link" target="_blank" referrerpolicy="no-referrer" rel="noreferrer"
+              [title]="licence.link">{{ licence.description }}</a>
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+    </mat-tab>
+    <mat-tab>
+      <div class="form-fields">
+        <!-- Technique Search -->
+        <mat-form-field>
+          <mat-label>Add technique:</mat-label>
+          <input matInput type="text" name="technique" placeholder="Search for technique"
+            [formControl]="searchTechnique" [matAutocomplete]="techniqueAutocomplete" />
+          <mat-icon matSuffix>search</mat-icon>
+          <mat-autocomplete #techniqueAutocomplete="matAutocomplete" [displayWith]="displayWikibaseItemLabel"
+            (optionSelected)="selectTechnique($event)">
+            <mat-option *ngFor="let technique of filteredTechniques$ | async" [value]="technique">
+              <app-autocomplete-option [optionItem]="technique"></app-autocomplete-option>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <!-- Software Search -->
+        <mat-form-field>
+          <mat-label>Add software:</mat-label>
+          <input matInput type="text" name="technique" placeholder="Search for software" [formControl]="searchSoftware"
+            [matAutocomplete]="softwareAutocomplete" />
+          <mat-icon matSuffix>search</mat-icon>
+          <mat-autocomplete #softwareAutocomplete="matAutocomplete" [displayWith]="displayWikibaseItemLabel"
+            (optionSelected)="selectSoftware($event)">
+            <mat-option *ngFor="let software of filteredSoftware$ | async" [value]="software">
+              <app-autocomplete-option [optionItem]="software"></app-autocomplete-option>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <!-- Equipment Field -->
+        <mat-form-field>
+          <mat-label>Add equipment:</mat-label>
+          <input matInput type="text" name="equipment" placeholder="Enter equipment type or brand"
+            [(ngModel)]="customEquipment" />
+        </mat-form-field>
+        <!-- Creation Date Field -->
+        <mat-form-field>
+          <mat-label>Add creation date (format: yyyy-mm-dd):</mat-label>
+          <input matInput type="text" name="creationDate" placeholder="" pattern="\d\d\d\d[-]\d\d[-]\d\d"
+            [(ngModel)]="creationDate" />
+        </mat-form-field>
+        <button mat-flat-button color="primary"
+          [disabled]="selectedTechnique$.value === undefined && selectedSoftware$.value === undefined && customEquipment.length === 0 && !validCreationDate()"
+          (click)="addCreationData()">
+          Add
+        </button>
+
+        <hr class="result-separator" *ngIf="
+          digitalEntity.techniques.length != 0
+          || digitalEntity.software.length != 0
+          || digitalEntity.equipment.length != 0
+          || digitalEntity.creationDate !== undefined
+        " />
+
+
+        <ng-container *ngFor="let technique of digitalEntity.techniques">         
+          <div class="card spacer">
+            Technique: {{ technique.label['en'] }}
+            <div class="actions">
+              <button mat-icon-button color="warn" aria-label="Remove technique" (click)="removeTechnique(technique)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>     
+        </ng-container>
+        <ng-container *ngFor="let software of digitalEntity.software">
+          <div class="card spacer">
+            Software: {{ software.label['en'] }}
+            <div class="actions">
+              <button mat-icon-button color="warn" aria-label="Remove software" (click)="removeSoftware(software)">
+                <mat-icon>delete</mat-icon>
+              </button>
+             </div>
+          </div>    
+        </ng-container>
+        <ng-container *ngFor="let equipment of digitalEntity.equipment">
+          <div class="card spacer">
+            Equipment: {{ equipment }}
+            <div class="actions">
+              <button mat-icon-button color="warn" aria-label="Remove equipment" (click)="removeEquipment(equipment)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="digitalEntity.creationDate !== undefined">
+          <div class="card spacer">
+            Creation Date: {{ digitalEntity.creationDate }}
+            <div class="actions">
+              <button mat-icon-button color="warn" aria-label="Remove creation date" (click)="removeCreationDate()">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>   
+        </ng-container>
+      </div>
+
+    </mat-tab>
+    <mat-tab>
+      <div class="form-fields">
+        <mat-form-field>
+          <mat-label>Add external link:</mat-label>
+          <input 
+            matInput 
+            type="url" 
+            name="externalLink" 
+            placeholder="Enter or paste external link URL here"
+            [(ngModel)]="externalLink" 
+          />
+        </mat-form-field>
+        <mat-error *ngIf="validExternalLink() === false">
+          Please enter a valid URL. (e.g. https://example.com or http://example.com)
+        </mat-error>
+        <br>
+
+        <button mat-flat-button color="primary" [disabled]="externalLink.length === 0 || validExternalLink() === false" (click)="addExternalLink()">
+          Add
+        </button> 
+
+        <hr class="result-separator" *ngIf="digitalEntity.externalLinks.length > 0" />
+
+
+        <ng-container *ngFor="let link of digitalEntity.externalLinks">
+          <div class="card spacer">
+            {{ link }}
+
+            <div class="actions">
+              <button mat-icon-button color="warn" aria-label="Remove link" (click)="removeExternalLink(link)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+      </div>
+    </mat-tab>
+    <mat-tab>
+      <div class="form-fields">
+        <!-- BibRef Search -->
+        <mat-form-field>
+          <mat-label>Add bibliographic reference:</mat-label>
+          <input matInput type="text" name="bibref" placeholder="Search for Reference Title"
+            [formControl]="searchBibRef" [matAutocomplete]="bibRefAutocomplete" />
+          <mat-icon matSuffix>search</mat-icon>
+          <mat-autocomplete #bibRefAutocomplete="matAutocomplete" [displayWith]="displayWikibaseItemLabel"
+            (optionSelected)="selectBibRef($event)">
+            <mat-option *ngFor="let ref of filteredBibRefs$ | async" [value]="ref">
+              <app-autocomplete-option [optionItem]="ref"></app-autocomplete-option>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <button mat-flat-button color="primary" [disabled]="selectedBibRef$.value === undefined" (click)="addBibRef()">
+          Add
+        </button>
+
+        <hr class="result-separator" *ngIf="digitalEntity.bibliographicRefs.length > 0" />
+
+        <div class="">
+          <ng-container *ngFor="let ref of digitalEntity.bibliographicRefs">
+            <div class="card spacer">
+              {{ displayWikibaseItemLabel(ref) }}
+
+              <div class="actions">
+                <button mat-icon-button color="warn" aria-label="Remove reference" (click)="removeBibRef(ref)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </mat-tab>
+    <mat-tab>
+      <div class="form-fields">
+        <!-- PhyObjs Search -->
+        <mat-form-field>
+          <mat-label>Add physical object(s) this media item represents:</mat-label>
+          <input 
+            matInput type="text" 
+            name="bibref" 
+            placeholder="Search for object like a building, building part, painting or other" 
+            [formControl]="searchPhyObjs"
+            [matAutocomplete]="phyObjsAutocomplete" />
+          <mat-icon matSuffix>search</mat-icon>
+          <mat-autocomplete #phyObjsAutocomplete="matAutocomplete" [displayWith]="displayWikibaseItemLabel"
+            (optionSelected)="selectPhyObjs($event)">
+            <mat-option *ngFor="let obj of filteredPhyObjs$ | async" [value]="obj">
+              <app-autocomplete-option [optionItem]="obj"></app-autocomplete-option>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+        <button mat-flat-button color="primary" [disabled]="selectedPhyObj$.value === undefined" (click)="addPhyObj()">
+          Add
+        </button>
+
+        <hr class="result-separator" *ngIf="digitalEntity.physicalObjs.length > 0"/>
+
+        <div class="">
+          <ng-container *ngFor="let obj of digitalEntity.physicalObjs">
+            <div class="card spacer">
+              {{ displayWikibaseItemLabel(obj) }}
+
+              <div class="actions">
+                <button mat-icon-button color="warn" aria-label="Remove physical object" (click)="removePhyObj(obj)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</ng-container>

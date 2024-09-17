@@ -26,6 +26,7 @@ export class ExtenderSlotDirective {
   // User has to input the slot name, which will then be used to find the components for that slot
   extendSlot = input<string | undefined>();
   slotData = input<unknown>();
+  slotBehaviour = input<'append' | 'prepend' | 'replace'>();
   event = output<{
     componentName: string;
     plugin?: ExtenderAddonProviderPlugin;
@@ -61,7 +62,19 @@ export class ExtenderSlotDirective {
               event,
             });
           });
-          this.#elementRef.nativeElement.append(ref.location.nativeElement);
+
+          switch (this.slotBehaviour()) {
+            case 'prepend':
+              this.#elementRef.nativeElement.prepend(ref.location.nativeElement);
+              break;
+            case 'replace':
+              this.#elementRef.nativeElement.replaceChildren(ref.location.nativeElement);
+              break;
+            case 'append':
+            default:
+              this.#elementRef.nativeElement.append(ref.location.nativeElement);
+              break;
+          }
         }
       }
     });
