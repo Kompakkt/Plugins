@@ -73,7 +73,7 @@ export class ContentProviderService {
 
   public async updateContent() {
     // TODO: refetch on some occasions, e.g. after wizard completion
-    await Promise.all([
+    await Promise.allSettled([
       this.updateMetadataChoices(),
       // this.updateInstitutions(),
       this.updateTags(),

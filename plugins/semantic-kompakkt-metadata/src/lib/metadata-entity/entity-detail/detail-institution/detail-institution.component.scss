@@ -1,0 +1,23 @@
+@use '@angular/material' as mat;
+
+:host {
+  display: block;
+  line-height: 1;
+}
+
+h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.mat-chip[color='primary'] {
+  background: var(--brand-color);
+  color: white;
+  text-transform: capitalize;
+}
+
+.address {
+  span + span {
+    margin-left: 0.5rem;
+  }
+}

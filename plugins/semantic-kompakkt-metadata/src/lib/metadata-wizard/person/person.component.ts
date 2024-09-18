@@ -1,22 +1,37 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatFormField, MatLabel, MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent,
+} from '@angular/material/autocomplete';
+import { MatFormField, MatLabel, MatSelectChange, MatSelectModule } from '@angular/material/select';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 
-import { ContentProviderService } from '../../content-provider.service';
-import { MediaAgent, ContactReference, Institution } from '../metadata';
-import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
-import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { ContentProviderService } from '../../content-provider.service';
+import { ContactReference, Institution, MediaAgent } from '../metadata';
 
 @Component({
   selector: 'app-person',
   templateUrl: './person.component.html',
-  styleUrls: ['./person.component.scss'],
+  styleUrls: ['../../theme.scss','./person.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatExpansionModule, MatIconModule, MatFormField, MatLabel, MatSelectModule, MatAutocompleteModule]
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatExpansionModule,
+    MatIconModule,
+    MatFormField,
+    MatLabel,
+    MatSelectModule,
+    MatAutocompleteModule,
+    MatInputModule,
+  ],
 })
 export class PersonComponent implements OnChanges {
   @Input() public entityId!: string;
@@ -130,24 +145,20 @@ export class PersonComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     // const person = changes.person?.currentValue as Person | undefined;
     // if (person) {
-      // this.isExisting.next(person.title.trim().length > 0);
-
-      // Patch existing roles into role object
-      // for (const role of this.person.roles[this.entityId] ?? []) {
-      //   for (const roleOption of this.availableRoles) {
-      //     if (roleOption.type === role) roleOption.checked = true;
-      //   }
-      // }
-      // this.updateRoles();
-
-      // Patch existing addresses to address selection and input
-      // this.availableContacts.next(Person.getValidContactRefs(person));
-
-      // const mostRecentContact = Person.getMostRecentContactRef(person);
-      // this.person.setContactRef(mostRecentContact, this.entityId);
-      // this.selectedContact.next(mostRecentContact);
-
-      // Patch existing related institutions
+    // this.isExisting.next(person.title.trim().length > 0);
+    // Patch existing roles into role object
+    // for (const role of this.person.roles[this.entityId] ?? []) {
+    //   for (const roleOption of this.availableRoles) {
+    //     if (roleOption.type === role) roleOption.checked = true;
+    //   }
+    // }
+    // this.updateRoles();
+    // Patch existing addresses to address selection and input
+    // this.availableContacts.next(Person.getValidContactRefs(person));
+    // const mostRecentContact = Person.getMostRecentContactRef(person);
+    // this.person.setContactRef(mostRecentContact, this.entityId);
+    // this.selectedContact.next(mostRecentContact);
+    // Patch existing related institutions
     // }
   }
 }

@@ -1,0 +1,126 @@
+@use '@angular/material' as mat;
+
+// TODO(v15): As of v15 mat.legacy-core no longer includes default typography styles.
+//  The following line adds:
+//    1. Default typography styles for all components
+//    2. Styles for typography hierarchy classes (e.g. .mat-headline-1)
+//  If you specify typography styles for the components you use elsewhere, you should delete this line.
+//  If you don't need the default component typographies but still want the hierarchy styles,
+//  you can delete this line and instead use:
+//    `@include mat.legacy-typography-hierarchy(mat.define-typography-config());`
+@include mat.all-component-typographies();
+@include mat.core();
+
+$turquoise: (
+  50: #e0f5fc,
+  100: #b3e7f8,
+  200: #80d7f3,
+  300: #4dc7ee,
+  400: #26bbeb,
+  500: #00afe7,
+  600: #00a8e4,
+  700: #009fe0,
+  800: #0096dd,
+  900: #0086d7,
+  A100: #feffff,
+  A200: #cbe9ff,
+  A400: #98d3ff,
+  A700: #7fc8ff,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: white,
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: white,
+    A400: white,
+    A700: white,
+  ),
+);
+
+$kompakkt-primary: mat.m2-define-palette($turquoise);
+$kompakkt-accent: mat.m2-define-palette(mat.$m2-pink-palette, 500, 900, A100);
+$kompakkt-warn: mat.m2-define-palette(mat.$m2-deep-orange-palette);
+
+$kompakkt-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $kompakkt-primary,
+    accent: $kompakkt-accent,
+    warn: $kompakkt-accent,
+  ),
+  typography: mat.m2-define-typography-config(),
+  density: 0,
+));
+
+@include mat.all-component-themes($kompakkt-theme);
+
+
+.metadata-container {
+    min-height: 400px;
+  }
+  
+  
+  .metadata-nav {
+    width: 200px;
+  }
+  
+  mat-action-list .mat-list-item {
+    color : white;
+  }
+  
+  .mat-action-list .mat-focus-indicator:focus {
+    // background-color: white;
+  }
+  
+  .close-dialog-button{
+    position: absolute;
+  }
+  
+  .mat-list-base .metaActive {
+    //color: mat.get-color-from-palette($kompakkt-accent);
+  
+    background: rgba(0, 0, 0, 0.04);
+  }
+  
+  .mat-list-base .mat-list-item {
+    font-size: 14px;
+  }
+  
+  .sidenav-link {
+      margin-right: 5px;
+  }
+  
+  .mat-option {
+    font-size: 12px;
+    line-height: 32px;
+    height: 32px;
+  }
+  
+  .mat-checkbox + .mat-flat-button {
+    margin-top: 2em;
+  }
+  
+  
+  .mat-dialog-container{
+    height: 95vh;
+    overflow: unset;
+  }
+  
+  .error {
+    color: mat.m2-get-color-from-palette($kompakkt-accent);
+  }
+  
+  mat-spinner + span {
+    display: inline-block;
+  }
+  
+  mat-spinner {
+    display: inline-block;
+    margin-right: 10px;
+  }

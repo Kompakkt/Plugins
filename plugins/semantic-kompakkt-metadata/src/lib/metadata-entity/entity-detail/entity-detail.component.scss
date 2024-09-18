@@ -1,0 +1,21 @@
+@use '@angular/material' as mat;
+
+.block {
+  background: white;
+  padding: 1rem 0;
+
+  &:first-child {
+    padding: 2rem;
+  }
+
+  h1 {
+    color: var(--brand-color);
+    margin-top: 0;
+  }
+
+  .button-row {
+    .mat-flat-button {
+      box-shadow: none;
+    }
+  }
+}

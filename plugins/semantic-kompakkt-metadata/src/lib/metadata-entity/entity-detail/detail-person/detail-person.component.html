@@ -1,0 +1,24 @@
+<ng-container *ngIf="person$ | async as person">
+  <h3>{{ person.label['en'] }}</h3>
+
+  <!--
+  <ng-container *ngIf="contact$ | async as contact">
+    <p *ngIf="contact.mail">{{ contact.mail }}</p>
+    <p *ngIf="contact.note">{{ contact.note }}</p>
+    <p *ngIf="contact.phonenumber">{{ contact.phonenumber }}</p>
+  </ng-container>
+  -->
+
+  <!--
+  <mat-chip-list *ngIf="roles$ | async as roles">
+    <mat-chip color="primary" *ngFor="let role of roles">{{ role }}</mat-chip>
+  </mat-chip-list>
+
+  <div class="block" *ngIf="institutions$ | async as institutions">
+    <app-detail-institution
+      *ngFor="let institution of institutions"
+      [institution]="institution"
+    ></app-detail-institution>
+  </div>
+  -->
+</ng-container>

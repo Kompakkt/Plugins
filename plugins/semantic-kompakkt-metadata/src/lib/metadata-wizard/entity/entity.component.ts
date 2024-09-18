@@ -1,58 +1,76 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ViewEncapsulation } from '@angular/core';
-import { MatAutocomplete, MatAutocompleteModule, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  effect
+} from '@angular/core';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  MatAutocompleteModule,
+  MatAutocompleteSelectedEvent
+} from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
-import { MatTab, MatTabGroup } from '@angular/material/tabs';
-import { MatIcon } from '@angular/material/icon'
-import { MatRadioButton } from '@angular/material/radio'
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatRadioButton } from '@angular/material/radio';
+import { MatTab, MatTabGroup, MatTabsModule } from '@angular/material/tabs';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map, filter, startWith, withLatestFrom } from 'rxjs/operators';
+import { filter, map, startWith, withLatestFrom } from 'rxjs/operators';
 
+import { CommonModule } from '@angular/common';
+import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
+import { createExtenderComponent } from '@kompakkt/extender';
+import { IDigitalEntity, IMediaAgent, IWikibaseItem, isDigitalEntity } from '../../../common';
+import { AutocompleteOptionComponent } from '../../autocomplete/autocomplete-option.component';
 import { ContentProviderService } from '../../content-provider.service';
 import {
-  DigitalEntity,
-  PhysicalEntity,
-  DimensionTuple,
-  PlaceTuple,
   CreationTuple,
-  TypeValueTuple,
   DescriptionValueTuple,
-  Person,
-  Institution,
-  Tag,
+  DigitalEntity,
+  DimensionTuple,
   FileTuple,
-  WikibaseItem,
+  Institution,
   MediaAgent,
+  Person,
+  PhysicalEntity,
+  PlaceTuple,
+  Tag,
+  TypeValueTuple,
+  WikibaseItem,
 } from '../metadata';
-import { isDigitalEntity, IDigitalEntity, IWikibaseItem, IMediaAgent } from '../../../common';
-import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
-import { CommonModule } from '@angular/common';
-import { AutocompleteOptionComponent } from '../../autocomplete/autocomplete-option.component';
-import { createExtenderComponent } from '@kompakkt/extender';
 
 type AnyEntity = DigitalEntity | PhysicalEntity;
 
 @Component({
   selector: 'app-entity',
   templateUrl: './entity.component.html',
-  styleUrls: ['./entity.component.scss'],
+  styleUrls: ['../../theme.scss', './entity.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatAutocompleteModule, MatTab, MatTabGroup, MatFormField, MatLabel, MatError, MatIcon, MatRadioButton, AutocompleteOptionComponent]
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatAutocompleteModule,
+    MatSidenavModule,
+    MatTabsModule,
+    MatFormField,
+    MatListModule,
+    MatLabel,
+    MatError,
+    MatIcon,
+    MatRadioButton,
+    AutocompleteOptionComponent,
+    MatInputModule,
+  ],
 })
-export class EntityComponent extends createExtenderComponent() implements OnChanges  {
-  @Input('index')
-  public index: number = 1;
-  @Output() indexChange = new EventEmitter<number>();
-
-  @Input('digitalEntity')
-  public digitalEntity: DigitalEntity | undefined = undefined;
+export class EntityComponent extends createExtenderComponent() {
   // Just for the first steps ofimpelementing locales
-  public locales = [
-    'german',
-    'english'
-  ]
+  public locales = ['german', 'english'];
   private entitySubject = new BehaviorSubject<IDigitalEntity | undefined>(undefined);
 
   public availableLicences = [
@@ -156,23 +174,44 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
   public separatorKeysCodes: number[] = [ENTER, COMMA];
 
   public selectedRole: number | undefined = undefined;
-  public customEquipment: string = "";
-  public creationDate: string = "";
-  public externalLink: string = "";
+  public customEquipment: string = '';
+  public creationDate: string = '';
+  public externalLink: string = '';
+
+  public metaDataIndex = 0;
+  public errorOnFinish: any = undefined;
 
   public touchedElements = {
     title: false,
-    description: false
-  }
+    description: false,
+  };
 
   private anyRoleSelected = new BehaviorSubject(false);
 
   public availableRolesKompakkt = [
-    { type: 'RIGHTS_OWNER', value: 'Rightsowner', checked: false, wb_value: 328, is_required: true },
+    {
+      type: 'RIGHTS_OWNER',
+      value: 'Rightsowner',
+      checked: false,
+      wb_value: 328,
+      is_required: true,
+    },
     { type: 'CREATOR', value: 'Creator', checked: false, wb_value: 340, is_required: true },
     { type: 'EDITOR', value: 'Editor', checked: false, wb_value: 329, is_required: false },
-    { type: 'DATA_CREATOR', value: 'Data Creator', checked: false, wb_value: 341, is_required: false },
-    { type: 'CONTACT_PERSON', value: 'Contact Person', checked: false, wb_value: 342, is_required: false },
+    {
+      type: 'DATA_CREATOR',
+      value: 'Data Creator',
+      checked: false,
+      wb_value: 341,
+      is_required: false,
+    },
+    {
+      type: 'CONTACT_PERSON',
+      value: 'Contact Person',
+      checked: false,
+      wb_value: 342,
+      is_required: false,
+    },
   ];
 
   constructor(
@@ -180,8 +219,7 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
     public dialog: MatDialog,
   ) {
     super();
-    (window as any)['printEntity'] = () =>
-      console.log(this.entitySubject.value);
+    (window as any)['printEntity'] = () => console.log(this.entitySubject.value);
 
     this.content.$Persons.subscribe(persons => {
       this.availablePersons.next(persons.map(p => new WikibaseItem(p)));
@@ -217,7 +255,7 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
         if (value) {
           return this.availablePersons.value.filter(p =>
             (p.label['en'] + p.description).toLowerCase().includes(value.toLowerCase()),
-          )
+          );
         }
         return [];
       }),
@@ -228,7 +266,7 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
         if (value) {
           return this.availableTechniques.value.filter(t =>
             (t.label['en'] + t.description).toLowerCase().includes(value.toLowerCase()),
-          )
+          );
         }
         return [];
       }),
@@ -239,7 +277,7 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
         if (value) {
           return this.availableBibRefs.value.filter(r =>
             r.label['en'].toLowerCase().includes(value.toLowerCase()),
-          )
+          );
         }
         return [];
       }),
@@ -250,7 +288,7 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
         if (value) {
           return this.availablePhyObjs.value.filter(o =>
             o.label['en'].toLowerCase().includes(value.toLowerCase()),
-          )
+          );
         }
         return [];
       }),
@@ -261,7 +299,7 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
         if (value) {
           return this.availableSoftware.value.filter(s =>
             s.label['en'].toLowerCase().includes(value.toLowerCase()),
-          )
+          );
         }
         return [];
       }),
@@ -276,6 +314,12 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
           .filter(t => t.value.toLowerCase().includes(value)),
       ),
     );
+
+    effect(() => {
+      const slotData = this.slotData();
+      console.log('EntityComponent', slotData, isDigitalEntity(slotData));
+      this.entitySubject.next(isDigitalEntity(slotData) ? slotData : new DigitalEntity());
+    });
   }
 
   get roles$() {
@@ -294,19 +338,18 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
   }
 
   public displayPersonName(person: WikibaseItem): string {
-    if (person === undefined || person.label === undefined) return "";
-    return person.label['en'] || "";
+    if (person === undefined || person.label === undefined) return '';
+    return person.label['en'] || '';
   }
 
   public displayWikibaseItemLabel(item: IWikibaseItem): string {
-    if (item === undefined || item.label === undefined) return "";
-    return item.label['en'] || "";
+    if (item === undefined || item.label === undefined) return '';
+    return item.label['en'] || '';
   }
 
   public selectPerson(event: MatAutocompleteSelectedEvent) {
     const person = this.availablePersons.value.find(p => p.id === event.option.value.id);
-    if (!person)
-      return console.warn(`Could not find person`);
+    if (!person) return console.warn(`Could not find person`);
     this.selectedPerson$.next(person);
   }
 
@@ -319,15 +362,16 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
 
   public selectSoftware(event: MatAutocompleteSelectedEvent) {
     const software = this.availableSoftware.value.find(s => s.id === event.option.value.id);
-    if (!software)
-      return console.warn(`Could not find software with id ${event.option.value.id}`);
+    if (!software) return console.warn(`Could not find software with id ${event.option.value.id}`);
     this.selectedSoftware$.next(software);
   }
 
   public selectBibRef(event: MatAutocompleteSelectedEvent) {
     const ref = this.availableBibRefs.value.find(r => r.id === event.option.value.id);
     if (!ref)
-      return console.warn(`Could not find bibliographic reference with id ${event.option.value.id}`);
+      return console.warn(
+        `Could not find bibliographic reference with id ${event.option.value.id}`,
+      );
     this.selectedBibRef$.next(ref);
   }
 
@@ -356,12 +400,12 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
       }
     }
 
-    this.searchPerson.setValue("", { emitEvent: false });
+    this.searchPerson.setValue('', { emitEvent: false });
     this.selectedPerson$.next(undefined);
     this.selectedRole = undefined;
 
     //set availableRolesKompakkt to unchecked
-    this.availableRolesKompakkt.forEach(role => role.checked = false);
+    this.availableRolesKompakkt.forEach(role => (role.checked = false));
   }
 
   public removePerson(person: IMediaAgent) {
@@ -379,7 +423,7 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
 
   public validExternalLink() {
     const exp = /^([-+.a-z\d]+):/i;
-    const res = this.externalLink.match(exp)
+    const res = this.externalLink.match(exp);
     //res is a RegExpMatchArray or null
     return res !== null;
   }
@@ -390,7 +434,7 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
       // remove to prevent dupes
       this.removeTechnique(technique);
       (this.entitySubject.value as IDigitalEntity).techniques.push(technique);
-      this.searchTechnique.setValue("", { emitEvent: false });
+      this.searchTechnique.setValue('', { emitEvent: false });
       this.selectedTechnique$.next(undefined);
     }
 
@@ -399,7 +443,7 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
       // remove to prevent dupes
       this.removeSoftware(software);
       (this.entitySubject.value as IDigitalEntity).software.push(software);
-      this.searchSoftware.setValue("", { emitEvent: false });
+      this.searchSoftware.setValue('', { emitEvent: false });
       this.selectedSoftware$.next(undefined);
     }
 
@@ -408,14 +452,14 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
       // remove to prevent dupes
       this.removeEquipment(equip);
       this.entitySubject.value?.equipment.push(equip);
-      this.customEquipment = "";
+      this.customEquipment = '';
     }
 
     if (this.validCreationDate()) {
       if (this.entitySubject.value !== undefined) {
         this.entitySubject.value.creationDate = this.creationDate;
       }
-      this.creationDate = "";
+      this.creationDate = '';
     }
   }
 
@@ -425,7 +469,7 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
       this.entitySubject.value.externalLinks.push(this.externalLink);
     }
     console.log(this.entitySubject.value);
-    this.externalLink = "";
+    this.externalLink = '';
   }
 
   public addBibRef() {
@@ -434,7 +478,7 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
       // remove to prevent dupes
       this.removeBibRef(ref);
       this.entitySubject.value?.bibliographicRefs.push(ref);
-      this.searchBibRef.setValue("", { emitEvent: false });
+      this.searchBibRef.setValue('', { emitEvent: false });
       this.selectedBibRef$.next(undefined);
     }
   }
@@ -445,7 +489,7 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
       // remove to prevent dupes
       this.removePhyObj(obj);
       this.entitySubject.value?.physicalObjs.push(obj);
-      this.searchPhyObjs.setValue("", { emitEvent: false });
+      this.searchPhyObjs.setValue('', { emitEvent: false });
       this.selectedPhyObj$.next(undefined);
     }
   }
@@ -564,25 +608,24 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
   // Validation
 
   public validationRelatedAgentsWB(): boolean {
-    let result = this.digitalEntity?.checkValidRelatedAgents();
+    return false;
+    /* let result = this.digitalEntity()?.checkValidRelatedAgents();
     if (typeof result === 'undefined') {
       return false;
     }
 
-    return result;
-
+    return result; */
   }
 
-
-
   get generalInformationValid$() {
-    return this.digitalEntity$.pipe(map(entity => entity.label['en'] !== '' && entity.description !== ''));
+    return this.digitalEntity$.pipe(
+      map(entity => entity.label['en'] !== '' && entity.description !== ''),
+    );
   }
 
   get licenceValid$() {
     return this.digitalEntity$.pipe(map(digitalEntity => digitalEntity.licence));
   }
-
 
   get hasRightsOwner$() {
     return this.digitalEntity$.pipe(
@@ -722,6 +765,7 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
         input.click();
         return;
     }
+    return undefined;
   }
 
   public removeProperty(entity: AnyEntity, property: string, index: number) {
@@ -741,13 +785,5 @@ export class EntityComponent extends createExtenderComponent() implements OnChan
     } else {
       console.warn(`Could not remove ${property} at ${index} from ${entity}`);
     }
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    const digitalEntity = changes['digitalEntity']?.currentValue as
-      | DigitalEntity
-      | undefined;
-    if (digitalEntity) this.entitySubject.next(digitalEntity);
-
   }
 }

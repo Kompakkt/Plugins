@@ -1,6 +1,3 @@
-@use '@angular/material' as mat;
-@import 'src/theme.scss';
-
 mat-form-field {
   & + mat-form-field {
     margin-top: 1rem;
@@ -56,19 +53,21 @@ mat-form-field {
     border-radius: 0.5rem;
 
     transition: filter 250ms ease-in-out;
-    border: solid 0.1rem mat.get-color-from-palette($kompakkt-primary, 500);
+    border: solid 0.1rem var(--brand-color, #00afe7);
     &:before {
       content: 'Please fill out all required fields';
       color: transparent;
-      transition: color 250ms ease-in-out, height 250ms ease-in-out;
+      transition:
+        color 250ms ease-in-out,
+        height 250ms ease-in-out;
       padding-bottom: 0.5rem;
       height: 0rem;
       text-align: center;
     }
     &.invalid {
-      border: solid 0.1rem mat.get-color-from-palette($kompakkt-accent, 500);
+      border: solid 0.1rem var(--color-accent, #cdcdcd);
       &:before {
-        color: mat.get-color-from-palette($kompakkt-accent, 500);
+        color: var(--color-accent, #cdcdcd);
         height: 1rem;
       }
     }
@@ -97,6 +96,12 @@ mat-form-field {
 ::ng-deep {
   .mat-chip-list-wrapper {
     margin-bottom: 0.5rem;
+  }
+
+  .mat-mdc-action-list .mat-mdc-list-item-unscoped-content {
+    display: grid;
+    align-items: center;
+    grid-template-columns: auto 1fr;
   }
 
   .mat-expansion-panel {
@@ -149,7 +154,7 @@ mat-form-field {
     border-bottom: solid 0.2rem transparent;
     transition: all 250ms !important;
     &.mat-expanded {
-      border-color: mat.get-color-from-palette($kompakkt-primary, 500);
+      border-color: var(--brand-color, #00afe7);
       .mat-expansion-panel-header-title {
         .mat-icon-button {
           pointer-events: all;
@@ -159,7 +164,7 @@ mat-form-field {
     }
   }
   &.invalid > .mat-expansion-panel-header.mat-expanded {
-    border-color: mat.get-color-from-palette($kompakkt-accent, 500);
+    border-color: var(--color-accent, #cdcdcd);
   }
 
   .licence-selection {
@@ -180,7 +185,7 @@ mat-form-field {
     }
   }
 
-  .header-less-tabs.mat-tab-group .mat-tab-header {
+  .header-less-tabs.mat-mdc-tab-group .mat-mdc-tab-header {
     display: none;
   }
 
@@ -231,13 +236,12 @@ mat-form-field {
 }
 
 .invalid {
-  color: mat.get-color-from-palette($kompakkt-warn);;
+  color: var(--color-warn, #ff8484);
 }
 
 .mt-2em {
   margin-top: 2em;
 }
-
 
 .not-touched {
   filter: grayscale(1) opacity(0.75);
@@ -245,14 +249,13 @@ mat-form-field {
 
 div.card {
   padding: 0.75rem 1rem;
-
 }
 
-div.card::before{
+div.card::before {
   padding-bottom: unset;
 }
 
-div.card .actions{
+div.card .actions {
   transform: translateX(10%) translateY(-15%);
 }
 
@@ -272,5 +275,5 @@ div.card .actions{
   vertical-align: middle;
 }
 .warning {
-  color: mat.get-color-from-palette($kompakkt-warn);
+  color: var(--color-warn, #ff8484);
 }

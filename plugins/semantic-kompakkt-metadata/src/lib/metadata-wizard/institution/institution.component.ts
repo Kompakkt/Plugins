@@ -1,19 +1,37 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { MatFormField, MatLabel, MatSelect, MatSelectChange, MatSelectModule } from '@angular/material/select';
-import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
-import { MatIcon } from '@angular/material/icon'
-import { BehaviorSubject } from 'rxjs';
-import { Institution, Address } from '../metadata';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
+import { MatIcon } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import {
+  MatFormField,
+  MatLabel,
+  MatSelectChange,
+  MatSelectModule
+} from '@angular/material/select';
+import { BehaviorSubject } from 'rxjs';
 import { AddressComponent } from '../address/address.component';
+import { Address, Institution } from '../metadata';
 
 @Component({
   selector: 'app-institution',
   templateUrl: './institution.component.html',
-  styleUrls: ['./institution.component.scss'],
+  styleUrls: ['../../theme.scss','./institution.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, MatFormField, MatLabel, MatSelectModule, MatAccordion, MatExpansionModule, MatIcon, AddressComponent]
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatSelectModule,
+    MatAccordion,
+    MatExpansionModule,
+    MatIcon,
+    AddressComponent,
+    MatInputModule,
+  ],
 })
 export class InstitutionComponent implements OnChanges {
   @Input() public entityId!: string;

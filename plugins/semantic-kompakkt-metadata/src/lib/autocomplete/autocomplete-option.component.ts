@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-autocomplete-option',
   templateUrl: './autocomplete-option.component.html',
-  styleUrls: ['./autocomplete-option.component.scss'],
+  styleUrls: ['../theme.scss', './autocomplete-option.component.scss'],
   standalone: true,
   imports: [CommonModule],
 })
