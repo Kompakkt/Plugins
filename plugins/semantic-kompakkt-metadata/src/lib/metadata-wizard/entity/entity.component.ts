@@ -1,33 +1,32 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  effect
-} from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, inject } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   MatAutocompleteModule,
-  MatAutocompleteSelectedEvent
+  MatAutocompleteSelectedEvent,
 } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
-import { MatIcon } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatRadioButton } from '@angular/material/radio';
-import { MatTab, MatTabGroup, MatTabsModule } from '@angular/material/tabs';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { filter, map, startWith, withLatestFrom } from 'rxjs/operators';
+import { MatRadioButton, MatRadioChange, MatRadioModule } from '@angular/material/radio';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatTabsModule } from '@angular/material/tabs';
+import { BehaviorSubject, combineLatest, firstValueFrom, interval } from 'rxjs';
+import { combineLatestWith, filter, map, startWith, switchMap, tap } from 'rxjs/operators';
 
 import { CommonModule } from '@angular/common';
-import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatError, MatFormField, MatFormFieldModule, MatLabel } from '@angular/material/form-field';
 import { createExtenderComponent } from '@kompakkt/extender';
-import { IDigitalEntity, IMediaAgent, IWikibaseItem, isDigitalEntity } from '../../../common';
+import { isDigitalEntity, isPhysicalEntity } from '../../../common';
+import { IMediaAgent, IWikibaseItem } from '../../../common/wikibase.common';
 import { AutocompleteOptionComponent } from '../../autocomplete/autocomplete-option.component';
 import { ContentProviderService } from '../../content-provider.service';
+import { getLabel, GetLabelPipe } from '../../get-label.pipe';
 import {
   CreationTuple,
   DescriptionValueTuple,
@@ -36,6 +35,7 @@ import {
   FileTuple,
   Institution,
   MediaAgent,
+  mergeExistingEntityWikibaseExtension,
   Person,
   PhysicalEntity,
   PlaceTuple,
@@ -55,23 +55,53 @@ type AnyEntity = DigitalEntity | PhysicalEntity;
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    MatButtonModule,
+    MatCheckboxModule,
     MatAutocompleteModule,
     MatSidenavModule,
     MatTabsModule,
-    MatFormField,
+    MatFormFieldModule,
     MatListModule,
     MatLabel,
     MatError,
-    MatIcon,
-    MatRadioButton,
+    MatIconModule,
+    MatRadioModule,
     AutocompleteOptionComponent,
     MatInputModule,
+    GetLabelPipe,
   ],
 })
 export class EntityComponent extends createExtenderComponent() {
+  #content = inject(ContentProviderService);
+  dialog = inject(MatDialog);
+
   // Just for the first steps ofimpelementing locales
   public locales = ['german', 'english'];
-  private entitySubject = new BehaviorSubject<IDigitalEntity | undefined>(undefined);
+  entity = computed(() => {
+    const slotData = this.slotData();
+    console.log('EntityComponent', slotData, isDigitalEntity(slotData), isPhysicalEntity(slotData));
+    const entity = isDigitalEntity(slotData)
+      ? mergeExistingEntityWikibaseExtension(slotData as DigitalEntity)
+      : isPhysicalEntity(slotData)
+        ? mergeExistingEntityWikibaseExtension(slotData as PhysicalEntity)
+        : new DigitalEntity();
+    return entity;
+    /*const proxy = new Proxy(entity, {
+      set: (target, prop, value) => {
+        return Reflect.set(target, prop, value);
+      },
+      get: (target, prop) => {
+        this.event.emit(new CustomEvent('entity-changed', { detail: target }));
+        return Reflect.get(target, prop);
+      },
+    });
+    return proxy;*/
+  });
+  entity$ = toObservable(this.entity);
+  digitalEntity$ = this.entity$.pipe(filter(entity => isDigitalEntity(entity)));
+  physicalEntity$ = this.entity$.pipe(filter(entity => isPhysicalEntity(entity)));
+
+  emitEntityInterval = interval(500).pipe(switchMap(() => this.entity$));
 
   public availableLicences = [
     {
@@ -134,6 +164,7 @@ export class EntityComponent extends createExtenderComponent() {
   ];
 
   // Public for validation
+  public DigitalEntity = DigitalEntity;
   public PhysicalEntity = PhysicalEntity;
   public DimensionTuple = DimensionTuple;
   public PlaceTuple = PlaceTuple;
@@ -146,193 +177,219 @@ export class EntityComponent extends createExtenderComponent() {
   public Tag = Tag;
   public FileTuple = FileTuple;
 
+  // Search FormControls
+  public searchPerson = new FormControl<string | WikibaseItem | null>('');
+  public searchTechnique = new FormControl<string | WikibaseItem | null>('');
+  public searchBibRef = new FormControl<string | WikibaseItem | null>('');
+  public searchPhyObjs = new FormControl<string | WikibaseItem | null>('');
+  public searchSoftware = new FormControl<string | WikibaseItem | null>('');
+  public searchTag = new FormControl<string | WikibaseItem | null>('');
+
   // Autocomplete Inputs
-  public availablePersons = new BehaviorSubject<WikibaseItem[]>([]);
-  public availableTechniques = new BehaviorSubject<WikibaseItem[]>([]);
-  public availableSoftware = new BehaviorSubject<WikibaseItem[]>([]);
-  public availableTags = new BehaviorSubject<Tag[]>([]);
-  public availableRoles = new BehaviorSubject<WikibaseItem[]>([]);
-  public availableBibRefs = new BehaviorSubject<WikibaseItem[]>([]);
-  public availablePhyObjs = new BehaviorSubject<WikibaseItem[]>([]);
-  public searchPerson = new FormControl('');
-  public searchTechnique = new FormControl('');
-  public searchBibRef = new FormControl('');
-  public searchPhyObjs = new FormControl('');
-  public searchSoftware = new FormControl('');
-  public searchTag = new FormControl('');
-  public filteredPersons$: Observable<WikibaseItem[]>;
-  public filteredTechniques$: Observable<WikibaseItem[]>;
-  public filteredSoftware$: Observable<WikibaseItem[]>;
-  public filteredBibRefs$: Observable<WikibaseItem[]>;
-  public filteredPhyObjs$: Observable<WikibaseItem[]>;
+  public availablePersons$ = this.#content.$Persons.pipe(
+    map(persons => persons.map(p => new WikibaseItem(p))),
+  );
+  public availableTechniques$ = this.#content.$Techniques.pipe(
+    map(techniques => techniques.map(t => new WikibaseItem(t))),
+  );
+  public availableSoftware$ = this.#content.$Software.pipe(
+    map(software => software.map(s => new WikibaseItem(s))),
+  );
+  public availableTags$ = this.#content.$Tags.pipe(map(tags => tags.map(t => new Tag(t))));
+  public availableRoles$ = this.#content.$Roles.pipe(
+    map(roles => roles.map(r => new WikibaseItem(r))),
+  );
+  public availableBibRefs$ = this.#content.$BibRefs.pipe(
+    map(ref => ref.map(r => new WikibaseItem(r))),
+  );
+  public availablePhyObjs$ = this.#content.$PhysicalObjects.pipe(
+    map(obj => obj.map(r => new WikibaseItem(r))),
+  );
+
+  public filteredPersons$ = this.searchPerson.valueChanges.pipe(
+    filter((v): v is string => typeof v === 'string' || v instanceof String),
+    startWith(''),
+    map(v => v?.toLowerCase()),
+    combineLatestWith(this.availablePersons$),
+    map(([value, persons]) => {
+      if (!value) return persons;
+      return persons.filter(p => (p.label['en'] + p.description).toLowerCase().includes(value));
+    }),
+  );
+  public filteredTechniques$ = this.searchTechnique.valueChanges.pipe(
+    filter((v): v is string => typeof v === 'string' || v instanceof String),
+    startWith(''),
+    map(v => v?.toLowerCase()),
+    combineLatestWith(this.availableTechniques$),
+    map(([value, techniques]) => {
+      if (!value) return techniques;
+      return techniques.filter(t => (t.label['en'] + t.description).toLowerCase().includes(value));
+    }),
+  );
+  public filteredSoftware$ = this.searchSoftware.valueChanges.pipe(
+    filter((v): v is string => typeof v === 'string' || v instanceof String),
+    startWith(''),
+    map(v => v?.toLowerCase()),
+    combineLatestWith(this.availableSoftware$),
+    map(([value, software]) => {
+      if (!value) return software;
+      return software.filter(s => s.label['en'].toLowerCase().includes(value));
+    }),
+  );
+  public filteredBibRefs$ = this.searchBibRef.valueChanges.pipe(
+    filter((v): v is string => typeof v === 'string' || v instanceof String),
+    startWith(''),
+    map(v => v?.toLowerCase()),
+    combineLatestWith(this.availableBibRefs$),
+    map(([value, bibrefs]) => {
+      if (!value) return bibrefs;
+      return bibrefs.filter(r => r.label['en'].toLowerCase().includes(value));
+    }),
+  );
+  public filteredPhyObjs$ = this.searchPhyObjs.valueChanges.pipe(
+    filter((v): v is string => typeof v === 'string' || v instanceof String),
+    startWith(''),
+    map(v => v?.toLowerCase()),
+    combineLatestWith(this.availablePhyObjs$),
+    map(([value, phyobjs]) => {
+      if (!value) return phyobjs;
+      return phyobjs.filter(o => o.label['en'].toLowerCase().includes(value));
+    }),
+  );
+  public filteredTags$ = this.searchTag.valueChanges.pipe(
+    filter((v): v is string => typeof v === 'string' || v instanceof String),
+    startWith(''),
+    map(v => v?.toLowerCase()),
+    combineLatestWith(this.digitalEntity$, this.availableTags$),
+    map(([value, digitalEntity, availableTags]) =>
+      availableTags
+        .filter(t => !digitalEntity.tags.find(tt => tt.value === t.value))
+        .filter(t => t.value.toLowerCase().includes(value)),
+    ),
+  );
   public selectedPerson$ = new BehaviorSubject<WikibaseItem | undefined>(undefined);
   public selectedTechnique$ = new BehaviorSubject<WikibaseItem | undefined>(undefined);
   public selectedSoftware$ = new BehaviorSubject<WikibaseItem | undefined>(undefined);
   public selectedBibRef$ = new BehaviorSubject<WikibaseItem | undefined>(undefined);
   public selectedPhyObj$ = new BehaviorSubject<WikibaseItem | undefined>(undefined);
-  public filteredTags$: Observable<Tag[]>;
+
   public separatorKeysCodes: number[] = [ENTER, COMMA];
 
+  public title = new FormControl<string>('', {
+    nonNullable: true,
+    validators: [Validators.minLength(1), Validators.required],
+  });
+  public description = new FormControl<string>('', {
+    nonNullable: true,
+    validators: [Validators.minLength(1), Validators.required],
+  });
   public selectedRole: number | undefined = undefined;
-  public customEquipment: string = '';
-  public creationDate: string = '';
-  public externalLink: string = '';
+  public customEquipment = new FormControl<string>('', {
+    nonNullable: true,
+  });
+  public creationDate = new FormControl<string>('', {
+    nonNullable: true,
+    validators: [Validators.pattern(/[0-9]{4}-[0-9]{2}-[0-9]{2}/)],
+  });
+  public externalLink = new FormControl<string>('', {
+    nonNullable: true,
+    validators: [
+      control => {
+        try {
+          new URL(control.value);
+          return null;
+        } catch (_) {
+          return { invalidUrl: true };
+        }
+      },
+    ],
+  });
 
   public metaDataIndex = 0;
   public errorOnFinish: any = undefined;
-
-  public touchedElements = {
-    title: false,
-    description: false,
-  };
-
-  private anyRoleSelected = new BehaviorSubject(false);
 
   public availableRolesKompakkt = [
     {
       type: 'RIGHTS_OWNER',
       value: 'Rightsowner',
-      checked: false,
+      checked: new FormControl<boolean>(false, { nonNullable: true }),
       wb_value: 328,
       is_required: true,
     },
-    { type: 'CREATOR', value: 'Creator', checked: false, wb_value: 340, is_required: true },
-    { type: 'EDITOR', value: 'Editor', checked: false, wb_value: 329, is_required: false },
+    {
+      type: 'CREATOR',
+      value: 'Creator',
+      checked: new FormControl<boolean>(false, { nonNullable: true }),
+      wb_value: 340,
+      is_required: true,
+    },
+    {
+      type: 'EDITOR',
+      value: 'Editor',
+      checked: new FormControl<boolean>(false, { nonNullable: true }),
+      wb_value: 329,
+      is_required: false,
+    },
     {
       type: 'DATA_CREATOR',
       value: 'Data Creator',
-      checked: false,
+      checked: new FormControl<boolean>(false, { nonNullable: true }),
       wb_value: 341,
       is_required: false,
     },
     {
       type: 'CONTACT_PERSON',
       value: 'Contact Person',
-      checked: false,
+      checked: new FormControl<boolean>(false, { nonNullable: true }),
       wb_value: 342,
       is_required: false,
     },
   ];
 
-  constructor(
-    public content: ContentProviderService,
-    public dialog: MatDialog,
-  ) {
+  public override async getSlotOutput() {
+    return this.entity();
+  }
+
+  constructor() {
     super();
-    (window as any)['printEntity'] = () => console.log(this.entitySubject.value);
+    (window as any)['printEntity'] = () => console.log(this.entity());
 
-    this.content.$Persons.subscribe(persons => {
-      this.availablePersons.next(persons.map(p => new WikibaseItem(p)));
+    const subscription = this.emitEntityInterval.subscribe(entity => {
+      try {
+        const customEvent = new CustomEvent('entity-changed', {
+          detail: {
+            entity,
+            isValid: entity.isDigital
+              ? DigitalEntity.checkIsValid(entity as DigitalEntity)
+              : PhysicalEntity.checkIsValid(entity as PhysicalEntity),
+          },
+        });
+        this.event.emit(customEvent);
+      } catch (error) {
+        console.warn('Could not emit. Unsubscribing');
+        subscription.unsubscribe();
+      }
     });
 
-    this.content.$Techniques.subscribe(techniques => {
-      this.availableTechniques.next(techniques.map(t => new WikibaseItem(t)));
+    combineLatest({
+      entity: this.entity$,
+      title: this.title.valueChanges,
+      description: this.description.valueChanges,
+    }).subscribe(args => {
+      if (!args.entity) return;
+      console.log(args);
+      args.entity.title = args.title;
+      args.entity.description = args.description;
+      args.entity.extensions.wikibase.description = { en: args.description };
+      args.entity.extensions.wikibase.label = { en: args.title };
     });
-
-    this.content.$Software.subscribe(software => {
-      this.availableSoftware.next(software.map(s => new WikibaseItem(s)));
-    });
-
-    this.content.$Tags.subscribe(tags => {
-      this.availableTags.next(tags.map(t => new Tag(t)));
-    });
-
-    this.content.$Roles.subscribe(roles => {
-      this.availableRoles.next(roles.map(r => new WikibaseItem(r)));
-    });
-
-    this.content.$BibRefs.subscribe(ref => {
-      this.availableBibRefs.next(ref.map(r => new WikibaseItem(r)));
-    });
-
-    this.content.$PhysicalObjects.subscribe(obj => {
-      this.availablePhyObjs.next(obj.map(o => new WikibaseItem(o)));
-    });
-
-    this.filteredPersons$ = this.searchPerson.valueChanges.pipe(
-      startWith(''),
-      map(value => {
-        if (value) {
-          return this.availablePersons.value.filter(p =>
-            (p.label['en'] + p.description).toLowerCase().includes(value.toLowerCase()),
-          );
-        }
-        return [];
-      }),
-    );
-    this.filteredTechniques$ = this.searchTechnique.valueChanges.pipe(
-      startWith(''),
-      map(value => {
-        if (value) {
-          return this.availableTechniques.value.filter(t =>
-            (t.label['en'] + t.description).toLowerCase().includes(value.toLowerCase()),
-          );
-        }
-        return [];
-      }),
-    );
-    this.filteredBibRefs$ = this.searchBibRef.valueChanges.pipe(
-      startWith(''),
-      map(value => {
-        if (value) {
-          return this.availableBibRefs.value.filter(r =>
-            r.label['en'].toLowerCase().includes(value.toLowerCase()),
-          );
-        }
-        return [];
-      }),
-    );
-    this.filteredPhyObjs$ = this.searchPhyObjs.valueChanges.pipe(
-      startWith(''),
-      map(value => {
-        if (value) {
-          return this.availablePhyObjs.value.filter(o =>
-            o.label['en'].toLowerCase().includes(value.toLowerCase()),
-          );
-        }
-        return [];
-      }),
-    );
-    this.filteredSoftware$ = this.searchSoftware.valueChanges.pipe(
-      startWith(''),
-      map(value => {
-        if (value) {
-          return this.availableSoftware.value.filter(s =>
-            s.label['en'].toLowerCase().includes(value.toLowerCase()),
-          );
-        }
-        return [];
-      }),
-    );
-    this.filteredTags$ = this.searchTag.valueChanges.pipe(
-      startWith(''),
-      map(value => (value as string).toLowerCase()),
-      withLatestFrom(this.digitalEntity$),
-      map(([value, digitalEntity]) =>
-        this.availableTags.value
-          .filter(t => !digitalEntity.tags.find(tt => tt.value === t.value))
-          .filter(t => t.value.toLowerCase().includes(value)),
-      ),
-    );
-
-    effect(() => {
-      const slotData = this.slotData();
-      console.log('EntityComponent', slotData, isDigitalEntity(slotData));
-      this.entitySubject.next(isDigitalEntity(slotData) ? slotData : new DigitalEntity());
-    });
-  }
-
-  get roles$() {
-    return this.availableRoles.asObservable();
-  }
-
-  public setTouched(element: keyof typeof this.touchedElements) {
-    this.touchedElements[element] = true;
   }
 
   public async selectTag(event: MatAutocompleteSelectedEvent, digitalEntity: DigitalEntity) {
     const tagId = event.option.value;
-    const tag = this.availableTags.value.find(t => t._id === tagId);
+    const tag = await firstValueFrom(this.availableTags$).then(tags =>
+      tags.find(t => t._id === tagId),
+    );
     if (!tag) return console.warn(`Could not tag with id ${tagId}`);
     digitalEntity.addTag(tag);
   }
@@ -344,30 +401,38 @@ export class EntityComponent extends createExtenderComponent() {
 
   public displayWikibaseItemLabel(item: IWikibaseItem): string {
     if (item === undefined || item.label === undefined) return '';
-    return item.label['en'] || '';
+    return getLabel(item);
   }
 
-  public selectPerson(event: MatAutocompleteSelectedEvent) {
-    const person = this.availablePersons.value.find(p => p.id === event.option.value.id);
+  public async selectPerson(event: MatAutocompleteSelectedEvent) {
+    const person = await firstValueFrom(this.availablePersons$).then(arr =>
+      arr.find(p => p.id === event.option.value.id),
+    );
     if (!person) return console.warn(`Could not find person`);
     this.selectedPerson$.next(person);
   }
 
-  public selectTechnique(event: MatAutocompleteSelectedEvent) {
-    const technique = this.availableTechniques.value.find(t => t.id === event.option.value.id);
+  public async selectTechnique(event: MatAutocompleteSelectedEvent) {
+    const technique = await firstValueFrom(this.availableTechniques$).then(arr =>
+      arr.find(t => t.id === event.option.value.id),
+    );
     if (!technique)
       return console.warn(`Could not find technique with id ${event.option.value.id}`);
     this.selectedTechnique$.next(technique);
   }
 
-  public selectSoftware(event: MatAutocompleteSelectedEvent) {
-    const software = this.availableSoftware.value.find(s => s.id === event.option.value.id);
+  public async selectSoftware(event: MatAutocompleteSelectedEvent) {
+    const software = await firstValueFrom(this.availableSoftware$).then(arr =>
+      arr.find(s => s.id === event.option.value.id),
+    );
     if (!software) return console.warn(`Could not find software with id ${event.option.value.id}`);
     this.selectedSoftware$.next(software);
   }
 
-  public selectBibRef(event: MatAutocompleteSelectedEvent) {
-    const ref = this.availableBibRefs.value.find(r => r.id === event.option.value.id);
+  public async selectBibRef(event: MatAutocompleteSelectedEvent) {
+    const ref = await firstValueFrom(this.availableBibRefs$).then(arr =>
+      arr.find(r => r.id === event.option.value.id),
+    );
     if (!ref)
       return console.warn(
         `Could not find bibliographic reference with id ${event.option.value.id}`,
@@ -375,8 +440,10 @@ export class EntityComponent extends createExtenderComponent() {
     this.selectedBibRef$.next(ref);
   }
 
-  public selectPhyObjs(event: MatAutocompleteSelectedEvent) {
-    const obj = this.availablePhyObjs.value.find(o => o.id === event.option.value.id);
+  public async selectPhyObjs(event: MatAutocompleteSelectedEvent) {
+    const obj = await firstValueFrom(this.availablePhyObjs$).then(arr =>
+      arr.find(o => o.id === event.option.value.id),
+    );
     if (!obj)
       return console.warn(`Could not find physical object with id ${event.option.value.id}`);
     this.selectedPhyObj$.next(obj);
@@ -389,15 +456,13 @@ export class EntityComponent extends createExtenderComponent() {
       return;
     }
 
-    for (const role of this.availableRolesKompakkt.filter(role => role.checked)) {
+    for (const role of this.availableRolesKompakkt.filter(role => role.checked.value)) {
       const copy = { ...person };
       copy.role = Number(role.wb_value);
       copy.roleTitle = role.value;
       // remove if already present in the list with this role
       this.removePerson(copy);
-      if (this.entitySubject.value !== undefined) {
-        (this.entitySubject.value as IDigitalEntity).agents.push(copy);
-      }
+      this.entity().extensions.wikibase?.agents?.push(copy);
     }
 
     this.searchPerson.setValue('', { emitEvent: false });
@@ -405,35 +470,39 @@ export class EntityComponent extends createExtenderComponent() {
     this.selectedRole = undefined;
 
     //set availableRolesKompakkt to unchecked
-    this.availableRolesKompakkt.forEach(role => (role.checked = false));
+    this.availableRolesKompakkt.forEach(role => role.checked.reset());
   }
 
   public removePerson(person: IMediaAgent) {
     const { id, role } = person;
-    const idx = this.entitySubject.value?.agents.findIndex(p => p.id === id && p.role === role);
+    const idx = this.entity().extensions?.wikibase?.agents?.findIndex(
+      p => p.id === id && p.role === role,
+    );
     if (idx !== undefined && idx >= 0) {
-      this.entitySubject.value?.agents.splice(idx, 1);
+      this.entity().extensions?.wikibase?.agents?.splice(idx, 1);
     }
   }
 
-  public validCreationDate() {
-    const exp = /\d\d\d\d-\d\d-\d\d/;
-    return this.creationDate.match(exp);
-  }
-
-  public validExternalLink() {
-    const exp = /^([-+.a-z\d]+):/i;
-    const res = this.externalLink.match(exp);
-    //res is a RegExpMatchArray or null
-    return res !== null;
-  }
+  canSaveCreationData$ = combineLatest([
+    this.selectedTechnique$,
+    this.selectedSoftware$,
+    this.customEquipment.valueChanges,
+    this.creationDate.valueChanges,
+  ]).pipe(map(arr => arr.some(v => !!v)));
+  disableSaveCreationData$ = this.canSaveCreationData$.pipe(map(v => !v));
+  hasAnyCreationData$ = this.digitalEntity$.pipe(
+    map(digitalEntity => {
+      const { techniques, software, equipment, creationDate } = digitalEntity.extensions.wikibase;
+      return [techniques, software, equipment, creationDate].some(v => v && v.length > 0);
+    }),
+  );
 
   public addCreationData() {
     const technique = this.selectedTechnique$.value;
     if (technique !== undefined) {
       // remove to prevent dupes
       this.removeTechnique(technique);
-      (this.entitySubject.value as IDigitalEntity).techniques.push(technique);
+      this.entity().extensions?.wikibase?.techniques?.push(technique);
       this.searchTechnique.setValue('', { emitEvent: false });
       this.selectedTechnique$.next(undefined);
     }
@@ -442,34 +511,32 @@ export class EntityComponent extends createExtenderComponent() {
     if (software !== undefined) {
       // remove to prevent dupes
       this.removeSoftware(software);
-      (this.entitySubject.value as IDigitalEntity).software.push(software);
+      this.entity().extensions?.wikibase?.software?.push(software);
       this.searchSoftware.setValue('', { emitEvent: false });
       this.selectedSoftware$.next(undefined);
     }
 
     const equip = this.customEquipment;
-    if (equip.length > 0) {
+    if (equip.value.length > 0) {
       // remove to prevent dupes
-      this.removeEquipment(equip);
-      this.entitySubject.value?.equipment.push(equip);
-      this.customEquipment = '';
+      /* this.removeEquipment(equip);
+      this.entity().extensions?.wikibase?.equipment?.push(equip); */
+      this.customEquipment.reset();
     }
 
-    if (this.validCreationDate()) {
-      if (this.entitySubject.value !== undefined) {
-        this.entitySubject.value.creationDate = this.creationDate;
+    if (this.creationDate.valid) {
+      if (this.entity().extensions?.wikibase) {
+        this.entity().extensions.wikibase!.creationDate = this.creationDate.value;
       }
-      this.creationDate = '';
+      this.creationDate.reset();
     }
   }
 
   public addExternalLink() {
-    this.removeExternalLink(this.externalLink);
-    if (this.entitySubject.value !== undefined) {
-      this.entitySubject.value.externalLinks.push(this.externalLink);
-    }
-    console.log(this.entitySubject.value);
-    this.externalLink = '';
+    this.removeExternalLink(this.externalLink.value);
+    this.entity().extensions?.wikibase?.externalLinks?.push(this.externalLink.value);
+    console.log(this.entity());
+    this.externalLink.reset();
   }
 
   public addBibRef() {
@@ -477,7 +544,7 @@ export class EntityComponent extends createExtenderComponent() {
     if (ref !== undefined) {
       // remove to prevent dupes
       this.removeBibRef(ref);
-      this.entitySubject.value?.bibliographicRefs.push(ref);
+      this.entity().extensions?.wikibase?.bibliographicRefs?.push(ref);
       this.searchBibRef.setValue('', { emitEvent: false });
       this.selectedBibRef$.next(undefined);
     }
@@ -488,58 +555,73 @@ export class EntityComponent extends createExtenderComponent() {
     if (obj !== undefined) {
       // remove to prevent dupes
       this.removePhyObj(obj);
-      this.entitySubject.value?.physicalObjs.push(obj);
+      this.entity().extensions?.wikibase?.physicalObjs?.push(obj);
       this.searchPhyObjs.setValue('', { emitEvent: false });
       this.selectedPhyObj$.next(undefined);
     }
   }
 
   public removeTechnique(technique: IWikibaseItem) {
-    const idx = this.entitySubject.value?.techniques.findIndex(p => p.id === technique.id);
+    const idx = this.entity().extensions?.wikibase?.techniques?.findIndex(
+      p => p.id === technique.id,
+    );
     if (idx !== undefined && idx >= 0) {
-      this.entitySubject.value?.techniques.splice(idx, 1);
+      this.entity().extensions?.wikibase?.techniques?.splice(idx, 1);
     }
   }
 
   public removeSoftware(software: IWikibaseItem) {
-    const idx = this.entitySubject.value?.software.findIndex(p => p.id === software.id);
+    const idx = this.entity().extensions?.wikibase?.software?.findIndex(p => p.id === software.id);
     if (idx !== undefined && idx >= 0) {
-      this.entitySubject.value?.software.splice(idx, 1);
+      this.entity().extensions?.wikibase?.software?.splice(idx, 1);
     }
   }
 
-  public removeEquipment(equipment: string) {
-    const idx = this.entitySubject.value?.equipment.findIndex(p => p === equipment);
+  public removeEquipment(equipment: IWikibaseItem) {
+    // TODO: this only works if equipment is not a string
+    const idx = this.entity().extensions?.wikibase?.equipment?.findIndex(
+      p => typeof p === 'object' && p.id === equipment.id,
+    );
     if (idx !== undefined && idx >= 0) {
-      this.entitySubject.value?.equipment.splice(idx, 1);
+      this.entity().extensions?.wikibase?.equipment?.splice(idx, 1);
     }
   }
 
   public removeCreationDate() {
-    if (this.entitySubject.value !== undefined) {
-      this.entitySubject.value.creationDate = undefined;
+    if (this.entity().extensions?.wikibase) {
+      this.entity().extensions.wikibase!.creationDate = undefined;
     }
   }
 
   public removeExternalLink(link: string) {
-    const idx = this.entitySubject.value?.externalLinks.findIndex(p => p === link);
+    const idx = this.entity().extensions?.wikibase?.externalLinks?.findIndex(p => p === link);
     if (idx !== undefined && idx >= 0) {
-      this.entitySubject.value?.externalLinks.splice(idx, 1);
+      this.entity().extensions?.wikibase?.externalLinks?.splice(idx, 1);
     }
   }
 
   public removeBibRef(ref: IWikibaseItem) {
-    const idx = this.entitySubject.value?.bibliographicRefs.findIndex(r => r.id === ref.id);
+    const idx = this.entity().extensions?.wikibase?.bibliographicRefs?.findIndex(
+      r => r.id === ref.id,
+    );
     if (idx !== undefined && idx >= 0) {
-      this.entitySubject.value?.bibliographicRefs.splice(idx, 1);
+      this.entity().extensions?.wikibase?.bibliographicRefs?.splice(idx, 1);
     }
   }
 
   public removePhyObj(obj: IWikibaseItem) {
-    const idx = this.entitySubject.value?.physicalObjs.findIndex(o => o.id === obj.id);
+    const idx = this.entity().extensions?.wikibase?.physicalObjs?.findIndex(o => o.id === obj.id);
     if (idx !== undefined && idx >= 0) {
-      this.entitySubject.value?.physicalObjs.splice(idx, 1);
+      this.entity().extensions?.wikibase?.physicalObjs?.splice(idx, 1);
     }
+  }
+
+  public selectLicence(change: MatRadioChange) {
+    const value = change.value;
+    if (typeof value !== 'number') return;
+    const licence = this.availableLicences.find(l => l.wikibase_item === value);
+    if (!licence) return console.warn(`Could not find licence with id ${value}`);
+    this.entity().extensions.wikibase!.licence = licence.wikibase_item;
   }
 
   public async handleFileInput(fileInput: HTMLInputElement) {
@@ -581,29 +663,9 @@ export class EntityComponent extends createExtenderComponent() {
     for (const file of files) {
       const metadataFile = await readfile(file);
       if (!metadataFile) continue;
-      this.entitySubject.value?.metadata_files.push(metadataFile);
+      this.entity().metadata_files.push(metadataFile);
     }
   }
-
-  // Entity access
-  get entity$() {
-    return this.entitySubject.pipe(
-      filter(entity => !!entity),
-      map(entity => entity as AnyEntity),
-    );
-  }
-
-  get _id$() {
-    return this.entity$.pipe(map(entity => entity._id.toString()));
-  }
-
-  get digitalEntity$() {
-    return this.entitySubject.pipe(
-      filter(entity => isDigitalEntity(entity)),
-      map(entity => entity as DigitalEntity),
-    );
-  }
-  // /Entity access
 
   // Validation
 
@@ -617,100 +679,74 @@ export class EntityComponent extends createExtenderComponent() {
     return result; */
   }
 
-  get generalInformationValid$() {
-    return this.digitalEntity$.pipe(
-      map(entity => entity.label['en'] !== '' && entity.description !== ''),
-    );
-  }
+  generalInformationValid$ = this.digitalEntity$.pipe(
+    map(entity => entity.extensions.wikibase?.label?.['en'] !== '' && entity.description !== ''),
+  );
 
-  get licenceValid$() {
-    return this.digitalEntity$.pipe(map(digitalEntity => digitalEntity.licence));
-  }
+  licenceValid$ = this.digitalEntity$.pipe(
+    map(digitalEntity => DigitalEntity.checkValidLicence(digitalEntity)),
+  );
 
-  get hasRightsOwner$() {
-    return this.digitalEntity$.pipe(
-      map(digitalEntity => DigitalEntity.hasRightsOwner(digitalEntity)),
-    );
-  }
+  hasRightsOwner$ = this.digitalEntity$.pipe(
+    map(digitalEntity => DigitalEntity.hasRightsOwner(digitalEntity)),
+  );
 
-  get hasContactPerson$() {
-    return this.digitalEntity$.pipe(
-      map(digitalEntity => DigitalEntity.hasContactPerson(digitalEntity)),
-    );
-  }
+  hasContactPerson$ = this.digitalEntity$.pipe(
+    map(digitalEntity => DigitalEntity.hasContactPerson(digitalEntity)),
+  );
 
-  get personsValid$() {
-    return this.entity$.pipe(
-      map(
-        entity =>
-          undefined === entity.persons.find(p => !Person.checkIsValid(p, entity._id.toString())),
-      ),
-    );
-  }
+  personsValid$ = this.entity$.pipe(
+    map(
+      entity =>
+        undefined === entity.persons.find(p => !Person.checkIsValid(p, entity._id.toString())),
+    ),
+  );
 
-  get institutionsValid$() {
-    return this.entity$.pipe(
-      map(
-        entity =>
-          undefined ===
-          entity.institutions.find(i => !Institution.checkIsValid(i, entity._id.toString())),
-      ),
-    );
-  }
+  institutionsValid$ = this.entity$.pipe(
+    map(
+      entity =>
+        undefined ===
+        entity.institutions.find(i => !Institution.checkIsValid(i, entity._id.toString())),
+    ),
+  );
 
-  get dimensionsValid$() {
-    return this.digitalEntity$.pipe(
-      map(entity => undefined === entity.dimensions.find(d => !DimensionTuple.checkIsValid(d))),
-    );
-  }
+  dimensionsValid$ = this.digitalEntity$.pipe(
+    map(entity => undefined === entity.dimensions.find(d => !DimensionTuple.checkIsValid(d))),
+  );
 
-  get creationValid$() {
-    return this.digitalEntity$.pipe(
-      map(entity => undefined === entity.creation.find(c => !CreationTuple.checkIsValid(c))),
-    );
-  }
+  creationValid$ = this.digitalEntity$.pipe(
+    map(entity => undefined === entity.creation.find(c => !CreationTuple.checkIsValid(c))),
+  );
 
-  get externalIdValid$() {
-    return this.entity$.pipe(
-      map(entity => undefined === entity.externalId.find(c => !TypeValueTuple.checkIsValid(c))),
-    );
-  }
+  externalIdValid$ = this.entity$.pipe(
+    map(entity => undefined === entity.externalId.find(c => !TypeValueTuple.checkIsValid(c))),
+  );
 
-  get externalLinkValid$() {
-    return this.entity$.pipe(
-      map(
-        entity =>
-          undefined === entity.externalLink.find(c => !DescriptionValueTuple.checkIsValid(c)),
-      ),
-    );
-  }
+  externalLinkValid$ = this.entity$.pipe(
+    map(
+      entity => undefined === entity.externalLink.find(c => !DescriptionValueTuple.checkIsValid(c)),
+    ),
+  );
 
-  get biblioRefsValid$() {
-    return this.entity$.pipe(
-      map(
-        entity =>
-          undefined === entity.biblioRefs.find(c => !DescriptionValueTuple.checkIsValid(c, false)),
-      ),
-    );
-  }
+  biblioRefsValid$ = this.entity$.pipe(
+    map(
+      entity =>
+        undefined === entity.biblioRefs.find(c => !DescriptionValueTuple.checkIsValid(c, false)),
+    ),
+  );
 
-  get otherValid$() {
-    return this.entity$.pipe(
-      map(entity => undefined === entity.other.find(c => !DescriptionValueTuple.checkIsValid(c))),
-    );
-  }
+  otherValid$ = this.entity$.pipe(
+    map(entity => undefined === entity.other.find(c => !DescriptionValueTuple.checkIsValid(c))),
+  );
 
-  get metadataFilesValid$() {
-    return this.entity$.pipe(
-      map(entity => undefined === entity.metadata_files.find(c => !FileTuple.checkIsValid(c))),
-    );
-  }
+  metadataFilesValid$ = this.entity$.pipe(
+    map(entity => undefined === entity.metadata_files.find(c => !FileTuple.checkIsValid(c))),
+  );
 
-  get phyObjsValid$() {
-    return this.digitalEntity$.pipe(
-      map(entity => undefined === entity.phyObjs.find(p => !PhysicalEntity.checkIsValid(p))),
-    );
-  }
+  phyObjsValid$ = this.digitalEntity$.pipe(
+    map(entity => undefined === entity.phyObjs.find(p => !PhysicalEntity.checkIsValid(p))),
+  );
+
   // /Validation
 
   public addDiscipline(event: MatChipInputEvent, digitalEntity: DigitalEntity) {
@@ -746,7 +782,7 @@ export class EntityComponent extends createExtenderComponent() {
     }
     switch (property) {
       case 'institutions':
-        return entity.institutions.push(this.content.addLocalInstitution(new Institution()));
+        return entity.institutions.push(this.#content.addLocalInstitution(new Institution()));
       case 'externalId':
         return entity.externalId.push(new TypeValueTuple());
       case 'externalLink':
@@ -777,9 +813,9 @@ export class EntityComponent extends createExtenderComponent() {
       // No reason to remove locally created persons and institutions
       /*if (isPerson(removed) || isInstitution(removed)) {
         if (property === 'persons' && removed) {
-          this.content.removeLocalPerson(removed as Person);
+          this.#content.removeLocalPerson(removed as Person);
         } else if (property === 'institutions' && removed) {
-          this.content.removeLocalInstitution(removed as Institution);
+          this.#content.removeLocalInstitution(removed as Institution);
         }
       }*/
     } else {

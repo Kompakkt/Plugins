@@ -1,4 +1,4 @@
-import { Directive, InjectionToken, Type, input, output } from '@angular/core';
+import { Directive, InjectionToken, Type, input, output, signal } from '@angular/core';
 import { ExtenderPluginManager } from './manager';
 import { ExtenderAddonProviderPlugin } from './provider';
 
@@ -37,6 +37,10 @@ export class ExtenderPluginBaseComponent {
   readonly slotData = input<unknown>();
   readonly event = output<Event>();
   readonly pluginManager = input<ExtenderPluginManager<unknown>>();
+
+  public async getSlotOutput(): Promise<unknown> {
+    throw new Error('Not implemented');
+  }
 }
 
 export const createExtenderComponent = () => {

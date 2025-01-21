@@ -1,17 +1,14 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { map, filter } from 'rxjs/operators';
-import { BehaviorSubject, combineLatest } from 'rxjs';
+import { Component, computed, input } from '@angular/core';
 
-import {
-  IDigitalEntity,
-  isDigitalEntity,
-  isInstitution,
-  IAddress,
-  IMediaHierarchy,
-} from  '../../../../common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
-import { AsyncPipe, CommonModule } from '@angular/common';
+import type { IDigitalEntity } from '../../../../common';
+import type {
+  IMediaHierarchy,
+  IWikibaseDigitalEntityExtension,
+} from '../../../../common/wikibase.common';
+import { GetLabelPipe } from '../../../get-label.pipe';
 
 interface ILicence {
   title: string;
@@ -20,30 +17,20 @@ interface ILicence {
   link: string;
 }
 
-// TODO: Kompakkt/Common typeguard
-const isAddress = (obj: IAddress): obj is IAddress => {
-  return (
-    !!obj?.building ||
-    !!obj?.city ||
-    !!obj?.country ||
-    !!obj?.number ||
-    !!obj?.street ||
-    !!obj?.postcode
-  );
-};
-
 @Component({
   selector: 'app-detail-entity',
   templateUrl: './detail-entity.component.html',
   styleUrls: ['../../../theme.scss', './detail-entity.component.scss'],
   standalone: true,
-  imports: [AsyncPipe, CommonModule, MatExpansionModule, MatIconModule],
+  imports: [AsyncPipe, CommonModule, MatExpansionModule, MatIconModule, GetLabelPipe],
 })
-export class DetailEntityComponent implements OnChanges {
-  @Input('digitalEntity')
-  public digitalEntity: IDigitalEntity | undefined = undefined;
-
-  private entitySubject = new BehaviorSubject<IDigitalEntity | undefined>(undefined);
+export class DetailEntityComponent {
+  digitalEntity = input.required<IDigitalEntity<IWikibaseDigitalEntityExtension>>();
+  wikibaseData = computed(() => {
+    const digitalEntity = this.digitalEntity();
+    if (!digitalEntity?.extensions?.wikibase) return undefined;
+    return digitalEntity.extensions.wikibase;
+  });
 
   public Licenses: { [key: number]: ILicence } = {
     46: {
@@ -79,15 +66,13 @@ export class DetailEntityComponent implements OnChanges {
     52: {
       title: 'BYNCSA',
       src: 'assets/licence/BYNCSA.png',
-      description:
-        'Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)',
+      description: 'Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)',
       link: 'https://creativecommons.org/licenses/by-nc-sa/4.0',
     },
     50: {
       title: 'BYNCND',
       src: 'assets/licence/BYNCND.png',
-      description:
-        'Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)',
+      description: 'Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)',
       link: 'https://creativecommons.org/licenses/by-nc-nd/4.0',
     },
     54: {
@@ -98,103 +83,43 @@ export class DetailEntityComponent implements OnChanges {
     },
   };
 
-  get agents$() {
-    return this.digitalEntity$.pipe(map(entity => entity.agents));
-  }
+  hasAgents = computed(() => {
+    const agents = this.wikibaseData()?.agents?.length;
+    return agents ? agents > 0 : false;
+  });
 
-  get techniques$() {
-    return this.digitalEntity$.pipe(map(entity => entity.techniques));
-  }
+  creationDate = computed(() => {
+    const wikibaseData = this.wikibaseData();
+    if (!wikibaseData?.creationDate) return undefined;
+    return Array.isArray(wikibaseData.creationDate)
+      ? wikibaseData.creationDate.join(' - ')
+      : wikibaseData.creationDate;
+  });
 
-  get software$() {
-    return this.digitalEntity$.pipe(map(entity => entity.software));
-  }
+  hasCreationData = computed(() => {
+    const techniques = this.wikibaseData()?.techniques?.length;
+    const software = this.wikibaseData()?.software?.length;
+    const equipment = this.wikibaseData()?.equipment?.length;
+    const creationDate = this.creationDate();
+    return !!(techniques || software || equipment || creationDate);
+  });
 
-  get equipment$() {
-    return this.digitalEntity$.pipe(map(entity => entity.equipment));
-  }
+  hasExternalLinks = computed(() => {
+    const links = this.wikibaseData()?.externalLinks?.length;
+    return links ? links > 0 : false;
+  });
 
-  get creationDate$() {
-    return this.digitalEntity$.pipe(map(entity => new Date(entity.creationDate || '')));
-  }
+  hasBibliograpicRefs = computed(() => {
+    const refs = this.wikibaseData()?.bibliographicRefs?.length;
+    return refs ? refs > 0 : false;
+  });
 
-  get externalLinks$() {
-    return this.digitalEntity$.pipe(map(entity => entity.externalLinks));
-  }
-
-  get bibliographicRefs$() {
-    return this.digitalEntity$.pipe(map(entity => entity.bibliographicRefs));
-  }
-
-  get hierarchies$() {
-    return this.digitalEntity$.pipe(map(entity => entity.hierarchies));
-  }
-
-  get physicalObjects$() {
-    return this.digitalEntity$.pipe(map(entity => entity.physicalObjs));
-  }
-
-  get hasAgents$() {
-    return this.agents$.pipe(
-      map(agents => agents.length > 0),
-    );
-  }
-
-  get hasCreationData$() {
-    return this.digitalEntity$.pipe(map(entity => {
-      return entity.techniques?.length ||
-             entity.software?.length ||
-             entity.equipment?.length ||
-             entity.creationDate;
-    }));
-  }
-
-  get hasExternalLinks$() {
-    return this.externalLinks$.pipe(
-      map(links => links.length > 0),
-    );
-  }
-
-  get hasBibliograpicRefs$() {
-    return this.bibliographicRefs$.pipe(
-      map(refs => refs.length > 0),
-    );
-  }
-
-  get hasHierarchies$() {
-    return this.hierarchies$.pipe(
-      map(hs => hs.length > 0),
-    );
-  }
-
-  get digitalEntity$() {
-    return this.entitySubject.pipe(
-      filter(entity => isDigitalEntity(entity)),
-      map(entity => entity as IDigitalEntity),
-    );
-  }
+  hasHierarchies = computed(() => {
+    const hierarchies = this.wikibaseData()?.hierarchies?.length;
+    return hierarchies ? hierarchies > 0 : false;
+  });
 
   isHierarchyEmpty(hierarchy: IMediaHierarchy) {
     return hierarchy.parents.length === 0 && hierarchy.siblings.length === 0;
-  }
-
-  // get place$() {
-  //   return this.physicalEntity$.pipe(map(physicalEntity => physicalEntity.place));
-  // }
-
-  // get address$() {
-  //   return this.place$.pipe(
-  //     map(place => place.address),
-  //     filter(
-  //       address => isAddress(address),
-  //       map(address => address as IAddress),
-  //     ),
-  //   );
-  // }
-
-  ngOnChanges(changes: SimpleChanges) {
-    const digitalEntity = changes['digitalEntity']?.currentValue as IDigitalEntity | undefined;
-
-    if (digitalEntity) this.entitySubject.next(digitalEntity);
   }
 }

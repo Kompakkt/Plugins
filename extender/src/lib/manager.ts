@@ -52,6 +52,11 @@ export class ExtenderPluginManager<T> {
     );
   }
 
+  public hasComponentsForSlot(slot: string, componentSet: 'viewerComponents' | 'repoComponents') {
+    const components = this.getComponentsForSlot(slot, componentSet);
+    return Array.from(components.values()).some(c => c.length > 0);
+  }
+
   public findAddonForComponent(
     slot: string,
     componentSet: 'viewerComponents' | 'repoComponents',

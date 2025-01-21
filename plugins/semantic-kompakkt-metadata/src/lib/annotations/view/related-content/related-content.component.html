@@ -1,0 +1,27 @@
+@if (relatedMediaUrls().length) {
+    @for (url of relatedMediaUrls(); track url) {
+        <div class="related-media-url">
+            <a target="_blank" [href]="url">{{ url }}</a>
+        </div>
+    }
+}
+
+@if (relatedMedia().length) {
+    @for (entity of relatedMedia(); track entity) {
+        <div class="related-media">
+            <a target="_blank" [href]="entity.id">
+                <img [src]="entity.media" alt="">
+                <mat-icon>open_in_browser</mat-icon>
+            </a>
+        </div>
+    }
+}
+
+@if (relatedEntities().length) {
+    @for (entity of relatedEntities(); track entity) {
+        <div class="related-entity">
+            <a target="_blank" [href]="entity.id">{{ entity | getLabel }}</a>
+        </div>
+    }
+}
+

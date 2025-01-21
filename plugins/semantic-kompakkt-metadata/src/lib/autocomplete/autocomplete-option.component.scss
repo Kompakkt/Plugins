@@ -1,6 +1,9 @@
-.result {
+:host {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  padding: 8px 4px;
+  box-sizing: border-box;
 }
 .result-label-id {
   display: flex;
@@ -10,7 +13,6 @@
 .result-label {
   font-weight: bold;
 }
-
 .result-muted {
   color: #999;
   font-size: smaller;

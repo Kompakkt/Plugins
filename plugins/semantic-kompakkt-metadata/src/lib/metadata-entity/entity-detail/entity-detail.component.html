@@ -1,16 +1,17 @@
-<ng-container *ngIf="entity$ | async as entity">
-  <!-- Entity -->
+@if (digitalEntity(); as digitalEntity) {
+    @if (wikibaseData(); as wikibaseData) {
+      <div class="block">
+        <a
+          href="{{ wikibaseData.address }}/entity/{{ wikibaseData.id }}"
+          target="_blank"
+        >
+          <h1>{{ label() }}</h1></a
+        >
+        <p>{{ description() }}</p>
+      </div>
+    }
 
-  <!-- DigitalEntity -->
-  <ng-container *ngIf="digitalEntity$ | async as digitalEntity">
-    <div class="block">
-     <a href="{{ digitalEntity.wikibase_address }}/entity/{{ digitalEntity.wikibase_id }}" target="_blank"> <h1>{{ digitalEntity.label['en'] }}</h1></a>
-      <p>{{ digitalEntity.description }}</p>
-    </div>
-    
     <div class="block">
       <app-detail-entity [digitalEntity]="digitalEntity"></app-detail-entity>
     </div>
-  </ng-container>
-  
-</ng-container>
+}

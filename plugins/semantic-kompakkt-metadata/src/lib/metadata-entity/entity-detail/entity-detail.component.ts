@@ -1,57 +1,68 @@
-import { Component, AfterViewInit, Input, OnChanges, SimpleChanges, effect } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { map, filter } from 'rxjs/operators';
+import { type AfterViewInit, Component, computed, effect } from '@angular/core';
 
-import { isDigitalEntity, IEntity, IDigitalEntity, isEntity } from '../../../common';
-import { createExtenderComponent } from '@kompakkt/extender';
 import { AsyncPipe, CommonModule } from '@angular/common';
+import { createExtenderComponent } from '@kompakkt/extender';
+import { type IDigitalEntity, isDigitalEntity, isEntity } from '../../../common';
+import type {
+  IWikibaseDigitalEntityExtension,
+  IWikibaseItem,
+  IWikibaseLabel,
+} from '../../../common/wikibase.common';
+import { getLabel, GetLabelPipe } from '../../get-label.pipe';
+import { transformOldWikibaseEntityToExtension } from '../../metadata-wizard/metadata';
 import { DetailEntityComponent } from './detail-entity/detail-entity.component';
+import { ContentProviderService } from '../../content-provider.service';
 
 @Component({
   selector: 'app-entity-detail',
   templateUrl: './entity-detail.component.html',
   styleUrls: ['../../theme.scss', './entity-detail.component.scss'],
   standalone: true,
-  imports: [AsyncPipe, CommonModule, DetailEntityComponent],
+  imports: [AsyncPipe, CommonModule, DetailEntityComponent, GetLabelPipe],
 })
 export class EntityDetailComponent extends createExtenderComponent() implements AfterViewInit {
-  private entitySubject = new BehaviorSubject<IEntity | undefined>(undefined);
+  entity = computed(() => {
+    const slotData = this.slotData();
+    console.log('EntityDetailComponentPlugin', slotData, isEntity(slotData));
+    return isEntity(slotData) ? slotData : undefined;
+  });
+  digitalEntity = computed(() => {
+    const entity = this.entity();
+    if (!isDigitalEntity(entity?.relatedDigitalEntity)) return undefined;
+    return entity.relatedDigitalEntity as IDigitalEntity<IWikibaseDigitalEntityExtension>;
+  });
+  wikibaseData = computed(() => {
+    let digitalEntity = this.digitalEntity();
+    if (!digitalEntity) return undefined;
+    digitalEntity = transformOldWikibaseEntityToExtension(digitalEntity);
+    if (!digitalEntity?.extensions?.wikibase) return undefined;
+    return digitalEntity.extensions.wikibase;
+  });
+
+  label = computed(() => {
+    const wikibaseData = this.wikibaseData();
+    if (!wikibaseData?.label) return 'No label';
+    return getLabel(wikibaseData as { label: IWikibaseLabel });
+  });
+  description = computed(() => {
+    const wikibaseData = this.wikibaseData();
+    if (!wikibaseData?.description) return 'No description';
+    return getLabel({ label: wikibaseData.description });
+  });
 
   constructor() {
     super();
     effect(() => {
-      const slotData = this.slotData();
-      console.log('EntityDetailComponentPlugin', slotData, isEntity(slotData));
-      this.entitySubject.next(isEntity(slotData) ? slotData : undefined);
+      console.log({
+        entity: this.entity(),
+        digitalEntity: this.digitalEntity(),
+        wikibaseData: this.wikibaseData(),
+      });
     });
   }
 
-  get entity$() {
-    return this.entitySubject.asObservable();
-  }
-
-  get digitalEntity$() {
-    return this.entity$.pipe(
-      map(entity => entity?.relatedDigitalEntity),
-      map(digitalEntity => ({
-        ...digitalEntity,
-        agents: (digitalEntity as any)?.['agents'] ?? [],
-        externalLinks: [],
-        bibliographicRefs: [],
-        hierarchies: [],
-        label: { en: (digitalEntity as any).title },
-      })),
-      filter(digitalEntity => isDigitalEntity(digitalEntity)),
-      map(digitalEntity => digitalEntity as IDigitalEntity),
-    );
-  }
-
-  // get physicalEntites$() {
-  //   return this.digitalEntity$.pipe(map(digitalEntity => digitalEntity.phyObjs));
-  // }
-
   public copyId() {
-    const _id = this.entitySubject.value?._id;
+    const _id = this.entity()?._id;
     if (!_id) throw new Error('Could not copy id');
     const copyIdEvent = new CustomEvent('copy-to-clipboard', {
       detail: _id.toString(),

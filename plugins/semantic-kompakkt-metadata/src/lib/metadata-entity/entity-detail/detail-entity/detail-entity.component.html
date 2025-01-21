@@ -1,26 +1,29 @@
-<ng-container *ngIf="digitalEntity$ | async as entity">
-  <mat-expansion-panel [expanded]="false" *ngIf="hasAgents$ | async">
-    <mat-expansion-panel-header>
-      <mat-panel-title>Related agents</mat-panel-title>
-      <mat-panel-description></mat-panel-description>
+@if (digitalEntity(); as digitalEntity) {
+  @if (wikibaseData(); as wikibaseData) {
+    @if (hasAgents()) {
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Related agents</mat-panel-title>
+          <mat-panel-description></mat-panel-description>
+        </mat-expansion-panel-header>
 
-    </mat-expansion-panel-header>
+        @for (agent of wikibaseData.agents; track agent) {
+          <div class="block">
+            <ng-container>
+              {{ agent.roleTitle }}:
+              <a target="_blank" href="{{ agent.id }}">{{ agent | getLabel }}</a>
+            </ng-container>
+          </div>
+        }
+      </mat-expansion-panel>
+    }
 
-    <ng-container *ngIf="agents$ | async as agents">
-      <div class="block" *ngFor="let agent of agents">
-        <ng-container>
-          {{ agent.roleTitle }}: <a target="_blank" href="{{ agent.id }}">{{ agent.label['en'] }}</a>
-        </ng-container>
-      </div>
-    </ng-container>
-  </mat-expansion-panel>
-
-  <ng-container *ngIf="digitalEntity$ | async as digitalEntity">
-    <mat-expansion-panel [expanded]="false" *ngIf="Licenses[digitalEntity.licence] as licence">
-      <mat-expansion-panel-header>
-        <mat-panel-title> Licence </mat-panel-title>
-      </mat-expansion-panel-header>
-      <div class="licence-block">
+    @if (Licenses[wikibaseData.licence!]; as licence) {
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title> Licence </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="licence-block">
           <a
             [href]="licence.link"
             target="_blank"
@@ -32,201 +35,248 @@
           </a>
 
           <a target="_blank" [href]="licence.link">{{ licence.description }}</a>
-      </div>
-    </mat-expansion-panel>
-  </ng-container>
+        </div>
+      </mat-expansion-panel>
+    }
 
-  <mat-expansion-panel [expanded]="false" *ngIf="hasCreationData$ | async">
-    <mat-expansion-panel-header>
-      <mat-panel-title>Creation</mat-panel-title>
-      <mat-panel-description></mat-panel-description>
+    @if (hasCreationData()) {
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Creation</mat-panel-title>
+          <mat-panel-description></mat-panel-description>
+        </mat-expansion-panel-header>
 
-    </mat-expansion-panel-header>
-
-    <ng-container>
-      <div class="creation-item" *ngIf="techniques$ | async as techniques">
-        <ng-container *ngFor="let technique of techniques">
-          Technique: <a target="_blank" href="{{ technique.id }}">{{ technique.label['en'] }}</a>
-        </ng-container>
-      </div>
-    </ng-container>
-    <ng-container *ngIf="software$ | async as software">
-      <div class="creation-item" *ngFor="let tool of software">
-        <ng-container>
-          Software: <a target="_blank" href="{{ tool.id }}">{{ tool.label['en'] }}</a>
-        </ng-container>
-      </div>
-    </ng-container>
-    <ng-container *ngIf="equipment$ | async as equipment">
-      <div class="creation-item" *ngFor="let tool of equipment">
-        <ng-container>
-          Equipment: {{ tool }}
-        </ng-container>
-      </div>
-    </ng-container>
-    <ng-container *ngIf="creationDate$ | async as creationDate">
-      <div class="creation-item">
-        <ng-container>
-          Date: {{ creationDate.toDateString() }}
-        </ng-container>
-      </div>
-    </ng-container>
-  </mat-expansion-panel>
-
-  <mat-expansion-panel [expanded]="false" *ngIf="hasExternalLinks$ | async">
-    <mat-expansion-panel-header>
-      <mat-panel-title>External Links</mat-panel-title>
-      <mat-panel-description></mat-panel-description>
-
-    </mat-expansion-panel-header>
-
-    <ng-container *ngIf="externalLinks$ | async as links">
-      <div class="block" *ngFor="let link of links">
-        <ng-container>
-          <a target="_blank" [href]="link">{{ link }}</a>
-        </ng-container>
-      </div>
-    </ng-container>
-  </mat-expansion-panel>
-
-  <mat-expansion-panel [expanded]="false" *ngIf="hasBibliograpicRefs$ | async">
-    <mat-expansion-panel-header>
-      <mat-panel-title>Bibliography</mat-panel-title>
-      <mat-panel-description></mat-panel-description>
-
-    </mat-expansion-panel-header>
-
-    <ng-container *ngIf="bibliographicRefs$ | async as refs">
-      <div class="block" *ngFor="let ref of refs">
-        <ng-container>
-          <a target="_blank" href="{{ ref.id }}">{{ ref.label['en'] }}</a>
-        </ng-container>
-      </div>
-    </ng-container>
-  </mat-expansion-panel>
-
-  <mat-expansion-panel [expanded]="false" *ngIf="hasHierarchies$ | async">
-    <mat-expansion-panel-header>
-      <mat-panel-title>Related object structure</mat-panel-title>
-      <mat-panel-description></mat-panel-description>
-
-    </mat-expansion-panel-header>
-
-    <ng-container *ngIf="hierarchies$ | async as hs">
-      <div class="block" *ngFor="let hierarchy of hs">
-        <ng-container>
-          <div *ngFor="let parent of hierarchy.parents; index as i" class="hierarchy-entry" [style.padding-left]="((i === 1 ? 0 : (i-1)*24)).toString() + 'px'">
-            <mat-icon class="hierarchy-icon" *ngIf="i > 0">
-              subdirectory_arrow_right
-            </mat-icon>
-            <div class="hierarchy-label" [class.active]="i === (hierarchy.parents.length-1)">
-              <a target="_blank" [href]="parent.id">{{ parent.label['en'] }}</a>
-            </div>
+        @for (technique of wikibaseData.techniques; track technique) {
+          <div class="creation-item">
+            Technique: <a target="_blank" href="{{ technique.id }}">{{ technique | getLabel }}</a>
           </div>
-          <div *ngFor="let sibling of hierarchy.siblings" class="hierarchy-entry"  [style.padding-left]="'max(' + ((hierarchy.parents.length-2) * 24).toString() + 'px, 0px)'">
-            <mat-icon class="hierarchy-icon">
-              subdirectory_arrow_right
-            </mat-icon>
-            <div class="hierarchy-label">
-              <a target="_blank" [href]="sibling.id">{{ sibling.label['en'] }}</a>
-            </div>
+        }
+
+        @for (tool of wikibaseData.software; track tool) {
+          <div class="creation-item">
+            Software: <a target="_blank" href="{{ tool.id }}">{{ tool | getLabel }}</a>
           </div>
-          <div class="hierarchy-label" *ngIf="isHierarchyEmpty(hierarchy)">
-            <div *ngIf="physicalObjects$ | async as physicalObjects">
-              <a target="_blank" [href]="physicalObjects[0].id">{{ physicalObjects[0].label['en'] }}</a>
-            </div>
+        }
+
+        @for (tool of wikibaseData.equipment; track tool) {
+          <div class="creation-item">Equipment: {{ tool | getLabel }}</div>
+        }
+
+        @if (creationDate(); as creationDate) {
+          <div class="creation-item">
+            Date: {{ creationDate }}
+            <!-- {{ creationDate.toDateString() }} -->
           </div>
-        </ng-container>
-      </div>
-    </ng-container>
-  </mat-expansion-panel>
+        }
+      </mat-expansion-panel>
+    }
 
-  <mat-expansion-panel
-          [expanded]="false"
-    *ngIf="entity.externalId.length && entity.externalId as externalIds"
-  >
-    <mat-expansion-panel-header>
-      <mat-panel-title>External identifiers</mat-panel-title>
-      <mat-panel-description></mat-panel-description>
-    </mat-expansion-panel-header>
+    @if (hasExternalLinks()) {
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>External Links</mat-panel-title>
+          <mat-panel-description></mat-panel-description>
+        </mat-expansion-panel-header>
 
-    <div class="block" *ngFor="let identifier of externalIds">
-      <p>
-        <span>{{ identifier.type }}</span>
-        <span>{{ identifier.value }}</span>
-      </p>
-    </div>
-  </mat-expansion-panel>
+        @for (link of wikibaseData.externalLinks; track link) {
+          <div class="block">
+            <a target="_blank" [href]="link">{{ link | getLabel }}</a>
+          </div>
+        }
+      </mat-expansion-panel>
+    }
 
-  <mat-expansion-panel
-          [expanded]="false"
-    *ngIf="entity.externalLink.length && entity.externalLink as externalLinks"
-  >
-    <mat-expansion-panel-header>
-      <mat-panel-title>External links</mat-panel-title>
-      <mat-panel-description></mat-panel-description>
-    </mat-expansion-panel-header>
+    @if (hasBibliograpicRefs()) {
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Bibliography</mat-panel-title>
+          <mat-panel-description></mat-panel-description>
+        </mat-expansion-panel-header>
 
-    <div class="block" *ngFor="let link of externalLinks">
-      <p *ngIf="link.description">
-        {{ link.description }}
-      </p>
-      <p *ngIf="link.description">
-        {{ link.value }}
-      </p>
-    </div>
-  </mat-expansion-panel>
+        @for (ref of wikibaseData.bibliographicRefs; track ref) {
+          <div class="block">
+            <a target="_blank" href="{{ ref.id }}">{{ ref | getLabel }}</a>
+          </div>
+        }
+      </mat-expansion-panel>
+    }
 
-  <mat-expansion-panel [expanded]="false" *ngIf="entity.biblioRefs.length && entity.biblioRefs as biblioRefs">
-    <mat-expansion-panel-header>
-      <mat-panel-title>Bibliographic references</mat-panel-title>
-      <mat-panel-description></mat-panel-description>
-    </mat-expansion-panel-header>
+    @if (hasHierarchies()) {
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Related object structure</mat-panel-title>
+          <mat-panel-description></mat-panel-description>
+        </mat-expansion-panel-header>
 
-    <div class="block" *ngFor="let ref of biblioRefs">
-      <p *ngIf="ref.description">
-        {{ ref.description }}
-      </p>
-      <p *ngIf="ref.value">
-        {{ ref.value }}
-      </p>
-    </div>
-  </mat-expansion-panel>
+        @for (hierarchy of wikibaseData.hierarchies; track hierarchy) {
+          <div class="block">
+            @for (parent of hierarchy.parents; track parent; let i = $index) {
+              <div
+                class="hierarchy-entry"
+                [style.padding-left]="(i === 1 ? 0 : (i - 1) * 24).toString() + 'px'"
+              >
+              @if (i > 0) {
+                <mat-icon class="hierarchy-icon"> subdirectory_arrow_right </mat-icon>
 
-  <mat-expansion-panel [expanded]="false" *ngIf="entity.other.length && entity.other as other">
-    <mat-expansion-panel-header>
-      <mat-panel-title>Other</mat-panel-title>
-      <mat-panel-description></mat-panel-description>
-    </mat-expansion-panel-header>
+              }
+                <div class="hierarchy-label" [class.active]="i === hierarchy.parents.length - 1">
+                  <a target="_blank" [href]="parent.id">{{ parent | getLabel }}</a>
+                </div>
+              </div>
+            }
 
-    <div class="block" *ngFor="let entry of other">
-      <p *ngIf="entry.description">
-        {{ entry.description }}
-      </p>
-      <p *ngIf="entry.value">
-        {{ entry.value }}
-      </p>
-    </div>
-  </mat-expansion-panel>
+            @for (sibling of hierarchy.siblings; track sibling) {
+              <div
+                class="hierarchy-entry"
+                [style.padding-left]="
+                  'max(' + ((hierarchy.parents.length - 2) * 24).toString() + 'px, 0px)'
+                "
+              >
+                <mat-icon class="hierarchy-icon"> subdirectory_arrow_right </mat-icon>
+                <div class="hierarchy-label">
+                  <a target="_blank" [href]="sibling.id">{{ sibling | getLabel }}</a>
+                </div>
+              </div>
+            }
 
-  <mat-expansion-panel
-          [expanded]="false"
-    *ngIf="entity.metadata_files.length && entity.metadata_files as metadata_files"
-  >
-    <mat-expansion-panel-header>
-      <mat-panel-title>Attached files</mat-panel-title>
-      <mat-panel-description></mat-panel-description>
-    </mat-expansion-panel-header>
+            <!-- TODO: Does this condition really make sense? -->
+            @if (hierarchy.parents.length + hierarchy.siblings.length === 0) {
+              <div class="hierarchy-label">
+                @if (wikibaseData.physicalObjs; as physicalObjects) {
+                  @for (phyObj of physicalObjects; track phyObj) {
+                    <div>
+                      <a target="_blank" [href]="phyObj.id">{{ phyObj | getLabel }}</a>
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </div>
+        }
+      </mat-expansion-panel>
+    }
 
-    <div class="block" *ngFor="let file of metadata_files">
-      <a
-        [href]="file.file_link"
-        target="_blank"
-        referrerpolicy="no-referrer"
-        rel="noreferrer"
-        [title]="file.file_name"
-        >{{ file.file_name }}</a
-      >
-    </div>
-  </mat-expansion-panel>
-</ng-container>
+    @if (digitalEntity.externalId; as externalIds) {
+      @if (externalIds.length > 0) {
+        <mat-expansion-panel [expanded]="false">
+          <mat-expansion-panel-header>
+            <mat-panel-title>External identifiers</mat-panel-title>
+            <mat-panel-description></mat-panel-description>
+          </mat-expansion-panel-header>
+
+          @for (identifier of externalIds; track identifier) {
+            <div class="block">
+              <p>
+                <span>{{ identifier.type }}</span>
+                <span>{{ identifier.value }}</span>
+              </p>
+            </div>
+          }
+        </mat-expansion-panel>
+      }
+    }
+
+    @if (digitalEntity.externalLink; as externalLinks) {
+      @if (externalLinks.length > 0) {
+        <mat-expansion-panel [expanded]="false">
+          <mat-expansion-panel-header>
+            <mat-panel-title>External links</mat-panel-title>
+            <mat-panel-description></mat-panel-description>
+          </mat-expansion-panel-header>
+
+          @for (link of externalLinks; track link) {
+            <div class="block">
+              @if (link.description) {
+                <p>
+                  {{ link.description }}
+                </p>  
+              }
+              @if (link.value) {
+                <p>
+                  {{ link.value }}
+                </p>
+              }
+              
+            </div>
+          }
+        </mat-expansion-panel>
+      }
+    }
+
+    @if (digitalEntity.biblioRefs; as biblioRefs) {
+      @if (biblioRefs.length > 0) {
+        <mat-expansion-panel [expanded]="false">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Bibliographic references</mat-panel-title>
+            <mat-panel-description></mat-panel-description>
+          </mat-expansion-panel-header>
+
+          @for (ref of biblioRefs; track ref) {
+            <div class="block">
+              @if (ref.description) {
+                <p>
+                  {{ ref.description }}
+                </p>
+              }
+              @if (ref.value) {
+                <p>
+                  {{ ref.value }}
+                </p>
+              }
+            </div>
+          }
+        </mat-expansion-panel>
+      }
+    }
+
+    @if (digitalEntity.other; as others) {
+      @if (others.length > 0) {
+        <mat-expansion-panel [expanded]="false">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Other</mat-panel-title>
+            <mat-panel-description></mat-panel-description>
+          </mat-expansion-panel-header>
+
+          @for (entry of others; track entry) {
+            <div class="block">
+              @if (entry.description) {
+                <p>
+                  {{ entry.description }}
+                </p>
+              }
+              @if (entry.value) {
+                <p>
+                  {{ entry.value }}
+                </p>
+              }
+            </div>
+          }
+        </mat-expansion-panel>
+      }
+    }
+
+    @if (digitalEntity.metadata_files; as metadata_files) {
+      @if (metadata_files.length > 0) {
+        <mat-expansion-panel [expanded]="false">
+          <mat-expansion-panel-header>
+            <mat-panel-title>Attached files</mat-panel-title>
+            <mat-panel-description></mat-panel-description>
+          </mat-expansion-panel-header>
+
+          @for (file of metadata_files; track file) {
+            <div class="block">
+              <a
+                [href]="file.file_link"
+                target="_blank"
+                referrerpolicy="no-referrer"
+                rel="noreferrer"
+                [title]="file.file_name"
+                >{{ file.file_name }}</a
+              >
+            </div>
+          }
+        </mat-expansion-panel>
+      }
+    }
+  }
+}

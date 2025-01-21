@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, input, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MatAutocompleteModule,
@@ -34,8 +34,8 @@ import { ContactReference, Institution, MediaAgent } from '../metadata';
   ],
 })
 export class PersonComponent implements OnChanges {
-  @Input() public entityId!: string;
-  @Input() public person!: MediaAgent;
+  public entityId = input.required<string>();
+  public person = input.required<MediaAgent>();
 
   private isExisting = new BehaviorSubject(false);
   private anyRoleSelected = new BehaviorSubject(false);
@@ -110,7 +110,7 @@ export class PersonComponent implements OnChanges {
   }
 
   get generalInformationValid() {
-    return this.person.title.length > 0;
+    return this.person().title.length > 0;
   }
 
   get contactValid() {

@@ -31,32 +31,10 @@ export enum Collection {
   entity = 'entity',
   group = 'group',
   institution = 'institution',
+  person = 'person',
+  physicalentity = 'physicalentity',
+  tag = 'tag',
+  // TODO: These might be moved to a different DB for extensions
   metadata = 'metadata',
   annotationlink = 'annotationlink',
-  tag = 'tag',
-}
-
-// TODO: check if this can be deprecated
-export enum Command {
-  locateReference,
-  pushEntry,
-}
-
-// TODO: check if this can be deprecated
-export enum License {
-  BY,
-  BYSA,
-  BYNC,
-  BYNCSA,
-  BYND,
-  BYNCND,
-  AR,
-}
-
-// TODO: check if this can be deprecated
-export enum Role {
-  RIGHTSOWNER,
-  CREATOR,
-  EDITOR,
-  DATA_CREATOR,
 }

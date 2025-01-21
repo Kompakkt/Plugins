@@ -1,9 +1,9 @@
-<div class="result" *ngIf="optionItem">
+@if (optionItem(); as optionItem) {
   <div class="result-label-id">
-    <div class="result-label">{{optionItem.label['en']}}</div>
-    <div class="result-id result-muted">{{optionItem.id.split('/').pop()}}</div>
+    <div class="result-label">{{ optionItem | getLabel }}</div>
+    <div class="result-id result-muted">{{ optionItem.id.split('/').pop() }}</div>
   </div>
   <div class="result-description result-muted">
-    {{optionItem.description || 'No description available'}}
+    {{ optionItem.description || 'No description available' }}
   </div>
-</div> 
+}

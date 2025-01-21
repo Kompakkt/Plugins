@@ -140,6 +140,29 @@
           "defaultConfiguration": "production"
         }
       }
+    },
+    "@kompakkt/plugin-sso-nfdi4culture": {
+      "projectType": "library",
+      "root": "./plugins/sso-nfdi4culture",
+      "sourceRoot": "./plugins/sso-nfdi4culture/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "plugins/sso-nfdi4culture/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "plugins/sso-nfdi4culture/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "plugins/sso-nfdi4culture/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        }
+      }
     }
   }
 }

@@ -1,9 +1,9 @@
-import { Component, Input } from '@angular/core';
-import { Address } from '../metadata';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
+import { Component, input, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { Address } from '../metadata';
 
 @Component({
   selector: 'app-address',
@@ -13,9 +13,6 @@ import { MatInputModule } from '@angular/material/input';
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInputModule],
 })
 export class AddressComponent {
-  @Input('address')
-  public address!: Address;
-
-  @Input('required')
-  public required = true;
+  address = input.required<Address>();
+  required = input(true);
 }

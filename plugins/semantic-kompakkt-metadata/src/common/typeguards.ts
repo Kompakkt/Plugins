@@ -1,26 +1,28 @@
-import {
+import type {
   IEntity,
   IAddress,
   IDocument,
   IGroup,
   ITag,
   IDigitalEntity,
+  IPhysicalEntity,
   ICompilation,
   IAnnotation,
+  IPerson,
   IInstitution,
   IContact,
-  IPhysicalEntity,
-  IPerson,
+  IEntitySettings,
 } from './interfaces';
 
 const isDefined = (value: any) => value != null && value != undefined;
 
-// TODO: allow dot notation
-const checkProps = (props: string[], obj: any) => {
+const checkProps = (props: string[], obj: unknown) => {
+  if (typeof obj !== 'object' || obj === null) return false;
   if (!isDefined(obj)) return false;
+  if (Array.isArray(obj)) return false;
   let valid = true;
   for (const prop of props) {
-    if (!isDefined(obj[prop])) {
+    if (!Object.hasOwn(obj, prop) || !isDefined((obj as Record<string, unknown>)[prop])) {
       valid = false;
       break;
     }
@@ -34,6 +36,17 @@ const checkProps = (props: string[], obj: any) => {
  */
 const isUnresolved = (obj: any): obj is IDocument =>
   Object.keys(obj).length === 1 && obj._id !== undefined;
+
+
+/**
+ * Checks whether an object has extensions
+ * @param obj 
+ * @returns 
+ */
+const hasExtensions = (obj: any): obj is { extensions: Record<string, unknown> } => {
+  if (!isDefined(obj)) return false;
+  return checkProps(['extensions'], obj);
+}
 
 /**
  * Checks whether an object is a group entry
@@ -49,7 +62,6 @@ const GROUP_PROPS = ['name', 'creator', 'owners', 'members'];
 const isTag = (obj: any): obj is ITag => checkProps(TAG_PROPS, obj);
 const TAG_PROPS = ['value'];
 
-
 /**
  * Checks whether an object is a digital/physical entity
  * @type {Boolean}
@@ -57,23 +69,6 @@ const TAG_PROPS = ['value'];
 const isMetadataEntity = (obj: any): obj is IDigitalEntity | IPhysicalEntity =>
   checkProps(META_ENTITY_PROPS, obj);
 const META_ENTITY_PROPS = ['title', 'description', 'persons', 'institutions'];
-
-/**
- * Checks whether an object is a digital entity
- * @type {Boolean}
- */
-const isDigitalEntity = (obj: any): obj is IDigitalEntity =>
-  checkProps(DIG_ENTITY_PROPS, obj);
-const DIG_ENTITY_PROPS = ['description', 'agents'];
-
-
-/**
- * Checks whether an object is a physical entity
- * @type {Boolean}
- */
-const isPhysicalEntity = (obj: any): obj is IPhysicalEntity =>
-  isMetadataEntity(obj) && checkProps(PHY_ENTITY_PROPS, obj);
-const PHY_ENTITY_PROPS = ['place', 'collection'];
 
 /**
  * Checks whether an object is a compilation
@@ -90,6 +85,12 @@ const isEntity = (obj: any): obj is IEntity => checkProps(ENTITY_PROPS, obj);
 const ENTITY_PROPS = ['name', 'mediaType', 'online', 'finished'];
 
 /**
+ * 
+ */
+const isEntitySettings = (obj: any): obj is IEntitySettings => checkProps(ENTITY_SETTINGS_PROPS, obj);
+const ENTITY_SETTINGS_PROPS = ['preview', 'cameraPositionInitial', 'background', 'lights'];
+
+/**
  * Checks whether an <IEntity | IDocument> is fully resolved
  * @type {Boolean}
  */
@@ -102,6 +103,22 @@ const isResolvedEntity = (obj: any): obj is IEntity & { relatedDigitalEntity: ID
  */
 const isAnnotation = (obj: any): obj is IAnnotation => checkProps(ANNO_PROPS, obj);
 const ANNO_PROPS = ['body', 'target'];
+
+/**
+ * Checks whether an object is a digital entity
+ * @type {Boolean}
+ */
+const isDigitalEntity = (obj: any): obj is IDigitalEntity =>
+  /* isMetadataEntity(obj) &&  */checkProps(DIG_ENTITY_PROPS, obj);
+const DIG_ENTITY_PROPS = ['type', 'licence'];
+
+/**
+ * Checks whether an object is a physical entity
+ * @type {Boolean}
+ */
+const isPhysicalEntity = (obj: any): obj is IPhysicalEntity =>
+  isMetadataEntity(obj) && checkProps(PHY_ENTITY_PROPS, obj);
+const PHY_ENTITY_PROPS = ['place', 'collection'];
 
 /**
  * Checks whether an object is a person
@@ -132,12 +149,14 @@ const isContact = (obj: any): obj is IContact => checkProps(CONTACT_PROPS, obj);
 const CONTACT_PROPS = ['mail', 'note', 'phonenumber'];
 
 export {
+  hasExtensions,
   isUnresolved,
   isGroup,
   isTag,
   isMetadataEntity,
   isCompilation,
   isEntity,
+  isEntitySettings,
   isResolvedEntity,
   isAnnotation,
   isDigitalEntity,

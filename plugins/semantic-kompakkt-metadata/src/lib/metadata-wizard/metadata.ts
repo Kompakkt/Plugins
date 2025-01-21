@@ -1,4 +1,5 @@
-import {
+import { debounceTime, ReplaySubject } from 'rxjs';
+import type {
   IDigitalEntity,
   IPhysicalEntity,
   IBaseEntity,
@@ -7,8 +8,6 @@ import {
   ITag,
   IContact,
   IAddress,
-  IWikibaseItem,
-  IMediaAgent,
   ITypeValueTuple,
   IDescriptionValueTuple,
   IDimensionTuple,
@@ -16,13 +15,31 @@ import {
   IFile,
   IPlaceTuple,
   IRelatedMap,
-  ObjectId,
 } from '../../common';
+import type {
+  IMediaAgent,
+  IWikibaseDigitalEntityExtension,
+  IWikibaseItem,
+} from '../../common/wikibase.common';
+import ObjectId from 'bson-objectid';
+
+type UndoPartial<T> = T extends Partial<infer R> ? R : T;
 
 const getObjectId = () => new ObjectId().toString();
 
-const empty = (value: string | number | any[]): boolean =>
-  typeof value === 'number' ? value <= 0 : value?.length === 0 ?? true;
+const empty = (value: unknown): boolean => {
+  if (typeof value === 'number') {
+    if (Number.isNaN(value)) return true;
+    return value <= 0;
+  }
+  if (typeof value === 'string') return value.length === 0;
+  if (value === null || typeof value === 'undefined') return true;
+  if (Array.isArray(value)) return value.length === 0;
+  if (typeof value === 'object') {
+    return Object.keys(value).length === 0;
+  }
+  return true;
+};
 const emptyProps = (arr: any[], props?: string[]) =>
   !empty(arr) &&
   arr.find(el => {
@@ -31,7 +48,7 @@ const emptyProps = (arr: any[], props?: string[]) =>
   });
 
 class WikibaseItem implements IWikibaseItem {
-  id: string = "";
+  id: string = '';
 
   label: Record<string, string> = {};
   internal_id = '';
@@ -59,8 +76,72 @@ class MediaAgent extends WikibaseItem implements IMediaAgent {
   }
 }
 
-class BaseEntity implements IBaseEntity {
-  _id: string | ObjectId = getObjectId();
+export const createWikibaseExtension = (): UndoPartial<IWikibaseDigitalEntityExtension> => {
+  const wikibase: IWikibaseDigitalEntityExtension['wikibase'] = {
+    label: {},
+    description: {},
+    agents: [],
+    techniques: [],
+    software: [],
+    equipment: [],
+    externalLinks: [],
+    bibliographicRefs: [],
+    physicalObjs: [],
+    creationDate: undefined,
+    claims: {},
+    hierarchies: [],
+    licence: -1,
+    id: undefined,
+    address: undefined,
+  };
+  return { wikibase };
+};
+
+// TODO: check if this works as intended
+export const mergeExistingEntityWikibaseExtension = <T extends DigitalEntity | PhysicalEntity>(
+  entity: T,
+): T => {
+  const extensionData = createWikibaseExtension();
+  if (!entity.extensions?.wikibase) {
+    entity.extensions = {
+      ...entity.extensions,
+      wikibase: extensionData.wikibase,
+    };
+    return entity;
+  }
+  console.log('mergeExistingEntityWikibaseExtension', extensionData);
+  for (const [key, value] of Object.entries(extensionData.wikibase)) {
+    if (Object.hasOwn(entity.extensions.wikibase, key)) continue;
+    (entity.extensions.wikibase as any)[key] = value;
+  }
+  return entity;
+};
+
+export const transformOldWikibaseEntityToExtension = <
+  T extends
+    | IDigitalEntity<IWikibaseDigitalEntityExtension>
+    | IPhysicalEntity<IWikibaseDigitalEntityExtension>,
+>(
+  entity: T,
+): T => {
+  const extensionData = createWikibaseExtension();
+  if (!!entity.extensions?.wikibase) {
+    return entity;
+  }
+  entity.extensions = extensionData;
+  for (const [key, value] of Object.entries(extensionData.wikibase)) {
+    (entity.extensions.wikibase as any)[key] = (entity as any)[key] ?? value;
+  }
+  entity.extensions.wikibase!.id = (entity as any).wikibase_id ?? entity.extensions.wikibase!.label;
+  entity.extensions.wikibase!.address =
+    (entity as any).wikibase_address ?? entity.extensions.wikibase!.agents;
+  return entity;
+};
+
+class BaseEntity implements IBaseEntity<IWikibaseDigitalEntityExtension> {
+  _id: string = getObjectId();
+
+  extensions = createWikibaseExtension();
 
   title = '';
   description = '';
@@ -69,19 +150,6 @@ class BaseEntity implements IBaseEntity {
   externalLink = new Array<IDescriptionValueTuple>();
   biblioRefs = new Array<IDescriptionValueTuple>();
   other = new Array<IDescriptionValueTuple>();
-
-  label: Record<string, string> = {};
-
-  // persons = new Array<Person>();
-  // institutions = new Array<Institution>();
-  agents = new Array<MediaAgent>();
-  techniques = new Array<WikibaseItem>();
-  software = new Array<WikibaseItem>();
-  equipment = new Array<string>();
-  creationDate: string | undefined = undefined;
-  externalLinks = new Array<string>();
-  bibliographicRefs = new Array<IWikibaseItem>();
-  physicalObjs = new Array<IWikibaseItem>();
 
   metadata_files = new Array<IFile>();
 
@@ -99,6 +167,11 @@ class BaseEntity implements IBaseEntity {
           break;
         case 'institutions':
           (value as IInstitution[]).forEach(i => this.addInstitution(i));
+          break;
+        case 'extensions':
+          if ((value as any).wikibase) {
+            this.extensions.wikibase = { ...this.extensions.wikibase, ...(value as any).wikibase };
+          }
           break;
         default:
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -121,16 +194,16 @@ class BaseEntity implements IBaseEntity {
 
   public static checkIsValid(entity: BaseEntity): boolean {
     const {
+      /* _id,
+      persons,
+      institutions, */
       title,
       description,
-      persons,
-      institutions,
       externalId,
       externalLink,
       biblioRefs,
       other,
       metadata_files,
-      _id,
     } = entity;
 
     // Every entity needs a title
@@ -165,11 +238,9 @@ class BaseEntity implements IBaseEntity {
   abstract get isDigital(): this is IPhysicalEntity;
 }
 
-
-
-class DigitalEntity extends BaseEntity implements IDigitalEntity {
+class DigitalEntity extends BaseEntity implements IDigitalEntity<IWikibaseDigitalEntityExtension> {
   type = '';
-  licence = 0;
+  licence = '';
 
   discipline = new Array<string>();
   tags = new Array<Tag>();
@@ -226,16 +297,16 @@ class DigitalEntity extends BaseEntity implements IDigitalEntity {
     return !!persons.find(p => Person.hasRole(p, _id, 'CONTACT_PERSON'));
   }
 
-  public checkValidLicence() {
-    const { licence, _id } = this;
-    if (licence === 0) return false;
+  public static checkValidLicence(entity: DigitalEntity) {
+    const licence = entity.extensions.wikibase?.licence;
+    if (!licence || licence <= 0) return false;
     return true;
   }
 
-  public checkValidRelatedAgents() {
+  public static checkValidRelatedAgents(entity: DigitalEntity) {
     let has_creator = false;
     let has_rightsowner = false;
-    for (const agent of this.agents) {
+    for (const agent of entity.extensions.wikibase?.agents ?? []) {
       if (has_creator && has_rightsowner) {
         return true;
       }
@@ -248,12 +319,11 @@ class DigitalEntity extends BaseEntity implements IDigitalEntity {
     }
 
     return has_creator && has_rightsowner;
-
   }
 
-  public checkValidGeneralInfo() {
-    if (empty(this.label['en'])) return false;
-    if (empty(this.description)) return false;
+  public static checkValidGeneralInfo(entity: DigitalEntity) {
+    if (empty(entity.extensions.wikibase?.label?.['en'])) return false;
+    if (empty(entity.extensions.wikibase?.description?.['en'])) return false;
     return true;
   }
 
@@ -266,13 +336,18 @@ class DigitalEntity extends BaseEntity implements IDigitalEntity {
   }
 
   public static override checkIsValid(entity: DigitalEntity): boolean {
-    return entity.checkValidGeneralInfo() &&
-      entity.checkValidRelatedAgents() &&
-      entity.checkValidLicence();
+    return (
+      DigitalEntity.checkValidGeneralInfo(entity) &&
+      DigitalEntity.checkValidRelatedAgents(entity) &&
+      DigitalEntity.checkValidLicence(entity)
+    );
   }
 }
 
-class PhysicalEntity extends BaseEntity implements IPhysicalEntity {
+class PhysicalEntity
+  extends BaseEntity
+  implements IPhysicalEntity<IWikibaseDigitalEntityExtension>
+{
   place = new PlaceTuple();
   collection = '';
 
@@ -316,7 +391,7 @@ class PhysicalEntity extends BaseEntity implements IPhysicalEntity {
 }
 
 class Person implements IPerson {
-  _id: string | ObjectId = getObjectId();
+  _id: string = getObjectId();
 
   prename = '';
   name = '';
@@ -351,13 +426,13 @@ class Person implements IPerson {
     return `${this.prename} ${this.name}`;
   }
 
-  public addInstitution(inst: IInstitution, relatedId: string | ObjectId) {
+  public addInstitution(inst: IInstitution, relatedId: string) {
     relatedId = relatedId.toString();
     if (!this.institutions[relatedId]) this.institutions[relatedId] = new Array<Institution>();
     (this.institutions[relatedId] as Institution[]).push(new Institution(inst));
   }
 
-  public static getRelatedInstitutions(person: Person, relatedId: string | ObjectId) {
+  public static getRelatedInstitutions(person: Person, relatedId: string) {
     return person.institutions[relatedId.toString()] ?? new Array<Institution>();
   }
 
@@ -383,28 +458,28 @@ class Person implements IPerson {
     return Array.from(map.values());
   }
 
-  public setContactRef(contact: IContact, relatedId: string | ObjectId) {
+  public setContactRef(contact: IContact, relatedId: string) {
     this.contact_references[relatedId.toString()] = new ContactReference(contact);
   }
 
-  public static getRelatedContactRef(person: Person, relatedId: string | ObjectId) {
+  public static getRelatedContactRef(person: Person, relatedId: string) {
     return person.contact_references[relatedId.toString()] ?? new ContactReference();
   }
 
-  public static getRelatedRoles(person: Person, relatedId: string | ObjectId) {
+  public static getRelatedRoles(person: Person, relatedId: string) {
     return person.roles[relatedId.toString()] ?? new Array<string>();
   }
 
-  public static hasRole(person: Person, relatedId: string | ObjectId, role: string) {
+  public static hasRole(person: Person, relatedId: string, role: string) {
     return Person.getRelatedRoles(person, relatedId).includes(role);
   }
 
-  public setRoles(roles: string[], relatedId: string | ObjectId) {
+  public setRoles(roles: string[], relatedId: string) {
     relatedId = relatedId.toString();
     this.roles[relatedId] = roles;
   }
 
-  public static checkIsValid(person: Person, relatedId: string | ObjectId): boolean {
+  public static checkIsValid(person: Person, relatedId: string): boolean {
     const { prename, name } = person;
 
     // Every person needs a prename
@@ -433,7 +508,7 @@ class Person implements IPerson {
 }
 
 class Institution implements IInstitution {
-  _id: string | ObjectId = getObjectId();
+  _id: string = getObjectId();
 
   name = '';
   university = '';
@@ -459,12 +534,12 @@ class Institution implements IInstitution {
     }
   }
 
-  public setAddress(inst: IAddress, relatedId: string | ObjectId) {
+  public setAddress(inst: IAddress, relatedId: string) {
     relatedId = relatedId.toString();
     this.addresses[relatedId] = new Address(inst);
   }
 
-  public setRoles(roles: string[], relatedId: string | ObjectId) {
+  public setRoles(roles: string[], relatedId: string) {
     relatedId = relatedId.toString();
     this.roles[relatedId] = roles;
   }
@@ -491,19 +566,19 @@ class Institution implements IInstitution {
     return Array.from(map.values());
   }
 
-  public static getRelatedAddress(inst: Institution, relatedId: string | ObjectId) {
+  public static getRelatedAddress(inst: Institution, relatedId: string) {
     return inst.addresses[relatedId.toString()] ?? new Address();
   }
 
-  public static getRelatedRoles(inst: Institution, relatedId: string | ObjectId) {
+  public static getRelatedRoles(inst: Institution, relatedId: string) {
     return inst.roles[relatedId.toString()] ?? [];
   }
 
-  public static hasRole(inst: Institution, relatedId: string | ObjectId, role: string) {
+  public static hasRole(inst: Institution, relatedId: string, role: string) {
     return Institution.getRelatedRoles(inst, relatedId).includes(role);
   }
 
-  public static checkIsValid(inst: Institution, relatedId: string | ObjectId): boolean {
+  public static checkIsValid(inst: Institution, relatedId: string): boolean {
     // Every institution needs a name
     if (empty(inst.name)) return false;
 
@@ -521,7 +596,7 @@ class Institution implements IInstitution {
 }
 
 class Tag implements ITag {
-  _id: string | ObjectId = getObjectId();
+  _id: string = getObjectId();
 
   value = '';
 
@@ -545,7 +620,7 @@ class Tag implements ITag {
 }
 
 class Address implements IAddress {
-  _id: string | ObjectId = getObjectId();
+  _id: string = getObjectId();
 
   building = '';
   number = '';
@@ -586,7 +661,7 @@ class Address implements IAddress {
 }
 
 class ContactReference implements IContact {
-  _id: string | ObjectId = getObjectId();
+  _id: string = getObjectId();
 
   mail = '';
   phonenumber = '';

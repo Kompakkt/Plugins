@@ -1,11 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 
 import { EXTENDED_BACKEND_SERVICE } from '@kompakkt/extender';
-import { MediaAgent, Institution, Tag, WikibaseItem } from './metadata-wizard/metadata';
+import { Institution, MediaAgent, Tag, WikibaseItem } from './metadata-wizard/metadata';
 
-import { map } from 'rxjs/operators';
 import { BehaviorSubject, combineLatest } from 'rxjs';
-import { Collection, IMetadataChoices, ITag } from '../common';
+import { map } from 'rxjs/operators';
+import { Collection, ITag } from '../common';
+import { IMetadataChoices } from '../common/wikibase.common';
 
 @Injectable({
   providedIn: 'root',
@@ -86,36 +87,36 @@ export class ContentProviderService {
 
   public async updateMetadataChoices() {
     this.#backend
-      .get(`api/v1/get/findall/${Collection.metadata}`)
+      .get(`wikibase/choices/metadata`)
       .then(result => result as IMetadataChoices)
       .then(result => {
         if (result.persons !== undefined && Array.isArray(result.persons)) {
-          console.debug("fetched persons");
+          console.debug('fetched persons');
           console.debug(result.persons);
           this.ServerPersons.next(result.persons.map(p => new WikibaseItem(p)));
         }
         if (result.techniques !== undefined && Array.isArray(result.techniques)) {
-          console.debug("fetched techniques");
+          console.debug('fetched techniques');
           console.debug(result.techniques);
           this.ServerTechniques.next(result.techniques.map(t => new WikibaseItem(t)));
         }
         if (result.software !== undefined && Array.isArray(result.software)) {
-          console.debug("fetched software");
+          console.debug('fetched software');
           console.debug(result.software);
           this.ServerSoftware.next(result.software.map(s => new WikibaseItem(s)));
         }
         if (result.roles !== undefined && Array.isArray(result.roles)) {
-          console.debug("fetched roles");
+          console.debug('fetched roles');
           console.debug(result.roles);
           this.ServerRoles.next(result.roles.map(r => new WikibaseItem(r)));
         }
         if (result.bibliographic_refs !== undefined && Array.isArray(result.bibliographic_refs)) {
-          console.debug("fetched bib refs");
+          console.debug('fetched bib refs');
           console.debug(result.bibliographic_refs);
           this.ServerBibRefs.next(result.bibliographic_refs.map(r => new WikibaseItem(r)));
         }
         if (result.physical_objs !== undefined && Array.isArray(result.physical_objs)) {
-          console.debug("fetched physical_objs");
+          console.debug('fetched physical_objs');
           console.debug(result.physical_objs);
           this.ServerPhyObjs.next(result.physical_objs.map(o => new WikibaseItem(o)));
         }

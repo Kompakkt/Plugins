@@ -1,4 +1,5 @@
 import {
+  ComponentRef,
   Directive,
   ElementRef,
   ViewContainerRef,
@@ -9,6 +10,7 @@ import {
   output,
 } from '@angular/core';
 import { PLUGIN_COMPONENT_SET, PLUGIN_MANAGER } from './extender';
+import { ExtenderPluginBaseComponent } from './factory';
 import { ExtenderAddonProviderPlugin } from './provider';
 
 @Directive({
@@ -32,6 +34,21 @@ export class ExtenderSlotDirective {
     plugin?: ExtenderAddonProviderPlugin;
     event: Event;
   }>();
+
+  #refs = new Array<ComponentRef<ExtenderPluginBaseComponent>>();
+
+  public async getData() {
+    return new Promise<unknown>(async (resolve, reject) => {
+      try {
+        const result = await Promise.all(this.#refs.map(ref => ref.instance.getSlotOutput()));
+        const filtered = result.filter(v => !!v);
+        if (filtered.length === 1) return resolve(filtered[0]);
+        return resolve(filtered);
+      } catch (e) {
+        return reject(e);
+      }
+    });
+  }
 
   // Create components for the slot
   #componentsForSlot = computed(() => {
@@ -62,6 +79,8 @@ export class ExtenderSlotDirective {
               event,
             });
           });
+
+          this.#refs.push(ref);
 
           switch (this.slotBehaviour()) {
             case 'prepend':

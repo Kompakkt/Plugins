@@ -1,4 +1,3 @@
-
 export type {
   IDocument,
   ITypeValueTuple,
@@ -7,25 +6,19 @@ export type {
   IDescriptionValueTuple,
   IPlaceTuple,
   IAddress,
-  IWikibaseItem,
   IContact,
   IRelatedMap,
-  IAgent,
-  IMediaAgent,
-  IMetadataChoices,
-  IAnnotationLinkChoices,
   IPerson,
   IInstitution,
   ITag,
   IBaseEntity,
   IPhysicalEntity,
   IDigitalEntity,
-  IMediaHierarchy,
   IStrippedUserData,
-  ILoginData,
   IUserData,
   IGroup,
   IAnnotation,
+  IAgent,
   IBody,
   IContent,
   ICameraPerspective,
@@ -41,19 +34,10 @@ export type {
   IEntityLight,
   IEntity,
   ICompilation,
-  ISocketAnnotation,
-  ISocketMessage,
-  ISocketUser,
-  ISocketUserInfo,
-  ISocketChangeRoom,
-  ISocketChangeRanking,
-  ISocketRoomData,
   ISizedEvent,
 } from './interfaces';
 
-export { ObjectId } from './interfaces';
-
-export { UserRank, Collection, Command, License, Role } from './enums';
+export { UserRank, Collection } from './enums';
 
 export {
   isUnresolved,
@@ -70,4 +54,5 @@ export {
   isInstitution,
   isAddress,
   isContact,
+  hasExtensions,
 } from './typeguards';
