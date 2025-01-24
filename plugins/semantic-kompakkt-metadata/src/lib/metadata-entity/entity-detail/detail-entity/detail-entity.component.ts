@@ -18,11 +18,10 @@ interface ILicence {
 }
 
 @Component({
-  selector: 'app-detail-entity',
-  templateUrl: './detail-entity.component.html',
-  styleUrls: ['../../../theme.scss', './detail-entity.component.scss'],
-  standalone: true,
-  imports: [AsyncPipe, CommonModule, MatExpansionModule, MatIconModule, GetLabelPipe],
+    selector: 'app-detail-entity',
+    templateUrl: './detail-entity.component.html',
+    styleUrls: ['../../../theme.scss', './detail-entity.component.scss'],
+    imports: [AsyncPipe, CommonModule, MatExpansionModule, MatIconModule, GetLabelPipe]
 })
 export class DetailEntityComponent {
   digitalEntity = input.required<IDigitalEntity<IWikibaseDigitalEntityExtension>>();

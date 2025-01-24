@@ -5,49 +5,64 @@ import {
   makeEnvironmentProviders,
 } from '@angular/core';
 import { ExtenderPluginManager } from './manager';
-import { ExtenderProviderPlugin } from './provider';
+import { ExtenderPlugin } from './provider';
 
 abstract class BackendServiceClass {
-  public abstract get(path: string): Promise<any>
-  public abstract post(path: string, obj: any): Promise<any>
+  public abstract get(path: string): Promise<any>;
+  public abstract post(path: string, obj: any): Promise<any>;
 }
 
-export type BackendService = Type<BackendServiceClass>
+export type BackendService = Type<BackendServiceClass>;
 
-export type ExtenderOptions<T> = {
+export type ExtenderOptions = {
   componentSet: 'viewerComponents' | 'repoComponents';
-  plugins: ExtenderProviderPlugin[];
-  services: Record<string, Type<T>>;
+  plugins: ExtenderPlugin[];
+  services: Record<string, Type<unknown>>;
   backendService: BackendService;
 };
 
-export const PLUGIN_MANAGER = new InjectionToken<ExtenderPluginManager<unknown>>(
+export const PLUGIN_MANAGER = new InjectionToken<ExtenderPluginManager>(
   'KOMPAKKT_EXTENDER_PLUGIN_MANAGER',
 );
 
-export const PLUGIN_COMPONENT_SET = new InjectionToken<ExtenderOptions<unknown>['componentSet']>(
+export const PLUGIN_COMPONENT_SET = new InjectionToken<ExtenderOptions['componentSet']>(
   'KOMPAKKT_EXTENDER_PLUGIN_COMPONENT_SET',
 );
 
 export const EXTENDED_BACKEND_SERVICE = new InjectionToken<BackendServiceClass>(
   'KOMPAKKT_EXTENDER_BACKEND_SERVICE',
-)
+);
 
-export const provideExtender = <T>({
+export const EXTENDER_PLUGINS = new InjectionToken<ExtenderPlugin[]>('KOMPAKKT_EXTENDER_PLUGINS');
+
+export const EXTENDER_SERVICES = new InjectionToken<Record<string, Type<unknown>>>(
+  'KOMPAKKT_EXTENDER_SERVICES',
+);
+
+export const provideExtender = ({
   componentSet,
   plugins,
   services,
   backendService,
-}: ExtenderOptions<T>): EnvironmentProviders => {
+}: ExtenderOptions): EnvironmentProviders => {
   const servicesByPlugins = plugins.map(p => Object.values((p as any).services)).flat();
   return makeEnvironmentProviders([
     {
-      provide: PLUGIN_MANAGER,
-      useFactory: () => new ExtenderPluginManager<T>(plugins, services),
+      provide: EXTENDER_PLUGINS,
+      useValue: plugins,
+    },
+    {
+      provide: EXTENDER_SERVICES,
+      useValue: services,
     },
     {
       provide: PLUGIN_COMPONENT_SET,
       useValue: componentSet,
+    },
+    {
+      provide: PLUGIN_MANAGER,
+      useClass: ExtenderPluginManager,
+      deps: [EXTENDER_PLUGINS, EXTENDER_SERVICES, PLUGIN_COMPONENT_SET],
     },
     {
       provide: EXTENDED_BACKEND_SERVICE,

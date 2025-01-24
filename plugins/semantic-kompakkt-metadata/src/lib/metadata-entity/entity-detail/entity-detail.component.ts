@@ -14,11 +14,10 @@ import { DetailEntityComponent } from './detail-entity/detail-entity.component';
 import { ContentProviderService } from '../../content-provider.service';
 
 @Component({
-  selector: 'app-entity-detail',
-  templateUrl: './entity-detail.component.html',
-  styleUrls: ['../../theme.scss', './entity-detail.component.scss'],
-  standalone: true,
-  imports: [AsyncPipe, CommonModule, DetailEntityComponent, GetLabelPipe],
+    selector: 'app-entity-detail',
+    templateUrl: './entity-detail.component.html',
+    styleUrls: ['../../theme.scss', './entity-detail.component.scss'],
+    imports: [AsyncPipe, CommonModule, DetailEntityComponent, GetLabelPipe]
 })
 export class EntityDetailComponent extends createExtenderComponent() implements AfterViewInit {
   entity = computed(() => {

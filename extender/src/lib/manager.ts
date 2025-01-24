@@ -1,22 +1,20 @@
-import { Injector, Type, inject, runInInjectionContext } from '@angular/core';
+import { Injectable, Injector, Type, inject, runInInjectionContext } from '@angular/core';
 import { ExtenderPluginBaseComponent } from './factory';
-import {
-  ExtenderAddonProviderPlugin,
-  ExtenderDataProviderPlugin,
-  ExtenderLoginProviderPlugin,
-  ExtenderProviderPlugin,
-} from './provider';
+import { ExtenderPlugin } from './provider';
+import { EXTENDER_PLUGINS, EXTENDER_SERVICES, PLUGIN_COMPONENT_SET } from './extender';
 
-export class ExtenderPluginManager<T> {
-  readonly plugins: ExtenderProviderPlugin[] = [];
-  readonly serviceMap = new Map<string, Type<T>>();
-  readonly injectedServicesMap = new Map<string, T>();
+@Injectable()
+export class ExtenderPluginManager {
+  readonly serviceMap = new Map<string, Type<unknown>>();
+  readonly injectedServicesMap = new Map<string, unknown>();
 
   #injector = inject(Injector);
+  readonly plugins = inject(EXTENDER_PLUGINS);
+  readonly services = inject(EXTENDER_SERVICES);
+  readonly componentSet = inject(PLUGIN_COMPONENT_SET);
 
-  constructor(plugins: ExtenderProviderPlugin[], services: Record<string, Type<T>>) {
-    this.plugins.push(...plugins);
-    for (const [key, service] of Object.entries(services)) {
+  constructor() {
+    for (const [key, service] of Object.entries(this.services)) {
       this.serviceMap.set(key, service);
     }
 
@@ -28,42 +26,23 @@ export class ExtenderPluginManager<T> {
     });
   }
 
-  get dataProvider(): ExtenderDataProviderPlugin | undefined {
-    return this.plugins.find(
-      (plugin): plugin is ExtenderDataProviderPlugin => plugin.type === 'data-provider',
+  public getComponentsForSlot(slot: string) {
+    return new Map<ExtenderPlugin, Type<ExtenderPluginBaseComponent>[]>(
+      this.plugins.map(p => [p, p?.[this.componentSet]?.[slot] ?? []] as const),
     );
   }
 
-  get loginProviders(): ExtenderLoginProviderPlugin[] {
-    return this.plugins.filter(
-      (plugin): plugin is ExtenderLoginProviderPlugin => plugin.type === 'login-provider',
-    );
-  }
-
-  get addonProviders(): ExtenderAddonProviderPlugin[] {
-    return this.plugins.filter(
-      (plugin): plugin is ExtenderAddonProviderPlugin => plugin.type === 'addon-provider',
-    );
-  }
-
-  public getComponentsForSlot(slot: string, componentSet: 'viewerComponents' | 'repoComponents') {
-    return new Map<ExtenderAddonProviderPlugin, Type<ExtenderPluginBaseComponent>[]>(
-      this.addonProviders.map(p => [p, p?.[componentSet]?.[slot] ?? []] as const),
-    );
-  }
-
-  public hasComponentsForSlot(slot: string, componentSet: 'viewerComponents' | 'repoComponents') {
-    const components = this.getComponentsForSlot(slot, componentSet);
+  public hasComponentsForSlot(slot: string) {
+    const components = this.getComponentsForSlot(slot);
     return Array.from(components.values()).some(c => c.length > 0);
   }
 
   public findAddonForComponent(
     slot: string,
-    componentSet: 'viewerComponents' | 'repoComponents',
     component: Type<ExtenderPluginBaseComponent>,
-  ): ExtenderAddonProviderPlugin | undefined {
-    return this.addonProviders.find(p =>
-      p?.[componentSet]?.[slot]?.find(c => c.name === component.name),
+  ): ExtenderPlugin | undefined {
+    return this.plugins.find(p =>
+      p?.[this.componentSet]?.[slot]?.find((c: any) => c.name === component.name),
     );
   }
 }

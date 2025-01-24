@@ -6,11 +6,10 @@ import { GetLabelPipe } from "../../../get-label.pipe";
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'lib-related-content',
-  standalone: true,
-  imports: [GetLabelPipe, MatIconModule],
-  templateUrl: './related-content.component.html',
-  styleUrl: './related-content.component.css',
+    selector: 'lib-related-content',
+    imports: [GetLabelPipe, MatIconModule],
+    templateUrl: './related-content.component.html',
+    styleUrl: './related-content.component.css'
 })
 export class RelatedContentComponent extends createExtenderComponent() {
   annotation = computed(() => {

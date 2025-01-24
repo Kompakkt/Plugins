@@ -1,6 +1,6 @@
 import { Directive, InjectionToken, Type, input, output, signal } from '@angular/core';
 import { ExtenderPluginManager } from './manager';
-import { ExtenderAddonProviderPlugin } from './provider';
+import { ExtenderPlugin } from './provider';
 
 @Directive()
 class ExtenderAddonProviderPluginBase {}
@@ -14,11 +14,11 @@ export const createExtenderPlugin = (options: {
   services?: Record<string, Type<unknown>>;
   tokenName: string;
 }) => {
-  const providerToken = new InjectionToken<ExtenderAddonProviderPlugin>(
+  const providerToken = new InjectionToken<ExtenderPlugin>(
     `KOMPAKKT_EXTENDER_PLUGIN_${options.tokenName}`,
   );
 
-  return class extends ExtenderAddonProviderPluginBase implements ExtenderAddonProviderPlugin {
+  return class extends ExtenderAddonProviderPluginBase implements ExtenderPlugin {
     readonly type = 'addon-provider' as const;
     readonly tokenName = options.tokenName;
     readonly name = options.name;
@@ -32,11 +32,11 @@ export const createExtenderPlugin = (options: {
   };
 };
 
-@Directive({})
+@Directive()
 export class ExtenderPluginBaseComponent {
   readonly slotData = input<unknown>();
   readonly event = output<Event>();
-  readonly pluginManager = input<ExtenderPluginManager<unknown>>();
+  readonly pluginManager = input<ExtenderPluginManager>();
 
   public async getSlotOutput(): Promise<unknown> {
     throw new Error('Not implemented');

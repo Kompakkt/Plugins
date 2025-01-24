@@ -6,11 +6,10 @@ import { MatInputModule } from '@angular/material/input';
 import { Address } from '../metadata';
 
 @Component({
-  selector: 'app-address',
-  templateUrl: './address.component.html',
-  styleUrls: ['../../theme.scss','./address.component.scss'],
-  standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInputModule],
+    selector: 'app-address',
+    templateUrl: './address.component.html',
+    styleUrls: ['../../theme.scss', './address.component.scss'],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, MatFormField, MatLabel, MatInputModule]
 })
 export class AddressComponent {
   address = input.required<Address>();

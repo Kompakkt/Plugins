@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { PLUGIN_COMPONENT_SET, PLUGIN_MANAGER } from './extender';
 import { ExtenderPluginBaseComponent } from './factory';
-import { ExtenderAddonProviderPlugin } from './provider';
+import { type ExtenderPlugin } from './provider';
 
 @Directive({
   selector: '[extendSlot]',
@@ -20,8 +20,6 @@ import { ExtenderAddonProviderPlugin } from './provider';
 export class ExtenderSlotDirective {
   // Fields needed from Plugin Manager (Extender)
   #pluginManager = inject(PLUGIN_MANAGER);
-  #componentSet = inject(PLUGIN_COMPONENT_SET);
-
   #viewContainerRef = inject(ViewContainerRef);
   #elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
@@ -31,7 +29,7 @@ export class ExtenderSlotDirective {
   slotBehaviour = input<'append' | 'prepend' | 'replace'>();
   event = output<{
     componentName: string;
-    plugin?: ExtenderAddonProviderPlugin;
+    plugin?: ExtenderPlugin;
     event: Event;
   }>();
 
@@ -53,7 +51,7 @@ export class ExtenderSlotDirective {
   // Create components for the slot
   #componentsForSlot = computed(() => {
     const slot = this.extendSlot();
-    return slot ? this.#pluginManager.getComponentsForSlot(slot, this.#componentSet) : [];
+    return slot ? this.#pluginManager.getComponentsForSlot(slot) : [];
   });
 
   constructor() {

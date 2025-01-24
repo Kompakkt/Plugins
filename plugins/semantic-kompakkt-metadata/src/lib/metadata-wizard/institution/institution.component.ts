@@ -9,23 +9,22 @@ import { AddressComponent } from '../address/address.component';
 import { Address, Institution } from '../metadata';
 
 @Component({
-  selector: 'app-institution',
-  templateUrl: './institution.component.html',
-  styleUrls: ['../../theme.scss', './institution.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatFormField,
-    MatLabel,
-    MatSelectModule,
-    MatAccordion,
-    MatExpansionModule,
-    MatIcon,
-    AddressComponent,
-    MatInputModule,
-  ],
+    selector: 'app-institution',
+    templateUrl: './institution.component.html',
+    styleUrls: ['../../theme.scss', './institution.component.scss'],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatFormField,
+        MatLabel,
+        MatSelectModule,
+        MatAccordion,
+        MatExpansionModule,
+        MatIcon,
+        AddressComponent,
+        MatInputModule,
+    ]
 })
 export class InstitutionComponent {
   public entityId = input.required<string>();

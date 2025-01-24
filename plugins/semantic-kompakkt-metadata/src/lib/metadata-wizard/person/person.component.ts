@@ -16,22 +16,21 @@ import { ContentProviderService } from '../../content-provider.service';
 import { ContactReference, Institution, MediaAgent } from '../metadata';
 
 @Component({
-  selector: 'app-person',
-  templateUrl: './person.component.html',
-  styleUrls: ['../../theme.scss','./person.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatExpansionModule,
-    MatIconModule,
-    MatFormField,
-    MatLabel,
-    MatSelectModule,
-    MatAutocompleteModule,
-    MatInputModule,
-  ],
+    selector: 'app-person',
+    templateUrl: './person.component.html',
+    styleUrls: ['../../theme.scss', './person.component.scss'],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatExpansionModule,
+        MatIconModule,
+        MatFormField,
+        MatLabel,
+        MatSelectModule,
+        MatAutocompleteModule,
+        MatInputModule,
+    ]
 })
 export class PersonComponent implements OnChanges {
   public entityId = input.required<string>();

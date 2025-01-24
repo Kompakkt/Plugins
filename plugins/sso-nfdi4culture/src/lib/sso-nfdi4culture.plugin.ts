@@ -26,8 +26,8 @@ import { createExtenderPlugin, createExtenderComponent } from '@kompakkt/extende
 class NFDI4CLogoComponent {}
 
 @Component({
-  selector: 'app-entity',
-  template: `
+    selector: 'app-entity',
+    template: `
     <button
       mat-stroked-button
       type="button"
@@ -40,7 +40,7 @@ class NFDI4CLogoComponent {}
       </div>
     </button>
   `,
-  styles: `
+    styles: `
     button {
       width: 100%;
       div.label {
@@ -53,8 +53,7 @@ class NFDI4CLogoComponent {}
       }
     }
   `,
-  standalone: true,
-  imports: [CommonModule, MatButtonModule, NFDI4CLogoComponent],
+    imports: [CommonModule, MatButtonModule, NFDI4CLogoComponent]
 })
 class SSONFDI4CultureComponent extends createExtenderComponent() {
   waitingForResponse = signal(false);

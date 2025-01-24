@@ -47,29 +47,28 @@ import {
 type AnyEntity = DigitalEntity | PhysicalEntity;
 
 @Component({
-  selector: 'app-entity',
-  templateUrl: './entity.component.html',
-  styleUrls: ['../../theme.scss', './entity.component.scss'],
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatAutocompleteModule,
-    MatSidenavModule,
-    MatTabsModule,
-    MatFormFieldModule,
-    MatListModule,
-    MatLabel,
-    MatError,
-    MatIconModule,
-    MatRadioModule,
-    AutocompleteOptionComponent,
-    MatInputModule,
-    GetLabelPipe,
-  ],
+    selector: 'app-entity',
+    templateUrl: './entity.component.html',
+    styleUrls: ['../../theme.scss', './entity.component.scss'],
+    imports: [
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatCheckboxModule,
+        MatAutocompleteModule,
+        MatSidenavModule,
+        MatTabsModule,
+        MatFormFieldModule,
+        MatListModule,
+        MatLabel,
+        MatError,
+        MatIconModule,
+        MatRadioModule,
+        AutocompleteOptionComponent,
+        MatInputModule,
+        GetLabelPipe,
+    ]
 })
 export class EntityComponent extends createExtenderComponent() {
   #content = inject(ContentProviderService);

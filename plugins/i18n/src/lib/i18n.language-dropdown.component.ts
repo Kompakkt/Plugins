@@ -5,10 +5,9 @@ import { FormControl } from '@angular/forms';
 import { KeyValuePipe } from '@angular/common';
 
 @Component({
-  templateUrl: './i18n.language-dropdown.component.html',
-  styleUrl: './i18n.language-dropdown.component.scss',
-  standalone: true,
-  imports: [KeyValuePipe],
+    templateUrl: './i18n.language-dropdown.component.html',
+    styleUrl: './i18n.language-dropdown.component.scss',
+    imports: [KeyValuePipe]
 })
 export class LanguageDropdownComponent extends createExtenderComponent() implements OnInit {
   #translateService = inject(TranslateService);

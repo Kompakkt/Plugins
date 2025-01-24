@@ -7,11 +7,10 @@ import { IAddress, IInstitution } from '../../../../common';
 const firstKey = (obj: any) => Object.keys(obj)[0] ?? '';
 
 @Component({
-  selector: 'app-detail-institution',
-  templateUrl: './detail-institution.component.html',
-  styleUrls: ['../../../theme.scss', './detail-institution.component.scss'],
-  standalone: true,
-  imports: [AsyncPipe, CommonModule, MatChipsModule],
+    selector: 'app-detail-institution',
+    templateUrl: './detail-institution.component.html',
+    styleUrls: ['../../../theme.scss', './detail-institution.component.scss'],
+    imports: [AsyncPipe, CommonModule, MatChipsModule]
 })
 export class DetailInstitutionComponent  {
   institution = input.required<IInstitution>();
