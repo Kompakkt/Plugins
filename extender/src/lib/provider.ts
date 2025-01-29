@@ -12,4 +12,6 @@ export type ExtenderPlugin = {
   version: `${number}.${number}.${number}`;
   viewerComponents: Record<string, Type<ExtenderPluginBaseComponent>[]>;
   repoComponents: Record<string, Type<ExtenderPluginBaseComponent>[]>;
+
+  enabled?: boolean;
 };

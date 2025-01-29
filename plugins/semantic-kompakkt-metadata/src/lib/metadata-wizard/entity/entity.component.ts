@@ -47,28 +47,28 @@ import {
 type AnyEntity = DigitalEntity | PhysicalEntity;
 
 @Component({
-    selector: 'app-entity',
-    templateUrl: './entity.component.html',
-    styleUrls: ['../../theme.scss', './entity.component.scss'],
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatButtonModule,
-        MatCheckboxModule,
-        MatAutocompleteModule,
-        MatSidenavModule,
-        MatTabsModule,
-        MatFormFieldModule,
-        MatListModule,
-        MatLabel,
-        MatError,
-        MatIconModule,
-        MatRadioModule,
-        AutocompleteOptionComponent,
-        MatInputModule,
-        GetLabelPipe,
-    ]
+  selector: 'app-entity',
+  templateUrl: './entity.component.html',
+  styleUrls: ['../../theme.scss', './entity.component.scss'],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatAutocompleteModule,
+    MatSidenavModule,
+    MatTabsModule,
+    MatFormFieldModule,
+    MatListModule,
+    MatLabel,
+    MatError,
+    MatIconModule,
+    MatRadioModule,
+    AutocompleteOptionComponent,
+    MatInputModule,
+    GetLabelPipe,
+  ],
 })
 export class EntityComponent extends createExtenderComponent() {
   #content = inject(ContentProviderService);
@@ -185,23 +185,23 @@ export class EntityComponent extends createExtenderComponent() {
   public searchTag = new FormControl<string | WikibaseItem | null>('');
 
   // Autocomplete Inputs
-  public availablePersons$ = this.#content.$Persons.pipe(
+  public availablePersons$ = this.#content.persons$.pipe(
     map(persons => persons.map(p => new WikibaseItem(p))),
   );
-  public availableTechniques$ = this.#content.$Techniques.pipe(
+  public availableTechniques$ = this.#content.techniques$.pipe(
     map(techniques => techniques.map(t => new WikibaseItem(t))),
   );
-  public availableSoftware$ = this.#content.$Software.pipe(
+  public availableSoftware$ = this.#content.software$.pipe(
     map(software => software.map(s => new WikibaseItem(s))),
   );
-  public availableTags$ = this.#content.$Tags.pipe(map(tags => tags.map(t => new Tag(t))));
-  public availableRoles$ = this.#content.$Roles.pipe(
+  public availableTags$ = this.#content.tags$.pipe(map(tags => tags.map(t => new Tag(t))));
+  public availableRoles$ = this.#content.roles$.pipe(
     map(roles => roles.map(r => new WikibaseItem(r))),
   );
-  public availableBibRefs$ = this.#content.$BibRefs.pipe(
+  public availableBibRefs$ = this.#content.bibrefs$.pipe(
     map(ref => ref.map(r => new WikibaseItem(r))),
   );
-  public availablePhyObjs$ = this.#content.$PhysicalObjects.pipe(
+  public availablePhyObjs$ = this.#content.physicalobjects$.pipe(
     map(obj => obj.map(r => new WikibaseItem(r))),
   );
 
