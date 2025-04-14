@@ -10,7 +10,7 @@ import type { IWikibaseLabel } from '../common/wikibase.common';
  * @returns
  */
 export const getLabel = (item?: { label: IWikibaseLabel } | string, locale?: string) => {
-  console.log('getLabel', item);
+  // console.log('getLabel', item);
   if (!item) {
     return 'No label';
   }

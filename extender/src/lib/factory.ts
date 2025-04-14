@@ -1,6 +1,18 @@
-import { Directive, InjectionToken, Type, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Directive,
+  InjectionToken,
+  OnDestroy,
+  Type,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { ExtenderPluginManager } from './manager';
 import { ExtenderPlugin } from './provider';
+import { BehaviorSubject } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Directive()
 class ExtenderAddonProviderPluginBase {}
@@ -33,13 +45,16 @@ export const createExtenderPlugin = (options: {
 };
 
 @Directive()
-export class ExtenderPluginBaseComponent {
-  readonly slotData = input<unknown>();
-  readonly event = output<Event>();
+export class ExtenderPluginBaseComponent implements OnDestroy {
+  readonly dataSubject = new BehaviorSubject<unknown>(undefined);
+  readonly slotData = toSignal(this.dataSubject);
+  readonly event = output<CustomEvent>();
   readonly pluginManager = input<ExtenderPluginManager>();
 
-  public async getSlotOutput(): Promise<unknown> {
-    throw new Error('Not implemented');
+  readonly changeDetectorRef = inject(ChangeDetectorRef);
+
+  ngOnDestroy(): void {
+    this.dataSubject?.unsubscribe();
   }
 }
 

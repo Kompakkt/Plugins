@@ -11,7 +11,9 @@
           <div class="block">
             <ng-container>
               {{ agent.roleTitle }}:
-              <a target="_blank" href="{{ agent.id }}">{{ agent | getLabel }}</a>
+              <a target="_blank" href="{{ agent | wikibaseItemAddress: wikibaseData }}">{{
+                agent | getLabel
+              }}</a>
             </ng-container>
           </div>
         }
@@ -48,13 +50,19 @@
 
         @for (technique of wikibaseData.techniques; track technique) {
           <div class="creation-item">
-            Technique: <a target="_blank" href="{{ technique.id }}">{{ technique | getLabel }}</a>
+            Technique:
+            <a target="_blank" href="{{ technique | wikibaseItemAddress: wikibaseData }}">{{
+              technique | getLabel
+            }}</a>
           </div>
         }
 
         @for (tool of wikibaseData.software; track tool) {
           <div class="creation-item">
-            Software: <a target="_blank" href="{{ tool.id }}">{{ tool | getLabel }}</a>
+            Software:
+            <a target="_blank" href="{{ tool | wikibaseItemAddress: wikibaseData }}">{{
+              tool | getLabel
+            }}</a>
           </div>
         }
 
@@ -95,7 +103,9 @@
 
         @for (ref of wikibaseData.bibliographicRefs; track ref) {
           <div class="block">
-            <a target="_blank" href="{{ ref.id }}">{{ ref | getLabel }}</a>
+            <a target="_blank" href="{{ ref | wikibaseItemAddress: wikibaseData }}">{{
+              ref | getLabel
+            }}</a>
           </div>
         }
       </mat-expansion-panel>
@@ -115,12 +125,13 @@
                 class="hierarchy-entry"
                 [style.padding-left]="(i === 1 ? 0 : (i - 1) * 24).toString() + 'px'"
               >
-              @if (i > 0) {
-                <mat-icon class="hierarchy-icon"> subdirectory_arrow_right </mat-icon>
-
-              }
+                @if (i > 0) {
+                  <mat-icon class="hierarchy-icon"> subdirectory_arrow_right </mat-icon>
+                }
                 <div class="hierarchy-label" [class.active]="i === hierarchy.parents.length - 1">
-                  <a target="_blank" [href]="parent.id">{{ parent | getLabel }}</a>
+                  <a target="_blank" [href]="parent | wikibaseItemAddress: wikibaseData">{{
+                    parent | getLabel
+                  }}</a>
                 </div>
               </div>
             }
@@ -134,7 +145,9 @@
               >
                 <mat-icon class="hierarchy-icon"> subdirectory_arrow_right </mat-icon>
                 <div class="hierarchy-label">
-                  <a target="_blank" [href]="sibling.id">{{ sibling | getLabel }}</a>
+                  <a target="_blank" [href]="sibling | wikibaseItemAddress: wikibaseData">{{
+                    sibling | getLabel
+                  }}</a>
                 </div>
               </div>
             }
@@ -145,7 +158,9 @@
                 @if (wikibaseData.physicalObjs; as physicalObjects) {
                   @for (phyObj of physicalObjects; track phyObj) {
                     <div>
-                      <a target="_blank" [href]="phyObj.id">{{ phyObj | getLabel }}</a>
+                      <a target="_blank" [href]="phyObj | wikibaseItemAddress: wikibaseData">{{
+                        phyObj | getLabel
+                      }}</a>
                     </div>
                   }
                 }
@@ -189,14 +204,13 @@
               @if (link.description) {
                 <p>
                   {{ link.description }}
-                </p>  
+                </p>
               }
               @if (link.value) {
                 <p>
                   {{ link.value }}
                 </p>
               }
-              
             </div>
           }
         </mat-expansion-panel>

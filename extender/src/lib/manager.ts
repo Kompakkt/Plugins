@@ -14,6 +14,9 @@ export class ExtenderPluginManager {
   readonly componentSet = inject(PLUGIN_COMPONENT_SET);
 
   readonly disabledPlugins = new Set<string>();
+  get enabledPlugins(): ExtenderPlugin[] {
+    return Array.from(this.plugins.values()).filter(p => !this.disabledPlugins.has(p.name));
+  }
 
   constructor() {
     for (const [key, service] of Object.entries(this.services)) {
@@ -30,9 +33,7 @@ export class ExtenderPluginManager {
 
   public getComponentsForSlot(slot: string) {
     return new Map<ExtenderPlugin, Type<ExtenderPluginBaseComponent>[]>(
-      this.plugins
-        .filter(p => !this.disabledPlugins.has(p.name))
-        .map(p => [p, p?.[this.componentSet]?.[slot] ?? []] as const),
+      this.enabledPlugins.map(p => [p, p?.[this.componentSet]?.[slot] ?? []] as const),
     );
   }
 
@@ -45,10 +46,8 @@ export class ExtenderPluginManager {
     slot: string,
     component: Type<ExtenderPluginBaseComponent>,
   ): ExtenderPlugin | undefined {
-    return this.plugins.find(
-      p =>
-        !this.disabledPlugins.has(p.name) &&
-        p?.[this.componentSet]?.[slot]?.find((c: any) => c.name === component.name),
+    return this.enabledPlugins.find(p =>
+      p?.[this.componentSet]?.[slot]?.find((c: any) => c.name === component.name),
     );
   }
 

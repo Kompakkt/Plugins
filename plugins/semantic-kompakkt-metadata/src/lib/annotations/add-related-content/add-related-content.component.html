@@ -1,0 +1,141 @@
+<div class="search-wrapper">
+  <k-input
+    class="hide-label"
+    label="Author"
+    placeholder="Add description author"
+    (valueChanged)="searchAgent.setValue($event.value)"
+    #searchAgentInput
+  />
+  <mat-icon>search</mat-icon>
+</div>
+
+<k-autocomplete [inputElement]="searchAgentInput">
+  @for (agent of filteredAgents$ | async; track agent) {
+    <k-wikibase-item-card
+      class="autocomplete-item"
+      [item]="agent"
+      (click)="addAgent(agent, searchAgentInput)"
+    />
+  } @empty {
+    <p>No related agents found.</p>
+  }
+</k-autocomplete>
+
+<div class="existing-list">
+  @for (agent of relatedAgents$ | async; track agent) {
+    <k-wikibase-item-card
+      class="existing-item"
+      [showDeleteButton]="true"
+      [item]="agent"
+      (onDelete)="remove(agent, 'agent')"
+    />
+  }
+</div>
+
+<div class="search-wrapper">
+  <k-input
+    class="hide-label"
+    label="Licenses"
+    placeholder="Add description license"
+    (valueChanged)="searchLicense.setValue($event.value)"
+    #searchLicenseInput
+  />
+  <mat-icon>search</mat-icon>
+</div>
+
+<k-autocomplete [inputElement]="searchLicenseInput">
+  @for (license of filteredLicenses$ | async; track license) {
+    <k-wikibase-item-card
+      class="autocomplete-item"
+      [item]="license"
+      (click)="addLicense(license, searchLicenseInput)"
+    />
+  } @empty {
+    <p>No related licenses found.</p>
+  }
+</k-autocomplete>
+
+<div class="existing-list">
+  @for (license of relatedLicenses$ | async; track license) {
+    <k-wikibase-item-card
+      class="existing-item"
+      [showDeleteButton]="true"
+      [item]="license"
+      (onDelete)="remove(license, 'license')"
+    />
+  }
+</div>
+
+<div class="search-wrapper">
+  <k-input
+    class="hide-label"
+    label="Media"
+    placeholder="Add related media from Kompakkt"
+    (valueChanged)="searchMedia.setValue($event.value)"
+    #searchMediaInput
+  />
+  <mat-icon>search</mat-icon>
+</div>
+
+<k-autocomplete [inputElement]="searchMediaInput">
+  @for (media of filteredMedia$ | async; track media) {
+    <k-wikibase-item-card
+      class="autocomplete-item"
+      [item]="media"
+      (click)="addMedia(media, searchMediaInput)"
+    />
+  } @empty {
+    <p>No related media found.</p>
+  }
+</k-autocomplete>
+
+<div class="existing-list">
+  @for (media of relatedMedia$ | async; track media) {
+    <k-wikibase-item-card
+      class="existing-item"
+      [showDeleteButton]="true"
+      [item]="media"
+      (onDelete)="remove(media, 'media')"
+    />
+  }
+</div>
+
+<div class="search-wrapper">
+  <k-input
+    class="hide-label"
+    label="Semantic concepts"
+    placeholder="Add semantic concept"
+    (valueChanged)="searchConcept.setValue($event.value)"
+    #searchConceptInput
+  />
+  <mat-icon>search</mat-icon>
+</div>
+
+<k-autocomplete [inputElement]="searchConceptInput">
+  @for (concept of filteredConcepts$ | async; track concept) {
+    <k-wikibase-item-card
+      class="autocomplete-item"
+      [item]="concept"
+      (click)="addConcept(concept, searchConceptInput)"
+    />
+  } @empty {
+    <p>No related concepts found.</p>
+  }
+</k-autocomplete>
+
+<div class="existing-list">
+  @for (concept of relatedConcepts$ | async; track concept) {
+    <k-wikibase-item-card
+      class="existing-item"
+      [showDeleteButton]="true"
+      [item]="concept"
+      (onDelete)="remove(concept, 'concept')"
+    />
+  }
+</div>
+
+<k-button-row justify="end">
+  <k-button type="solid-primary">
+    <span>{{ 'Add' | translate }}</span>
+  </k-button>
+</k-button-row>

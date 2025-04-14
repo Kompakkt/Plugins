@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -9,6 +9,9 @@ import type {
   IWikibaseDigitalEntityExtension,
 } from '../../../../common/wikibase.common';
 import { GetLabelPipe } from '../../../get-label.pipe';
+import { ContentProviderService } from '../../../content-provider.service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { GetWikibaseItemAddressPipe } from '../../../wikibase-item-address.pipe';
 
 interface ILicence {
   title: string;
@@ -18,10 +21,17 @@ interface ILicence {
 }
 
 @Component({
-    selector: 'app-detail-entity',
-    templateUrl: './detail-entity.component.html',
-    styleUrls: ['../../../theme.scss', './detail-entity.component.scss'],
-    imports: [AsyncPipe, CommonModule, MatExpansionModule, MatIconModule, GetLabelPipe]
+  selector: 'app-detail-entity',
+  templateUrl: './detail-entity.component.html',
+  styleUrls: ['../../../theme.scss', './detail-entity.component.scss'],
+  imports: [
+    AsyncPipe,
+    CommonModule,
+    MatExpansionModule,
+    MatIconModule,
+    GetLabelPipe,
+    GetWikibaseItemAddressPipe,
+  ],
 })
 export class DetailEntityComponent {
   digitalEntity = input.required<IDigitalEntity<IWikibaseDigitalEntityExtension>>();

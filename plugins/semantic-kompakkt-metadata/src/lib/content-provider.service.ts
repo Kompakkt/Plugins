@@ -6,10 +6,17 @@ import { Institution, MediaAgent, Tag, WikibaseItem } from './metadata-wizard/me
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Collection, ITag } from '../common';
-import { IMetadataChoices } from '../common/wikibase.common';
+import { IAnnotationLinkChoices, IMetadataChoices } from '../common/wikibase.common';
 
-type InstanceInfo = {
+export type InstanceInfo = {
   instance: string;
+};
+
+const sortWikibaseItemsById = (a: WikibaseItem, b: WikibaseItem) => {
+  if (!a.id || !b.id) return 0;
+  const aID = +a.id.slice(1);
+  const bID = +b.id.slice(1);
+  return aID - bID;
 };
 
 @Injectable({
@@ -27,6 +34,10 @@ export class ContentProviderService {
   private serverRoles = new BehaviorSubject<WikibaseItem[]>([]);
   private serverBibRefs = new BehaviorSubject<WikibaseItem[]>([]);
   private serverPhyObjs = new BehaviorSubject<WikibaseItem[]>([]);
+  private serverConcepts = new BehaviorSubject<WikibaseItem[]>([]);
+  private serverMedia = new BehaviorSubject<WikibaseItem[]>([]);
+  private serverAgents = new BehaviorSubject<WikibaseItem[]>([]);
+  private serverLicenses = new BehaviorSubject<WikibaseItem[]>([]);
 
   // Newly added content
   private localPersons = new BehaviorSubject<WikibaseItem[]>([]);
@@ -48,6 +59,10 @@ export class ContentProviderService {
   roles$ = this.serverRoles.asObservable();
   bibrefs$ = this.serverBibRefs.asObservable();
   physicalobjects$ = this.serverPhyObjs.asObservable();
+  concepts$ = this.serverConcepts.asObservable();
+  media$ = this.serverMedia.asObservable();
+  agents$ = this.serverAgents.asObservable();
+  licenses$ = this.serverLicenses.asObservable();
 
   constructor() {
     this.updateContent();
@@ -57,22 +72,55 @@ export class ContentProviderService {
     // TODO: refetch on some occasions, e.g. after wizard completion
     await Promise.allSettled([
       this.updateMetadataChoices(),
+      this.updateAnnotationLinkChoices(),
       // this.updateInstitutions(),
       this.updateTags(),
       // this.updateSoftware(),
       // this.updateTechniques(),
       // this.updateRoles(),
-      this.updateWikibaseMetadata(),
+      this.updateInstanceInfo(),
     ]);
     // await Promise.all([this.updatePersons()]);
   }
 
-  public async updateWikibaseMetadata() {
+  public async updateInstanceInfo() {
     return this.#backend
       .get(`wikibase/instance/info`)
       .then(result => result as InstanceInfo)
       .then(result => {
+        console.debug('instance info', result);
         this.instanceInfo.next(result);
+        return result;
+      });
+  }
+
+  public async updateAnnotationLinkChoices() {
+    return this.#backend
+      .get(`/wikibase/choices/annotation-link`)
+      .then(result => result as IAnnotationLinkChoices)
+      .then(result => {
+        console.debug('annotation link choices', result);
+        if (result.relatedAgents !== undefined && Array.isArray(result.relatedAgents)) {
+          this.serverAgents.next(
+            result.relatedAgents.map(ra => new WikibaseItem(ra)).sort(sortWikibaseItemsById),
+          );
+        }
+        if (result.relatedConcepts !== undefined && Array.isArray(result.relatedConcepts)) {
+          this.serverConcepts.next(
+            result.relatedConcepts.map(rc => new WikibaseItem(rc)).sort(sortWikibaseItemsById),
+          );
+        }
+        if (result.relatedMedia !== undefined && Array.isArray(result.relatedMedia)) {
+          this.serverMedia.next(
+            result.relatedMedia.map(rm => new WikibaseItem(rm)).sort(sortWikibaseItemsById),
+          );
+        }
+        if (result.licenses !== undefined && Array.isArray(result.licenses)) {
+          this.serverLicenses.next(
+            result.licenses.map(rl => new WikibaseItem(rl)).sort(sortWikibaseItemsById),
+          );
+        }
+        return result;
       });
   }
 
@@ -81,35 +129,36 @@ export class ContentProviderService {
       .get(`wikibase/choices/metadata`)
       .then(result => result as IMetadataChoices)
       .then(result => {
+        console.debug('metadata choices', result);
         if (result.persons !== undefined && Array.isArray(result.persons)) {
-          console.debug('fetched persons');
-          console.debug(result.persons);
-          this.serverPersons.next(result.persons.map(p => new WikibaseItem(p)));
+          this.serverPersons.next(
+            result.persons.map(p => new WikibaseItem(p)).sort(sortWikibaseItemsById),
+          );
         }
         if (result.techniques !== undefined && Array.isArray(result.techniques)) {
-          console.debug('fetched techniques');
-          console.debug(result.techniques);
-          this.serverTechniques.next(result.techniques.map(t => new WikibaseItem(t)));
+          this.serverTechniques.next(
+            result.techniques.map(t => new WikibaseItem(t)).sort(sortWikibaseItemsById),
+          );
         }
         if (result.software !== undefined && Array.isArray(result.software)) {
-          console.debug('fetched software');
-          console.debug(result.software);
-          this.serverSoftware.next(result.software.map(s => new WikibaseItem(s)));
+          this.serverSoftware.next(
+            result.software.map(s => new WikibaseItem(s)).sort(sortWikibaseItemsById),
+          );
         }
         if (result.roles !== undefined && Array.isArray(result.roles)) {
-          console.debug('fetched roles');
-          console.debug(result.roles);
-          this.serverRoles.next(result.roles.map(r => new WikibaseItem(r)));
+          this.serverRoles.next(
+            result.roles.map(r => new WikibaseItem(r)).sort(sortWikibaseItemsById),
+          );
         }
         if (result.bibliographic_refs !== undefined && Array.isArray(result.bibliographic_refs)) {
-          console.debug('fetched bib refs');
-          console.debug(result.bibliographic_refs);
-          this.serverBibRefs.next(result.bibliographic_refs.map(r => new WikibaseItem(r)));
+          this.serverBibRefs.next(
+            result.bibliographic_refs.map(r => new WikibaseItem(r)).sort(sortWikibaseItemsById),
+          );
         }
         if (result.physical_objs !== undefined && Array.isArray(result.physical_objs)) {
-          console.debug('fetched physical_objs');
-          console.debug(result.physical_objs);
-          this.serverPhyObjs.next(result.physical_objs.map(o => new WikibaseItem(o)));
+          this.serverPhyObjs.next(
+            result.physical_objs.map(o => new WikibaseItem(o)).sort(sortWikibaseItemsById),
+          );
         }
       })
       .catch(() => {});

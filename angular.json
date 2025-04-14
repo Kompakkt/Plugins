@@ -163,6 +163,29 @@
           "defaultConfiguration": "production"
         }
       }
+    },
+    "@kompakkt/plugin-custom-branding": {
+      "projectType": "library",
+      "root": "./plugins/custom-branding",
+      "sourceRoot": "./plugins/custom-branding/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "plugins/custom-branding/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "plugins/custom-branding/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "plugins/custom-branding/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        }
+      }
     }
   },
   "cli": {

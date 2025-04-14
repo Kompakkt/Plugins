@@ -11,6 +11,7 @@ export {
   createExtenderPlugin,
   type ExtenderPluginBaseComponent,
 } from './lib/factory';
-export { ExtenderSlotDirective } from './lib/slot.directive';
+export { ExtenderSlotDirective, type ExtenderSlotEvent } from './lib/slot.directive';
 export { type ExtenderPlugin } from './lib/provider';
 export { type ExtenderPluginManager } from './lib/manager';
+export { ExtenderTransformer } from './lib/transformer';

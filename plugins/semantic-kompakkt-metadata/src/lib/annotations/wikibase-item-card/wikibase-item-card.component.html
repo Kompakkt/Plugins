@@ -1,0 +1,28 @@
+@if (context(); as context) {
+  <h3>{{ context }}</h3>
+}
+
+<h2>
+  <span class="id-badge">{{ item().id }}</span> {{ item().label['en'] }}
+</h2>
+
+@if (trimmedDescription(); as description) {
+  <p>{{ description }}</p>
+} @else {
+  <p><i>No description available.</i></p>
+}
+
+@if (showButtons()) {
+  <k-button-row direction="vertical" justify="start">
+    @if (showOpenButton()) {
+      <k-button icon-button color="transparent" (click)="openInNewTab()"
+        ><mat-icon>open_in_new</mat-icon></k-button
+      >
+    }
+    @if (showDeleteButton()) {
+      <k-button icon-button color="transparent" (click)="deleteItem()"
+        ><mat-icon>delete</mat-icon></k-button
+      >
+    }
+  </k-button-row>
+}

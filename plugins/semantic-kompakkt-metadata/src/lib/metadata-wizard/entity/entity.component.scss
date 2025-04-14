@@ -209,6 +209,10 @@ mat-form-field {
     flex-direction: column;
     padding: 1em 2em;
     font-size: 14px;
+
+    > * + * {
+      margin-top: 12px;
+    }
   }
 
   .person-search {
@@ -244,10 +248,6 @@ mat-form-field {
     grid-template-columns: auto auto;
     align-items: center;
   }
-}
-
-.spacer {
-  margin-bottom: 1rem;
 }
 
 .invalid {

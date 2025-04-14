@@ -2,6 +2,7 @@ import {
   ComponentRef,
   Directive,
   ElementRef,
+  OnDestroy,
   ViewContainerRef,
   computed,
   effect,
@@ -12,12 +13,19 @@ import {
 import { PLUGIN_COMPONENT_SET, PLUGIN_MANAGER } from './extender';
 import { ExtenderPluginBaseComponent } from './factory';
 import { type ExtenderPlugin } from './provider';
+import { Observable, Subscription } from 'rxjs';
+
+export type ExtenderSlotEvent<T = any> = {
+  componentName: string;
+  plugin?: ExtenderPlugin;
+  event: CustomEvent<T>;
+};
 
 @Directive({
   selector: '[extendSlot]',
   standalone: true,
 })
-export class ExtenderSlotDirective {
+export class ExtenderSlotDirective implements OnDestroy {
   // Fields needed from Plugin Manager (Extender)
   #pluginManager = inject(PLUGIN_MANAGER);
   #viewContainerRef = inject(ViewContainerRef);
@@ -25,28 +33,11 @@ export class ExtenderSlotDirective {
 
   // User has to input the slot name, which will then be used to find the components for that slot
   extendSlot = input<string | undefined>();
-  slotData = input<unknown>();
+  dataObservable = input<Observable<unknown>>();
   slotBehaviour = input<'append' | 'prepend' | 'replace'>();
-  event = output<{
-    componentName: string;
-    plugin?: ExtenderPlugin;
-    event: Event;
-  }>();
+  event = output<ExtenderSlotEvent>();
 
   #refs = new Array<ComponentRef<ExtenderPluginBaseComponent>>();
-
-  public async getData() {
-    return new Promise<unknown>(async (resolve, reject) => {
-      try {
-        const result = await Promise.all(this.#refs.map(ref => ref.instance.getSlotOutput()));
-        const filtered = result.filter(v => !!v);
-        if (filtered.length === 1) return resolve(filtered[0]);
-        return resolve(filtered);
-      } catch (e) {
-        return reject(e);
-      }
-    });
-  }
 
   // Create components for the slot
   #componentsForSlot = computed(() => {
@@ -54,22 +45,17 @@ export class ExtenderSlotDirective {
     return slot ? this.#pluginManager.getComponentsForSlot(slot) : [];
   });
 
+  #slotDataSubscription?: Subscription;
+
   constructor() {
     effect(() => {
-      console.log('SlotData', this.slotData());
       console.log('SlotDirective components', this.#componentsForSlot());
       const componentList = this.#componentsForSlot();
-      const data = this.slotData();
 
       for (const [plugin, components] of componentList) {
         for (const component of components) {
           const ref = this.#viewContainerRef.createComponent(component);
-          try {
-            ref.setInput('slotData', data);
-            ref.setInput('pluginManager', this.#pluginManager);
-          } catch (e) {
-            console.error('Error while setting slotData', e);
-          }
+          ref.setInput('pluginManager', this.#pluginManager);
           ref.instance.event.subscribe(event => {
             this.event.emit({
               componentName: ref.instance.constructor.name,
@@ -94,6 +80,27 @@ export class ExtenderSlotDirective {
           }
         }
       }
+
+      this.setupDataObservable();
     });
+
+    effect(() => {
+      const observable = this.dataObservable();
+      this.setupDataObservable();
+    });
+  }
+
+  private setupDataObservable() {
+    const observable = this.dataObservable();
+    this.#slotDataSubscription?.unsubscribe();
+    this.#slotDataSubscription = observable?.subscribe(data => {
+      for (const ref of this.#refs) {
+        ref.instance.dataSubject.next(data);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.#slotDataSubscription?.unsubscribe();
   }
 }
