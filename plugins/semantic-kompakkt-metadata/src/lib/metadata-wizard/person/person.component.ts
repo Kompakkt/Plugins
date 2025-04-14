@@ -16,21 +16,21 @@ import { ContentProviderService } from '../../content-provider.service';
 import { ContactReference, Institution, MediaAgent } from '../metadata';
 
 @Component({
-    selector: 'app-person',
-    templateUrl: './person.component.html',
-    styleUrls: ['../../theme.scss', './person.component.scss'],
-    imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatExpansionModule,
-        MatIconModule,
-        MatFormField,
-        MatLabel,
-        MatSelectModule,
-        MatAutocompleteModule,
-        MatInputModule,
-    ]
+  selector: 'app-person',
+  templateUrl: './person.component.html',
+  styleUrls: ['../../theme.scss', './person.component.scss'],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatExpansionModule,
+    MatIconModule,
+    MatFormField,
+    MatLabel,
+    MatSelectModule,
+    MatAutocompleteModule,
+    MatInputModule,
+  ],
 })
 export class PersonComponent implements OnChanges {
   public entityId = input.required<string>();
@@ -56,7 +56,7 @@ export class PersonComponent implements OnChanges {
   public Institution = Institution;
 
   constructor(private content: ContentProviderService) {
-    this.content.$Institutions.subscribe(insts => {
+    this.content.institutions$.subscribe(insts => {
       this.availableInstitutions.next(insts.map(i => new Institution(i)));
     });
 
@@ -138,7 +138,7 @@ export class PersonComponent implements OnChanges {
   }
 
   get availableInstitutions$() {
-    return this.content.$Institutions;
+    return this.content.institutions$;
   }
 
   ngOnChanges(changes: SimpleChanges) {
