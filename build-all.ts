@@ -3,7 +3,7 @@ import { $ } from 'bun';
 import { readdir, rename, mkdir, exists } from 'node:fs/promises';
 import { join } from 'node:path';
 
-const hardRequirements = ['@kompakkt/extender', '@kompakkt/plugin-i18n'];
+const hardRequirements = ['@kompakkt/extender'];
 
 const getProjectNames = async () => {
   const angularJson = await getAngularJson();

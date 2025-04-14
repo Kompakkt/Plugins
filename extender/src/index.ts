@@ -2,8 +2,10 @@ export {
   type ExtenderOptions,
   PLUGIN_COMPONENT_SET,
   PLUGIN_MANAGER,
-  EXTENDED_BACKEND_SERVICE,
+  EXTENDER_BACKEND_SERVICE,
+  EXTENDER_TRANSLATE_PIPE,
   type BackendService,
+  type TranslatePipe,
   provideExtender,
 } from './lib/extender';
 export {

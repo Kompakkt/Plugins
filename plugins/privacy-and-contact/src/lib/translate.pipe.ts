@@ -1,5 +1,5 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { TranslateService } from './i18n.service';
+import { EXTENDER_TRANSLATE_PIPE } from '@kompakkt/extender';
 
 @Pipe({
   name: 'translate',
@@ -7,9 +7,9 @@ import { TranslateService } from './i18n.service';
   standalone: true,
 })
 export class TranslatePipe implements PipeTransform {
-  #translateService = inject(TranslateService);
+  #extendedPipe = inject(EXTENDER_TRANSLATE_PIPE);
 
   transform(key: string): string {
-    return this.#translateService.getTranslatedKey(key);
+    return this.#extendedPipe.transform(key);
   }
 }

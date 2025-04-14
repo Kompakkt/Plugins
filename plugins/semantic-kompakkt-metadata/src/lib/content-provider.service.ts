@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 
-import { EXTENDED_BACKEND_SERVICE } from '@kompakkt/extender';
+import { EXTENDER_BACKEND_SERVICE } from '@kompakkt/extender';
 import { Institution, MediaAgent, Tag, WikibaseItem } from './metadata-wizard/metadata';
 
 import { BehaviorSubject, combineLatest } from 'rxjs';
@@ -23,7 +23,7 @@ const sortWikibaseItemsById = (a: WikibaseItem, b: WikibaseItem) => {
   providedIn: 'root',
 })
 export class ContentProviderService {
-  #backend = inject(EXTENDED_BACKEND_SERVICE);
+  #backend = inject(EXTENDER_BACKEND_SERVICE);
 
   // Existing server content
   private serverInstitutions = new BehaviorSubject<Institution[]>([]);

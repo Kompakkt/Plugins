@@ -4,7 +4,6 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { createExtenderComponent } from '@kompakkt/extender';
-import { TranslatePipe } from '@kompakkt/plugin-i18n';
 import {
   AutocompleteComponent,
   ButtonComponent,
@@ -16,6 +15,7 @@ import { IAnnotation, isAnnotation } from '../../../common';
 import { IWikibaseAnnotationExtension, IWikibaseItem } from '../../../common/wikibase.common';
 import { ContentProviderService } from '../../content-provider.service';
 import { WikibaseItemCardComponent } from '../wikibase-item-card/wikibase-item-card.component';
+import { TranslatePipe } from '../../translate.pipe';
 
 const searchWikibaseItem = (query: string, item: IWikibaseItem) => {
   return (item.label['en'] + item.description).toLowerCase().includes(query);

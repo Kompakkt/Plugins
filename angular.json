@@ -95,29 +95,6 @@
         }
       }
     },
-    "@kompakkt/plugin-i18n": {
-      "projectType": "library",
-      "root": "./plugins/i18n",
-      "sourceRoot": "./plugins/i18n/src",
-      "prefix": "lib",
-      "architect": {
-        "build": {
-          "builder": "@angular/build:ng-packagr",
-          "options": {
-            "project": "plugins/i18n/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "plugins/i18n/tsconfig.lib.prod.json"
-            },
-            "development": {
-              "tsConfig": "plugins/i18n/tsconfig.lib.json"
-            }
-          },
-          "defaultConfiguration": "production"
-        }
-      }
-    },
     "@kompakkt/plugin-semantic-kompakkt-metadata": {
       "projectType": "library",
       "root": "./plugins/semantic-kompakkt-metadata",

@@ -1,6 +1,7 @@
 import {
   EnvironmentProviders,
   InjectionToken,
+  PipeTransform,
   Type,
   makeEnvironmentProviders,
 } from '@angular/core';
@@ -14,11 +15,21 @@ abstract class BackendServiceClass {
 
 export type BackendService = Type<BackendServiceClass>;
 
+abstract class TranslatePipeClass implements PipeTransform {
+  public abstract transform(key: string): string;
+}
+
+export type TranslatePipe = Type<TranslatePipeClass>;
+
 export type ExtenderOptions = {
   componentSet: 'viewerComponents' | 'repoComponents';
   plugins: ExtenderPlugin[];
-  services: Record<string, Type<unknown>>;
-  backendService: BackendService;
+  services: Record<string, Type<unknown>> & {
+    backendService: BackendService;
+  };
+  pipes: Record<string, Type<unknown>> & {
+    translatePipe: TranslatePipe;
+  };
 };
 
 export const PLUGIN_MANAGER = new InjectionToken<ExtenderPluginManager>(
@@ -29,8 +40,12 @@ export const PLUGIN_COMPONENT_SET = new InjectionToken<ExtenderOptions['componen
   'KOMPAKKT_EXTENDER_PLUGIN_COMPONENT_SET',
 );
 
-export const EXTENDED_BACKEND_SERVICE = new InjectionToken<BackendServiceClass>(
+export const EXTENDER_BACKEND_SERVICE = new InjectionToken<BackendServiceClass>(
   'KOMPAKKT_EXTENDER_BACKEND_SERVICE',
+);
+
+export const EXTENDER_TRANSLATE_PIPE = new InjectionToken<TranslatePipeClass>(
+  'KOMPAKKT_EXTENDER_TRANSLATE_PIPE',
 );
 
 export const EXTENDER_PLUGINS = new InjectionToken<ExtenderPlugin[]>('KOMPAKKT_EXTENDER_PLUGINS');
@@ -43,7 +58,7 @@ export const provideExtender = ({
   componentSet,
   plugins,
   services,
-  backendService,
+  pipes,
 }: ExtenderOptions): EnvironmentProviders => {
   const servicesByPlugins = plugins.map(p => Object.values((p as any).services)).flat();
   return makeEnvironmentProviders([
@@ -65,8 +80,12 @@ export const provideExtender = ({
       deps: [EXTENDER_PLUGINS, EXTENDER_SERVICES, PLUGIN_COMPONENT_SET],
     },
     {
-      provide: EXTENDED_BACKEND_SERVICE,
-      useClass: backendService,
+      provide: EXTENDER_BACKEND_SERVICE,
+      useClass: services.backendService,
+    },
+    {
+      provide: EXTENDER_TRANSLATE_PIPE,
+      useClass: pipes.translatePipe,
     },
     servicesByPlugins.map(c => ({ provide: c, useClass: c })),
     ...plugins
