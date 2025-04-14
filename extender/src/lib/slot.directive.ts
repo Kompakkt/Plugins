@@ -10,10 +10,10 @@ import {
   input,
   output,
 } from '@angular/core';
-import { PLUGIN_COMPONENT_SET, PLUGIN_MANAGER } from './extender';
-import { ExtenderPluginBaseComponent } from './factory';
-import { type ExtenderPlugin } from './provider';
 import { Observable, Subscription } from 'rxjs';
+import { PLUGIN_MANAGER } from './extender';
+import { type ExtenderPluginBaseComponent } from './factory';
+import { type ExtenderPlugin } from './provider';
 
 export type ExtenderSlotEvent<T = any> = {
   componentName: string;
@@ -54,7 +54,8 @@ export class ExtenderSlotDirective implements OnDestroy {
 
       for (const [plugin, components] of componentList) {
         for (const component of components) {
-          const ref = this.#viewContainerRef.createComponent(component);
+          const ref =
+            this.#viewContainerRef.createComponent<ExtenderPluginBaseComponent>(component);
           ref.setInput('pluginManager', this.#pluginManager);
           ref.instance.event.subscribe(event => {
             this.event.emit({
@@ -81,17 +82,16 @@ export class ExtenderSlotDirective implements OnDestroy {
         }
       }
 
-      this.setupDataObservable();
+      this.setupDataObservable(this.dataObservable());
     });
 
     effect(() => {
       const observable = this.dataObservable();
-      this.setupDataObservable();
+      this.setupDataObservable(observable);
     });
   }
 
-  private setupDataObservable() {
-    const observable = this.dataObservable();
+  private setupDataObservable(observable?: Observable<unknown>) {
     this.#slotDataSubscription?.unsubscribe();
     this.#slotDataSubscription = observable?.subscribe(data => {
       for (const ref of this.#refs) {
