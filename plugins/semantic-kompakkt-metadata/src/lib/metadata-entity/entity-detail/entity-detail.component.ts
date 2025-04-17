@@ -1,23 +1,20 @@
 import { type AfterViewInit, Component, computed, effect } from '@angular/core';
-
-import { AsyncPipe, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { createExtenderComponent } from '@kompakkt/extender';
 import { type IDigitalEntity, isDigitalEntity, isEntity } from '../../../common';
 import type {
   IWikibaseDigitalEntityExtension,
-  IWikibaseItem,
   IWikibaseLabel,
 } from '../../../common/wikibase.common';
-import { getLabel, GetLabelPipe } from '../../get-label.pipe';
+import { getLabel } from '../../get-label.pipe';
 import { transformOldWikibaseEntityToExtension } from '../../metadata-wizard/metadata';
 import { DetailEntityComponent } from './detail-entity/detail-entity.component';
-import { ContentProviderService } from '../../content-provider.service';
 
 @Component({
-    selector: 'app-entity-detail',
-    templateUrl: './entity-detail.component.html',
-    styleUrls: ['../../theme.scss', './entity-detail.component.scss'],
-    imports: [AsyncPipe, CommonModule, DetailEntityComponent, GetLabelPipe]
+  selector: 'app-entity-detail',
+  templateUrl: './entity-detail.component.html',
+  styleUrls: ['../../theme.scss', './entity-detail.component.scss'],
+  imports: [CommonModule, DetailEntityComponent],
 })
 export class EntityDetailComponent extends createExtenderComponent() implements AfterViewInit {
   entity = computed(() => {

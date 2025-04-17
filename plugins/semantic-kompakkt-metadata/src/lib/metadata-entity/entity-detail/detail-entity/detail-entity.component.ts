@@ -1,6 +1,5 @@
-import { Component, computed, inject, input } from '@angular/core';
-
-import { AsyncPipe, CommonModule } from '@angular/common';
+import { Component, computed, input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import type { IDigitalEntity } from '../../../../common';
@@ -9,8 +8,6 @@ import type {
   IWikibaseDigitalEntityExtension,
 } from '../../../../common/wikibase.common';
 import { GetLabelPipe } from '../../../get-label.pipe';
-import { ContentProviderService } from '../../../content-provider.service';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { GetWikibaseItemAddressPipe } from '../../../wikibase-item-address.pipe';
 
 interface ILicence {
@@ -25,7 +22,6 @@ interface ILicence {
   templateUrl: './detail-entity.component.html',
   styleUrls: ['../../../theme.scss', './detail-entity.component.scss'],
   imports: [
-    AsyncPipe,
     CommonModule,
     MatExpansionModule,
     MatIconModule,

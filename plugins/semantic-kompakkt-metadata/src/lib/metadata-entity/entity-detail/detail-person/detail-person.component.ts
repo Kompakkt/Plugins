@@ -1,14 +1,13 @@
 import { Component, input } from '@angular/core';
-
-import { AsyncPipe, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { IMediaAgent } from '../../../../common/wikibase.common';
 import { GetLabelPipe } from '../../../get-label.pipe';
 
 @Component({
-    selector: 'app-detail-person',
-    templateUrl: './detail-person.component.html',
-    styleUrls: ['../../../theme.scss', './detail-person.component.scss'],
-    imports: [AsyncPipe, CommonModule, GetLabelPipe]
+  selector: 'app-detail-person',
+  templateUrl: './detail-person.component.html',
+  styleUrls: ['../../../theme.scss', './detail-person.component.scss'],
+  imports: [CommonModule, GetLabelPipe],
 })
 export class DetailPersonComponent {
   person = input.required<IMediaAgent>();

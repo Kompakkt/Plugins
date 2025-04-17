@@ -1,4 +1,4 @@
-import { Component, input, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MatAutocompleteModule,
