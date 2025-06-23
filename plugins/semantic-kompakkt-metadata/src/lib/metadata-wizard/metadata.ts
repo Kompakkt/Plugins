@@ -64,8 +64,7 @@ class WikibaseItem implements IWikibaseItem {
 }
 
 class MediaAgent extends WikibaseItem implements IMediaAgent {
-  role: number = 0;
-  roleTitle: string | undefined = undefined;
+  roleTitle: IMediaAgent['roleTitle'] = undefined;
 
   constructor(obj: Partial<IMediaAgent> = {}) {
     super(obj);
@@ -90,7 +89,7 @@ export const createWikibaseExtension = (): UndoPartial<IWikibaseDigitalEntityExt
     creationDate: undefined,
     claims: {},
     hierarchies: [],
-    licence: -1,
+    licence: undefined,
     id: undefined,
     address: undefined,
   };
@@ -102,14 +101,14 @@ export const mergeExistingEntityWikibaseExtension = <T extends DigitalEntity | P
   entity: T,
 ): T => {
   const extensionData = createWikibaseExtension();
-  if (!entity.extensions?.wikibase) {
+  if (!entity.extensions.wikibase) {
     entity.extensions = {
       ...entity.extensions,
       wikibase: extensionData.wikibase,
     };
     return entity;
   }
-  console.log('mergeExistingEntityWikibaseExtension', extensionData);
+  console.debug('mergeExistingEntityWikibaseExtension', extensionData);
   for (const [key, value] of Object.entries(extensionData.wikibase)) {
     if (Object.hasOwn(entity.extensions.wikibase, key)) continue;
     (entity.extensions.wikibase as any)[key] = value;
@@ -299,7 +298,7 @@ class DigitalEntity extends BaseEntity implements IDigitalEntity<IWikibaseDigita
 
   public static checkValidLicence(entity: DigitalEntity) {
     const licence = entity.extensions.wikibase?.licence;
-    if (!licence || licence <= 0) return false;
+    if (!licence) return false;
     return true;
   }
 
@@ -310,10 +309,10 @@ class DigitalEntity extends BaseEntity implements IDigitalEntity<IWikibaseDigita
       if (has_creator && has_rightsowner) {
         return true;
       }
-      if (agent.role === 328) {
+      if (agent.roleTitle === 'Creator') {
         has_creator = true;
       }
-      if (agent.role === 340) {
+      if (agent.roleTitle === 'Rightsowner') {
         has_rightsowner = true;
       }
     }
@@ -336,6 +335,11 @@ class DigitalEntity extends BaseEntity implements IDigitalEntity<IWikibaseDigita
   }
 
   public static override checkIsValid(entity: DigitalEntity): boolean {
+    console.debug('DigitalEntity.checkIsValid', entity, {
+      validGeneralInfo: DigitalEntity.checkValidGeneralInfo(entity),
+      validRelatedAgents: DigitalEntity.checkValidRelatedAgents(entity),
+      validLicence: DigitalEntity.checkValidLicence(entity),
+    });
     return (
       DigitalEntity.checkValidGeneralInfo(entity) &&
       DigitalEntity.checkValidRelatedAgents(entity) &&

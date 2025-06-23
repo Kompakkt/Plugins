@@ -1,6 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Component, computed, inject } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   MatAutocompleteModule,
@@ -11,30 +10,27 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIcon, MatIconModule } from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
-import { MatRadioButton, MatRadioChange, MatRadioModule } from '@angular/material/radio';
+import { MatRadioChange, MatRadioModule } from '@angular/material/radio';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatTabsModule } from '@angular/material/tabs';
-import { BehaviorSubject, combineLatest, firstValueFrom, interval } from 'rxjs';
+import { BehaviorSubject, combineLatest, firstValueFrom } from 'rxjs';
 import {
   combineLatestWith,
   debounceTime,
   distinctUntilChanged,
   filter,
   map,
-  skip,
   startWith,
-  switchMap,
-  tap,
 } from 'rxjs/operators';
 
 import { CommonModule } from '@angular/common';
-import { MatError, MatFormField, MatFormFieldModule, MatLabel } from '@angular/material/form-field';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { createExtenderComponent } from '@kompakkt/extender';
 import { isDigitalEntity, isPhysicalEntity } from '../../../common';
-import { IMediaAgent, IWikibaseItem } from '../../../common/wikibase.common';
+import { getWikibaseItemID, IMediaAgent, IWikibaseItem } from '../../../common/wikibase.common';
 import { AutocompleteOptionComponent } from '../../autocomplete/autocomplete-option.component';
 import { ContentProviderService } from '../../content-provider.service';
 import { getLabel, GetLabelPipe } from '../../get-label.pipe';
@@ -72,8 +68,6 @@ type AnyEntity = DigitalEntity | PhysicalEntity;
     MatTabsModule,
     MatFormFieldModule,
     MatListModule,
-    MatLabel,
-    MatError,
     MatIconModule,
     MatRadioModule,
     AutocompleteOptionComponent,
@@ -91,7 +85,13 @@ export class EntityComponent extends createExtenderComponent() {
   entity$ = this.dataSubject.pipe(
     distinctUntilChanged((prev, next) => JSON.stringify(prev) === JSON.stringify(next)),
     map(entity => {
-      console.log('EntityComponent', entity, isDigitalEntity(entity), isPhysicalEntity(entity));
+      console.debug(
+        'EntityComponent',
+        entity,
+        isDigitalEntity(entity),
+        isPhysicalEntity(entity),
+        JSON.stringify((entity as any)?.extensions?.wikibase ?? {}),
+      );
       return isDigitalEntity(entity)
         ? mergeExistingEntityWikibaseExtension(entity as DigitalEntity)
         : isPhysicalEntity(entity)
@@ -108,49 +108,42 @@ export class EntityComponent extends createExtenderComponent() {
       src: 'assets/licence/CC0.png',
       description: 'No Rights Reserved (CC0)',
       link: 'https://creativecommons.org/publicdomain/zero/1.0/',
-      wikibase_item: 46,
     },
     {
       title: 'BY',
       src: 'assets/licence/BY.png',
       description: 'Attribution 4.0 International (CC BY 4.0)',
       link: 'https://creativecommons.org/licenses/by/4.0',
-      wikibase_item: 47,
     },
     {
       title: 'BY-SA',
       src: 'assets/licence/BY-SA.png',
       description: 'Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)',
       link: 'https://creativecommons.org/licenses/by-sa/4.0',
-      wikibase_item: 48,
     },
     {
       title: 'BY-ND',
       src: 'assets/licence/BY-ND.png',
       description: 'Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)',
       link: 'https://creativecommons.org/licenses/by-nd/4.0',
-      wikibase_item: 51,
     },
     {
       title: 'BYNC',
       src: 'assets/licence/BYNC.png',
       description: 'Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)',
       link: 'https://creativecommons.org/licenses/by-nc/4.0',
-      wikibase_item: 49,
     },
     {
       title: 'BYNCSA',
       src: 'assets/licence/BYNCSA.png',
       description: 'Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)',
       link: 'https://creativecommons.org/licenses/by-nc-sa/4.0',
-      wikibase_item: 52,
     },
     {
       title: 'BYNCND',
       src: 'assets/licence/BYNCND.png',
       description: 'Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)',
       link: 'https://creativecommons.org/licenses/by-nc-nd/4.0',
-      wikibase_item: 50,
     },
     //Copyrighted - All rights reserved
     {
@@ -158,7 +151,6 @@ export class EntityComponent extends createExtenderComponent() {
       src: 'assets/licence/AR.png',
       description: 'All rights reserved',
       link: 'https://en.wikipedia.org/wiki/All_rights_reserved',
-      wikibase_item: 54,
     },
   ];
 
@@ -186,7 +178,7 @@ export class EntityComponent extends createExtenderComponent() {
 
   // Autocomplete Inputs
   public availablePersons$ = this.#content.persons$.pipe(
-    map(persons => persons.map(p => new WikibaseItem(p))),
+    map(persons => persons.map(p => new MediaAgent(p))),
   );
   public availableTechniques$ = this.#content.techniques$.pipe(
     map(techniques => techniques.map(t => new WikibaseItem(t))),
@@ -195,9 +187,6 @@ export class EntityComponent extends createExtenderComponent() {
     map(software => software.map(s => new WikibaseItem(s))),
   );
   public availableTags$ = this.#content.tags$.pipe(map(tags => tags.map(t => new Tag(t))));
-  public availableRoles$ = this.#content.roles$.pipe(
-    map(roles => roles.map(r => new WikibaseItem(r))),
-  );
   public availableBibRefs$ = this.#content.bibrefs$.pipe(
     map(ref => ref.map(r => new WikibaseItem(r))),
   );
@@ -208,12 +197,11 @@ export class EntityComponent extends createExtenderComponent() {
     this.availablePersons$,
     this.availableTechniques$,
     this.availableSoftware$,
-    this.availableRoles$,
     this.availableBibRefs$,
     this.availablePhyObjs$,
   ]).pipe(
-    map(([persons, techniques, software, roles, bibrefs, phyObjs]) => {
-      return [...persons, ...techniques, ...software, ...roles, ...bibrefs, ...phyObjs];
+    map(([persons, techniques, software, bibrefs, phyObjs]) => {
+      return [...persons, ...techniques, ...software, ...bibrefs, ...phyObjs];
     }),
   );
 
@@ -284,7 +272,7 @@ export class EntityComponent extends createExtenderComponent() {
         .filter(t => t.value.toLowerCase().includes(value)),
     ),
   );
-  public selectedPerson$ = new BehaviorSubject<WikibaseItem | undefined>(undefined);
+  public selectedPerson$ = new BehaviorSubject<MediaAgent | undefined>(undefined);
   public selectedTechnique$ = new BehaviorSubject<WikibaseItem | undefined>(undefined);
   public selectedSoftware$ = new BehaviorSubject<WikibaseItem | undefined>(undefined);
   public selectedBibRef$ = new BehaviorSubject<WikibaseItem | undefined>(undefined);
@@ -325,40 +313,40 @@ export class EntityComponent extends createExtenderComponent() {
   public metaDataIndex = 0;
   public errorOnFinish: any = undefined;
 
-  public availableRolesKompakkt = [
+  public availableRolesKompakkt: {
+    type: string;
+    value: NonNullable<IMediaAgent['roleTitle']>;
+    checked: FormControl<boolean>;
+    is_required: boolean;
+  }[] = [
     {
       type: 'RIGHTS_OWNER',
       value: 'Rightsowner',
       checked: new FormControl<boolean>(false, { nonNullable: true }),
-      wb_value: 328,
       is_required: true,
     },
     {
       type: 'CREATOR',
       value: 'Creator',
       checked: new FormControl<boolean>(false, { nonNullable: true }),
-      wb_value: 340,
       is_required: true,
     },
     {
       type: 'EDITOR',
       value: 'Editor',
       checked: new FormControl<boolean>(false, { nonNullable: true }),
-      wb_value: 329,
       is_required: false,
     },
     {
       type: 'DATA_CREATOR',
       value: 'Data Creator',
       checked: new FormControl<boolean>(false, { nonNullable: true }),
-      wb_value: 341,
       is_required: false,
     },
     {
       type: 'CONTACT_PERSON',
       value: 'Contact Person',
       checked: new FormControl<boolean>(false, { nonNullable: true }),
-      wb_value: 342,
       is_required: false,
     },
   ];
@@ -373,13 +361,17 @@ export class EntityComponent extends createExtenderComponent() {
     (window as any)['printSKEntity'] = () =>
       firstValueFrom(this.entity$).then(entity => console.log(entity));
 
-    this.emitEntitySubject
-      .pipe(
-        debounceTime(500),
-        switchMap(() => this.entity$),
-      )
-      .subscribe(entity => {
-        console.log('Emitting entity', entity);
+    combineLatest([this.emitEntitySubject, this.entity$])
+      .pipe(debounceTime(500))
+      .subscribe(([_, entity]) => {
+        console.debug(
+          'emitEntity',
+          entity,
+          entity.isDigital,
+          entity.isDigital
+            ? DigitalEntity.checkIsValid(entity as DigitalEntity)
+            : PhysicalEntity.checkIsValid(entity as PhysicalEntity),
+        );
         const customEvent = new CustomEvent('entity-changed', {
           detail: {
             entity,
@@ -409,20 +401,12 @@ export class EntityComponent extends createExtenderComponent() {
       if (isDigitalEntity(entity)) {
         if (entity.licence && !entity.extensions.wikibase.licence) {
           console.log('Setting K licence to SK');
-          const licence = this.availableLicences.find(l => l.title === entity.licence);
-          if (licence?.wikibase_item) {
-            entity.extensions.wikibase.licence = licence.wikibase_item;
-            changed = true;
-          }
+          entity.extensions.wikibase.licence = entity.licence;
+          changed = true;
         } else if (!entity.licence && entity.extensions.wikibase.licence) {
           console.log('Setting SK licence to K');
-          const licence = this.availableLicences.find(
-            l => l.wikibase_item === entity.extensions.wikibase.licence,
-          );
-          if (licence) {
-            entity.licence = licence.title;
-            changed;
-          }
+          entity.licence = entity.extensions.wikibase.licence;
+          changed = true;
         }
       }
 
@@ -468,6 +452,8 @@ export class EntityComponent extends createExtenderComponent() {
     );
     if (!tag) return console.warn(`Could not tag with id ${tagId}`);
     digitalEntity.addTag(tag);
+
+    this.emitEntity();
   }
 
   public displayPersonName(person: WikibaseItem): string {
@@ -475,8 +461,10 @@ export class EntityComponent extends createExtenderComponent() {
     return person.label['en'] || '';
   }
 
-  public displayWikibaseItemLabel(item: IWikibaseItem): string {
-    if (item === undefined || item.label === undefined) return '';
+  public displayWikibaseItemLabel(item?: IWikibaseItem | string): string {
+    if (!item) return '';
+    if (typeof item === 'string') return item;
+    if (item.label === undefined) return '';
     return item.id + ' ' + getLabel(item);
   }
 
@@ -527,17 +515,18 @@ export class EntityComponent extends createExtenderComponent() {
 
   public async addPerson() {
     const entity = await firstValueFrom(this.entity$);
-    const person = this.selectedPerson$.value as MediaAgent;
+    const person = this.selectedPerson$.getValue();
+    const checkedRoles = this.availableRolesKompakkt.filter(role => role.checked.value);
+
     if (person === undefined) {
       return;
     }
 
-    for (const role of this.availableRolesKompakkt.filter(role => role.checked.value)) {
+    for (const role of checkedRoles) {
       const copy = { ...person };
-      copy.role = Number(role.wb_value);
       copy.roleTitle = role.value;
       // remove if already present in the list with this role
-      this.removePerson(copy);
+      await this.removePerson(copy);
       entity.extensions.wikibase?.agents?.push(copy);
     }
 
@@ -547,15 +536,21 @@ export class EntityComponent extends createExtenderComponent() {
 
     //set availableRolesKompakkt to unchecked
     this.availableRolesKompakkt.forEach(role => role.checked.reset());
+
+    this.emitEntity();
   }
 
   public async removePerson(person: IMediaAgent) {
     const entity = await firstValueFrom(this.entity$);
-    const { id, role } = person;
-    const idx = entity.extensions?.wikibase?.agents?.findIndex(p => p.id === id && p.role === role);
+    const { id, roleTitle } = person;
+    const idx = entity.extensions?.wikibase?.agents?.findIndex(
+      p => p.id === id && p.roleTitle === roleTitle,
+    );
     if (idx !== undefined && idx >= 0) {
       entity.extensions?.wikibase?.agents?.splice(idx, 1);
     }
+
+    this.emitEntity();
   }
 
   canSaveCreationData$ = combineLatest([
@@ -568,7 +563,10 @@ export class EntityComponent extends createExtenderComponent() {
   hasAnyCreationData$ = this.digitalEntity$.pipe(
     map(digitalEntity => {
       const { techniques, software, equipment, creationDate } = digitalEntity.extensions.wikibase;
-      return [techniques, software, equipment, creationDate].some(v => v && v.length > 0);
+      if (techniques && techniques.length > 0) return true;
+      if (software && software.length > 0) return true;
+      if (equipment && equipment.length > 0) return true;
+      return creationDate !== undefined;
     }),
   );
 
@@ -585,17 +583,15 @@ export class EntityComponent extends createExtenderComponent() {
     });
 
     if (technique) {
-      if (!entity.extensions?.wikibase?.techniques?.find(t => t.id === technique.id)) {
-        entity.extensions?.wikibase?.techniques?.push(technique);
-      }
+      const idx = this.#findItemIndex(entity.extensions?.wikibase?.techniques, technique.id);
+      if (idx < 0) entity.extensions?.wikibase?.techniques?.push(technique);
       this.searchTechnique.reset();
       this.selectedTechnique$.next(undefined);
     }
 
     if (software) {
-      if (!entity.extensions?.wikibase?.software?.find(s => s.id === software.id)) {
-        entity.extensions?.wikibase?.software?.push(software);
-      }
+      const idx = this.#findItemIndex(entity.extensions?.wikibase?.software, software.id);
+      if (idx < 0) entity.extensions?.wikibase?.software?.push(software);
       this.searchSoftware.reset();
       this.selectedSoftware$.next(undefined);
     }
@@ -618,10 +614,12 @@ export class EntityComponent extends createExtenderComponent() {
 
   public async addExternalLink() {
     const entity = await firstValueFrom(this.entity$);
-    this.removeExternalLink(this.externalLink.value);
+    await this.removeExternalLink(this.externalLink.value);
     entity.extensions?.wikibase?.externalLinks?.push(this.externalLink.value);
     console.log(entity);
     this.externalLink.reset();
+
+    this.emitEntity();
   }
 
   public async addBibRef() {
@@ -629,11 +627,13 @@ export class EntityComponent extends createExtenderComponent() {
     const ref = this.selectedBibRef$.value;
     if (ref !== undefined) {
       // remove to prevent dupes
-      this.removeBibRef(ref);
+      await this.removeBibRef(ref);
       entity.extensions?.wikibase?.bibliographicRefs?.push(ref);
       this.searchBibRef.setValue('', { emitEvent: false });
       this.selectedBibRef$.next(undefined);
     }
+
+    this.emitEntity();
   }
 
   public async addPhyObj() {
@@ -641,38 +641,60 @@ export class EntityComponent extends createExtenderComponent() {
     const obj = this.selectedPhyObj$.value;
     if (obj !== undefined) {
       // remove to prevent dupes
-      this.removePhyObj(obj);
+      await this.removePhyObj(obj);
       entity.extensions?.wikibase?.physicalObjs?.push(obj);
       this.searchPhyObjs.setValue('', { emitEvent: false });
       this.selectedPhyObj$.next(undefined);
     }
+
+    this.emitEntity();
   }
 
-  public async removeTechnique(technique: IWikibaseItem) {
+  #findItemIndex(items: (string | IWikibaseItem)[] | undefined, value: string) {
+    if (!items) return -1;
+    return items.findIndex(item => {
+      if (typeof item === 'string') {
+        return item === value;
+      } else {
+        return item.id === value;
+      }
+    });
+  }
+
+  public async removeTechnique(technique: IWikibaseItem | string) {
     const entity = await firstValueFrom(this.entity$);
-    const idx = entity.extensions?.wikibase?.techniques?.findIndex(p => p.id === technique.id);
+    const idx = this.#findItemIndex(
+      entity.extensions?.wikibase?.techniques,
+      getWikibaseItemID(technique),
+    );
     if (idx !== undefined && idx >= 0) {
       entity.extensions?.wikibase?.techniques?.splice(idx, 1);
     }
+
+    this.emitEntity();
   }
 
-  public async removeSoftware(software: IWikibaseItem) {
+  public async removeSoftware(software: IWikibaseItem | string) {
     const entity = await firstValueFrom(this.entity$);
-    const idx = entity.extensions?.wikibase?.software?.findIndex(p => p.id === software.id);
+    const idx = this.#findItemIndex(
+      entity.extensions?.wikibase?.software,
+      getWikibaseItemID(software),
+    );
     if (idx !== undefined && idx >= 0) {
       entity.extensions?.wikibase?.software?.splice(idx, 1);
     }
+
+    this.emitEntity();
   }
 
   public async removeEquipment(equipment: IWikibaseItem) {
     const entity = await firstValueFrom(this.entity$);
-    // TODO: this only works if equipment is not a string
-    const idx = entity.extensions?.wikibase?.equipment?.findIndex(
-      p => typeof p === 'object' && p.id === equipment.id,
-    );
+    const idx = this.#findItemIndex(entity.extensions?.wikibase?.equipment, equipment.id);
     if (idx !== undefined && idx >= 0) {
       entity.extensions?.wikibase?.equipment?.splice(idx, 1);
     }
+
+    this.emitEntity();
   }
 
   public async removeCreationDate() {
@@ -680,30 +702,44 @@ export class EntityComponent extends createExtenderComponent() {
     if (entity.extensions?.wikibase) {
       entity.extensions.wikibase!.creationDate = undefined;
     }
+
+    this.emitEntity();
   }
 
   public async removeExternalLink(link: string) {
     const entity = await firstValueFrom(this.entity$);
-    const idx = entity.extensions?.wikibase?.externalLinks?.findIndex(p => p === link);
+    const idx = this.#findItemIndex(entity.extensions?.wikibase?.externalLinks, link);
     if (idx !== undefined && idx >= 0) {
       entity.extensions?.wikibase?.externalLinks?.splice(idx, 1);
     }
+
+    this.emitEntity();
   }
 
-  public async removeBibRef(ref: IWikibaseItem) {
+  public async removeBibRef(ref: IWikibaseItem | string) {
     const entity = await firstValueFrom(this.entity$);
-    const idx = entity.extensions?.wikibase?.bibliographicRefs?.findIndex(r => r.id === ref.id);
+    const idx = this.#findItemIndex(
+      entity.extensions?.wikibase?.bibliographicRefs,
+      getWikibaseItemID(ref),
+    );
     if (idx !== undefined && idx >= 0) {
       entity.extensions?.wikibase?.bibliographicRefs?.splice(idx, 1);
     }
+
+    this.emitEntity();
   }
 
-  public async removePhyObj(obj: IWikibaseItem) {
+  public async removePhyObj(obj: IWikibaseItem | string) {
     const entity = await firstValueFrom(this.entity$);
-    const idx = entity.extensions?.wikibase?.physicalObjs?.findIndex(o => o.id === obj.id);
+    const idx = this.#findItemIndex(
+      entity.extensions?.wikibase?.physicalObjs,
+      getWikibaseItemID(obj),
+    );
     if (idx !== undefined && idx >= 0) {
       entity.extensions?.wikibase?.physicalObjs?.splice(idx, 1);
     }
+
+    this.emitEntity();
   }
 
   public async selectLicence(change: MatRadioChange<string>) {
@@ -714,7 +750,9 @@ export class EntityComponent extends createExtenderComponent() {
     if (isDigitalEntity(entity)) {
       entity.licence = licence.title;
     }
-    entity.extensions.wikibase!.licence = licence.wikibase_item;
+    entity.extensions.wikibase!.licence = licence.title;
+
+    this.emitEntity();
   }
 
   public async handleFileInput(fileInput: HTMLInputElement) {
@@ -857,6 +895,8 @@ export class EntityComponent extends createExtenderComponent() {
     this.searchTag.patchValue('');
     this.searchTag.setValue('');
     event.input.value = '';
+
+    this.emitEntity();
   }
 
   public addSimpleProperty(event: MouseEvent, entity: AnyEntity, property: string) {
@@ -865,26 +905,35 @@ export class EntityComponent extends createExtenderComponent() {
     if (isDigitalEntity(entity)) {
       switch (property) {
         case 'dimensions':
-          return entity.dimensions.push(new DimensionTuple());
+          entity.dimensions.push(new DimensionTuple());
+          break;
         case 'creation':
-          return entity.creation.push(new CreationTuple());
+          entity.creation.push(new CreationTuple());
+          break;
         case 'tags':
-          return entity.tags.push(new Tag());
+          entity.tags.push(new Tag());
+          break;
         case 'phyObjs':
-          return entity.phyObjs.push(new PhysicalEntity());
+          entity.phyObjs.push(new PhysicalEntity());
+          break;
       }
     }
     switch (property) {
       case 'institutions':
-        return entity.institutions.push(this.#content.addLocalInstitution(new Institution()));
+        entity.institutions.push(this.#content.addLocalInstitution(new Institution()));
+        break;
       case 'externalId':
-        return entity.externalId.push(new TypeValueTuple());
+        entity.externalId.push(new TypeValueTuple());
+        break;
       case 'externalLink':
-        return entity.externalLink.push(new DescriptionValueTuple());
+        entity.externalLink.push(new DescriptionValueTuple());
+        break;
       case 'biblioRefs':
-        return entity.biblioRefs.push(new DescriptionValueTuple());
+        entity.biblioRefs.push(new DescriptionValueTuple());
+        break;
       case 'other':
-        return entity.other.push(new DescriptionValueTuple());
+        entity.other.push(new DescriptionValueTuple());
+        break;
       case 'metadata_files':
         const input = document.createElement('input');
         input.type = 'file';
@@ -893,9 +942,9 @@ export class EntityComponent extends createExtenderComponent() {
         document.body.appendChild(input);
         input.onchange = () => this.handleFileInput(input).then(() => input.remove());
         input.click();
-        return;
+        break;
     }
-    return undefined;
+    this.emitEntity();
   }
 
   public removeProperty(entity: AnyEntity, property: string, index: number) {
@@ -912,6 +961,7 @@ export class EntityComponent extends createExtenderComponent() {
           this.#content.removeLocalInstitution(removed as Institution);
         }
       }*/
+      this.emitEntity();
     } else {
       console.warn(`Could not remove ${property} at ${index} from ${entity}`);
     }

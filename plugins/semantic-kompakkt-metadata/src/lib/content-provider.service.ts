@@ -31,7 +31,6 @@ export class ContentProviderService {
   private serverPersons = new BehaviorSubject<WikibaseItem[]>([]);
   private serverSoftware = new BehaviorSubject<WikibaseItem[]>([]);
   private serverTechniques = new BehaviorSubject<WikibaseItem[]>([]);
-  private serverRoles = new BehaviorSubject<WikibaseItem[]>([]);
   private serverBibRefs = new BehaviorSubject<WikibaseItem[]>([]);
   private serverPhyObjs = new BehaviorSubject<WikibaseItem[]>([]);
   private serverConcepts = new BehaviorSubject<WikibaseItem[]>([]);
@@ -56,7 +55,6 @@ export class ContentProviderService {
   tags$ = this.serverTags.asObservable();
   techniques$ = this.serverTechniques.asObservable();
   software$ = this.serverSoftware.asObservable();
-  roles$ = this.serverRoles.asObservable();
   bibrefs$ = this.serverBibRefs.asObservable();
   physicalobjects$ = this.serverPhyObjs.asObservable();
   concepts$ = this.serverConcepts.asObservable();
@@ -66,6 +64,7 @@ export class ContentProviderService {
 
   constructor() {
     this.updateContent();
+    (window as any)['updateWikibaseContent'] = () => this.updateContent();
   }
 
   public async updateContent() {
@@ -143,11 +142,6 @@ export class ContentProviderService {
         if (result.software !== undefined && Array.isArray(result.software)) {
           this.serverSoftware.next(
             result.software.map(s => new WikibaseItem(s)).sort(sortWikibaseItemsById),
-          );
-        }
-        if (result.roles !== undefined && Array.isArray(result.roles)) {
-          this.serverRoles.next(
-            result.roles.map(r => new WikibaseItem(r)).sort(sortWikibaseItemsById),
           );
         }
         if (result.bibliographic_refs !== undefined && Array.isArray(result.bibliographic_refs)) {

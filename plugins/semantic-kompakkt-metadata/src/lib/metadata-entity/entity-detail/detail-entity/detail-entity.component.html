@@ -20,7 +20,7 @@
       </mat-expansion-panel>
     }
 
-    @if (Licenses[wikibaseData.licence!]; as licence) {
+    @if (usedLicense(); as licence) {
       <mat-expansion-panel [expanded]="false">
         <mat-expansion-panel-header>
           <mat-panel-title> Licence </mat-panel-title>

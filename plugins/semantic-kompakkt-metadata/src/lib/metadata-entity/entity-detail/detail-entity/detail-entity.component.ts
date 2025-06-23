@@ -37,56 +37,63 @@ export class DetailEntityComponent {
     return digitalEntity.extensions.wikibase;
   });
 
-  public Licenses: { [key: number]: ILicence } = {
-    46: {
+  public Licenses: { [key: string]: ILicence } = {
+    CC0: {
       title: 'CC0',
       src: 'assets/licence/CC0.png',
       description: 'No Rights Reserved (CC0)',
       link: 'https://creativecommons.org/publicdomain/zero/1.0/',
     },
-    47: {
+    BY: {
       title: 'BY',
       src: 'assets/licence/BY.png',
       description: 'Attribution 4.0 International (CC BY 4.0)',
       link: 'https://creativecommons.org/licenses/by/4.0',
     },
-    48: {
+    BYSA: {
       title: 'BY-SA',
       src: 'assets/licence/BY-SA.png',
       description: 'Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)',
       link: 'https://creativecommons.org/licenses/by-sa/4.0',
     },
-    51: {
+    BYND: {
       title: 'BY-ND',
       src: 'assets/licence/BY-ND.png',
       description: 'Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)',
       link: 'https://creativecommons.org/licenses/by-nd/4.0',
     },
-    49: {
-      title: 'BYNC',
+    BYNC: {
+      title: 'BY-NC',
       src: 'assets/licence/BYNC.png',
       description: 'Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)',
       link: 'https://creativecommons.org/licenses/by-nc/4.0',
     },
-    52: {
-      title: 'BYNCSA',
+    BYNCSA: {
+      title: 'BY-NC-SA',
       src: 'assets/licence/BYNCSA.png',
       description: 'Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)',
       link: 'https://creativecommons.org/licenses/by-nc-sa/4.0',
     },
-    50: {
-      title: 'BYNCND',
+    BYNCND: {
+      title: 'BY-NC-ND',
       src: 'assets/licence/BYNCND.png',
       description: 'Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)',
       link: 'https://creativecommons.org/licenses/by-nc-nd/4.0',
     },
-    54: {
+    AR: {
       title: 'AR',
       src: 'assets/licence/AR.png',
       description: 'All rights reserved',
       link: 'https://en.wikipedia.org/wiki/All_rights_reserved',
     },
   };
+
+  usedLicense = computed(() => {
+    const wikibaseData = this.wikibaseData();
+    const license = wikibaseData?.licence?.replace('-', '');
+    if (!license) return undefined;
+    return this.Licenses[license];
+  });
 
   hasAgents = computed(() => {
     const agents = this.wikibaseData()?.agents?.length;
