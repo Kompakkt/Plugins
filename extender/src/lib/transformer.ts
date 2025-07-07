@@ -1,29 +1,19 @@
-import type { IAnnotation, IDigitalEntity, IEntity, IPhysicalEntity } from '../common';
+import { Collection } from '../common';
 
-export type ITransformable = IAnnotation | IEntity | IDigitalEntity | IPhysicalEntity;
-export type TransformableType = 'annotation' | 'entity' | 'digitalentity' | 'physicalentity';
-export type TransformerFn<T extends ITransformable> = (data: T) => T | Promise<T>;
+export type TransformerFn<T> = (data: T) => T | Promise<T>;
 
 export const ExtenderTransformer = new (class ExtenderTransformer {
-  public readonly transformers: Record<TransformableType, Array<TransformerFn<any>>> = {
-    annotation: [],
-    entity: [],
-    digitalentity: [],
-    physicalentity: [],
-  };
+  public readonly transformers = new Map<Collection, Array<TransformerFn<any>>>();
 
-  public registerTransformer<T extends ITransformable>(
-    type: TransformableType,
-    transformer: TransformerFn<T>,
-  ) {
-    this.transformers[type].push(transformer);
+  public registerTransformer<T>(type: Collection, transformer: TransformerFn<T>) {
+    if (!this.transformers.has(type)) {
+      this.transformers.set(type, []);
+    }
+    this.transformers.get(type)?.push(transformer);
   }
 
-  public async applyTransformations<T extends ITransformable>(
-    type: TransformableType,
-    data: T,
-  ): Promise<T> {
-    const transformers = this.transformers[type];
+  public async applyTransformations<T>(type: Collection, data: T): Promise<T> {
+    const transformers = this.transformers.get(type) ?? [];
     if (!transformers || transformers.length === 0) return data;
     let result = data;
     for (const transformer of transformers) {
