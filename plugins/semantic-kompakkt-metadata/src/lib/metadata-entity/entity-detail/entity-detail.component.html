@@ -1,17 +1,19 @@
 @if (digitalEntity(); as digitalEntity) {
-    @if (wikibaseData(); as wikibaseData) {
-      <div class="block">
-        <a
-          href="{{ wikibaseData.address }}/entity/{{ wikibaseData.id }}"
-          target="_blank"
-        >
-          <h1>{{ label() }}</h1></a
-        >
-        <p>{{ description() }}</p>
-      </div>
-    }
-
+  @if (wikibaseData(); as wikibaseData) {
     <div class="block">
-      <app-detail-entity [digitalEntity]="digitalEntity"></app-detail-entity>
+      @if (entityUrl(); as url) {
+        <a [href]="url" target="_blank"
+          ><h1>{{ label() }}</h1></a
+        >
+      } @else {
+        <h1>{{ label() }}</h1>
+      }
+
+      <p>{{ description() }}</p>
     </div>
+  }
+
+  <div class="block">
+    <app-detail-entity [digitalEntity]="digitalEntity"></app-detail-entity>
+  </div>
 }

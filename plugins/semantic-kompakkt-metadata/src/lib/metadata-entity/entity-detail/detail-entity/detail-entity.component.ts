@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +9,7 @@ import type {
 } from '../../../../common/wikibase.common';
 import { GetLabelPipe } from '../../../get-label.pipe';
 import { GetWikibaseItemAddressPipe } from '../../../wikibase-item-address.pipe';
+import { ContentProviderService } from '../../../content-provider.service';
 
 interface ILicence {
   title: string;
@@ -30,6 +31,8 @@ interface ILicence {
   ],
 })
 export class DetailEntityComponent {
+  readonly content = inject(ContentProviderService);
+
   digitalEntity = input.required<IDigitalEntity<IWikibaseDigitalEntityExtension>>();
   wikibaseData = computed(() => {
     const digitalEntity = this.digitalEntity();

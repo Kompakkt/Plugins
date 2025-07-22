@@ -1,4 +1,4 @@
-import { type AfterViewInit, Component, computed, effect } from '@angular/core';
+import { type AfterViewInit, Component, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { createExtenderComponent } from '@kompakkt/extender';
 import { type IDigitalEntity, isDigitalEntity, isEntity } from '../../../common';
@@ -9,6 +9,11 @@ import type {
 import { getLabel } from '../../get-label.pipe';
 import { transformOldWikibaseEntityToExtension } from '../../metadata-wizard/metadata';
 import { DetailEntityComponent } from './detail-entity/detail-entity.component';
+import { ContentProviderService } from '../../content-provider.service';
+import {
+  getWikibaseItemAddress,
+  GetWikibaseItemAddressPipe,
+} from '../../wikibase-item-address.pipe';
 
 @Component({
   selector: 'app-entity-detail',
@@ -17,6 +22,8 @@ import { DetailEntityComponent } from './detail-entity/detail-entity.component';
   imports: [CommonModule, DetailEntityComponent],
 })
 export class EntityDetailComponent extends createExtenderComponent() implements AfterViewInit {
+  readonly content = inject(ContentProviderService);
+
   entity = computed(() => {
     const slotData = this.slotData();
     console.log('EntityDetailComponentPlugin', slotData, isEntity(slotData));
@@ -33,6 +40,16 @@ export class EntityDetailComponent extends createExtenderComponent() implements 
     digitalEntity = transformOldWikibaseEntityToExtension(digitalEntity);
     if (!digitalEntity?.extensions?.wikibase) return undefined;
     return digitalEntity.extensions.wikibase;
+  });
+
+  entityUrl = computed(() => {
+    const wikibaseData = this.wikibaseData();
+    const instanceInfo = this.content.instanceInfo();
+
+    const id = wikibaseData?.id;
+    if (!id) return undefined;
+    const address = getWikibaseItemAddress(id, wikibaseData, instanceInfo);
+    return address;
   });
 
   label = computed(() => {

@@ -7,6 +7,7 @@ import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Collection, ITag } from '../common';
 import { IAnnotationLinkChoices, IMetadataChoices } from '../common/wikibase.common';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 export type InstanceInfo = {
   instance: string;
@@ -44,7 +45,8 @@ export class ContentProviderService {
   // There are no cases where local tags are needed
   // private LocalTags = new BehaviorSubject<Tag[]>([]);
 
-  public readonly instanceInfo = new BehaviorSubject<InstanceInfo | undefined>(undefined);
+  public readonly instanceInfo$ = new BehaviorSubject<InstanceInfo | undefined>(undefined);
+  public readonly instanceInfo = toSignal(this.instanceInfo$, { initialValue: undefined });
 
   persons$ = combineLatest([this.serverPersons, this.localPersons]).pipe(
     map(([serverPersons, localPersons]) => serverPersons.concat(localPersons)),
@@ -88,7 +90,7 @@ export class ContentProviderService {
       .then(result => result as InstanceInfo)
       .then(result => {
         console.debug('instance info', result);
-        this.instanceInfo.next(result);
+        this.instanceInfo$.next(result);
         return result;
       });
   }

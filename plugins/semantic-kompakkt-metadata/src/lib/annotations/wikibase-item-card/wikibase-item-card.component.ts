@@ -27,11 +27,10 @@ export class WikibaseItemCardComponent {
   trimmedDescription = computed(() => {
     return this.item().description?.trim() ?? '';
   });
-  instanceInfo$ = this.#content.instanceInfo;
 
   async openInNewTab() {
     const item = this.item();
-    const instanceInfo = await firstValueFrom(this.instanceInfo$);
+    const instanceInfo = this.#content.instanceInfo();
     const url = getWikibaseItemAddress(item, instanceInfo);
     if (url.startsWith('http')) {
       window.open(url, '_blank');
