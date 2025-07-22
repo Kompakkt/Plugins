@@ -354,32 +354,32 @@
         @for (equipment of digitalEntity.extensions.wikibase!.equipment; track equipment) {
           <div class="card">
             Equipment: {{ equipment }}
-            <!-- TODO: Enable button -->
-            <!-- <div class="actions">
-                <button
+            <div class="actions">
+              <button
                 mat-icon-button
                 color="warn"
                 aria-label="Remove equipment"
                 (click)="removeEquipment(equipment)"
-                >
+              >
                 <mat-icon>delete</mat-icon>
-                </button>
-            </div> -->
+              </button>
+            </div>
           </div>
         }
 
         @if (digitalEntity.extensions.wikibase!.creationDate; as creationDate) {
-          <div class="card"></div>
-          Creation Date: {{ creationDate }}
-          <div class="actions">
-            <button
-              mat-icon-button
-              color="warn"
-              aria-label="Remove creation date"
-              (click)="removeCreationDate()"
-            >
-              <mat-icon>delete</mat-icon>
-            </button>
+          <div class="card">
+            Creation Date: {{ creationDate }}
+            <div class="actions">
+              <button
+                mat-icon-button
+                color="warn"
+                aria-label="Remove creation date"
+                (click)="removeCreationDate()"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
           </div>
         }
       </div>
@@ -422,15 +422,14 @@
             {{ link }}
 
             <div class="actions">
-              <!-- TODO -->
-              <!-- <button
+              <button
                 mat-icon-button
                 color="warn"
                 aria-label="Remove link"
                 (click)="removeExternalLink(link)"
-                >
+              >
                 <mat-icon>delete</mat-icon>
-                </button> -->
+              </button>
             </div>
           </div>
         }

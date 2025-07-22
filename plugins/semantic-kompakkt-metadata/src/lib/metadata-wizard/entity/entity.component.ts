@@ -85,13 +85,10 @@ export class EntityComponent extends createExtenderComponent() {
   entity$ = this.dataSubject.pipe(
     distinctUntilChanged((prev, next) => JSON.stringify(prev) === JSON.stringify(next)),
     map(entity => {
-      console.debug(
+      /*console.debug(
         'EntityComponent',
-        entity,
-        isDigitalEntity(entity),
-        isPhysicalEntity(entity),
-        JSON.stringify((entity as any)?.extensions?.wikibase ?? {}),
-      );
+        JSON.stringify((entity as any)?.extensions?.wikibase ?? {}, null, 2),
+      );*/
       return isDigitalEntity(entity)
         ? mergeExistingEntityWikibaseExtension(entity as DigitalEntity)
         : isPhysicalEntity(entity)
@@ -294,7 +291,7 @@ export class EntityComponent extends createExtenderComponent() {
   });
   public creationDate = new FormControl<string>('', {
     nonNullable: true,
-    validators: [Validators.pattern(/[0-9]{4}-[0-9]{2}-[0-9]{2}/)],
+    validators: [Validators.minLength(1), Validators.pattern(/[0-9]{4}-[0-9]{2}-[0-9]{2}/)],
   });
   public externalLink = new FormControl<string>('', {
     nonNullable: true,
@@ -364,14 +361,14 @@ export class EntityComponent extends createExtenderComponent() {
     combineLatest([this.emitEntitySubject, this.entity$])
       .pipe(debounceTime(500))
       .subscribe(([_, entity]) => {
-        console.debug(
+        /*console.debug(
           'emitEntity',
-          entity,
+          JSON.stringify(entity),
           entity.isDigital,
           entity.isDigital
             ? DigitalEntity.checkIsValid(entity as DigitalEntity)
             : PhysicalEntity.checkIsValid(entity as PhysicalEntity),
-        );
+        );*/
         const customEvent = new CustomEvent('entity-changed', {
           detail: {
             entity,
@@ -574,37 +571,47 @@ export class EntityComponent extends createExtenderComponent() {
     const entity = await firstValueFrom(this.entity$);
     const technique = this.selectedTechnique$.getValue();
     const software = this.selectedSoftware$.getValue();
-    const equip = this.customEquipment;
+    const equipment = this.customEquipment.value.trim();
+    const creationDate = this.creationDate.value;
     console.log('addCreationData', {
       technique,
       software,
-      equipment: this.customEquipment.value,
-      creationDate: this.creationDate.value,
+      equipment,
+      creationDate,
     });
 
     if (technique) {
-      const idx = this.#findItemIndex(entity.extensions?.wikibase?.techniques, technique.id);
+      const idx = this.#findItemIndex(
+        entity.extensions?.wikibase?.techniques,
+        getWikibaseItemID(technique),
+      );
       if (idx < 0) entity.extensions?.wikibase?.techniques?.push(technique);
       this.searchTechnique.reset();
       this.selectedTechnique$.next(undefined);
     }
 
     if (software) {
-      const idx = this.#findItemIndex(entity.extensions?.wikibase?.software, software.id);
+      const idx = this.#findItemIndex(
+        entity.extensions?.wikibase?.software,
+        getWikibaseItemID(software),
+      );
       if (idx < 0) entity.extensions?.wikibase?.software?.push(software);
       this.searchSoftware.reset();
       this.selectedSoftware$.next(undefined);
     }
 
-    if (equip.value.trim().length > 0) {
-      // TODO: Why is this only a string, how to add to wikibase?
-      // entity.extensions?.wikibase?.equipment?.push(equip.value.trim());
+    if (equipment.length > 0) {
+      const idx = this.#findItemIndex(
+        entity.extensions?.wikibase?.equipment,
+        getWikibaseItemID(equipment),
+      );
+      if (idx < 0) entity.extensions?.wikibase?.equipment?.push(equipment);
       this.customEquipment.reset();
     }
 
-    if (this.creationDate.valid) {
+    if (this.creationDate.valid && creationDate.length > 0) {
       if (entity.extensions?.wikibase) {
-        entity.extensions.wikibase!.creationDate = this.creationDate.value;
+        entity.extensions.wikibase!.creationDate = creationDate;
       }
       this.creationDate.reset();
     }
@@ -687,9 +694,12 @@ export class EntityComponent extends createExtenderComponent() {
     this.emitEntity();
   }
 
-  public async removeEquipment(equipment: IWikibaseItem) {
+  public async removeEquipment(equipment: IWikibaseItem | string) {
     const entity = await firstValueFrom(this.entity$);
-    const idx = this.#findItemIndex(entity.extensions?.wikibase?.equipment, equipment.id);
+    const idx = this.#findItemIndex(
+      entity.extensions?.wikibase?.equipment,
+      getWikibaseItemID(equipment),
+    );
     if (idx !== undefined && idx >= 0) {
       entity.extensions?.wikibase?.equipment?.splice(idx, 1);
     }
@@ -706,9 +716,12 @@ export class EntityComponent extends createExtenderComponent() {
     this.emitEntity();
   }
 
-  public async removeExternalLink(link: string) {
+  public async removeExternalLink(link: IWikibaseItem | string) {
     const entity = await firstValueFrom(this.entity$);
-    const idx = this.#findItemIndex(entity.extensions?.wikibase?.externalLinks, link);
+    const idx = this.#findItemIndex(
+      entity.extensions?.wikibase?.externalLinks,
+      getWikibaseItemID(link),
+    );
     if (idx !== undefined && idx >= 0) {
       entity.extensions?.wikibase?.externalLinks?.splice(idx, 1);
     }
