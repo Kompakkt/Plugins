@@ -1,7 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { createExtenderPlugin, createExtenderComponent } from '@kompakkt/extender';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import {
+  createExtenderPlugin,
+  createExtenderComponent,
+  EXTENDER_BACKEND_SERVICE,
+} from '@kompakkt/extender';
+import { TranslatePipe } from './translate.pipe';
+import { from } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'nfdi4c-logo',
@@ -26,13 +34,16 @@ import { createExtenderPlugin, createExtenderComponent } from '@kompakkt/extende
 class NFDI4CLogoComponent {}
 
 @Component({
-    selector: 'app-entity',
-    template: `
+  selector: 'app-entity',
+  template: `
     <button
       mat-stroked-button
       type="button"
       (click)="loginWithSAML()"
-      [disabled]="waitingForResponse()"
+      [class.disabled]="!isSamlAvailable()"
+      [matTooltip]="
+        isSamlAvailable() ? '' : ('NFDI4Culture SAML login is currently not available' | translate)
+      "
     >
       <div class="label">
         <nfdi4c-logo />
@@ -40,7 +51,7 @@ class NFDI4CLogoComponent {}
       </div>
     </button>
   `,
-    styles: `
+  styles: `
     button {
       width: 100%;
       div.label {
@@ -51,12 +62,25 @@ class NFDI4CLogoComponent {}
         align-items: center;
         width: 100%;
       }
+      &.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        border-color: lightgray !important;
+      }
     }
   `,
-    imports: [CommonModule, MatButtonModule, NFDI4CLogoComponent]
+  imports: [CommonModule, MatButtonModule, NFDI4CLogoComponent, TranslatePipe, MatTooltipModule],
 })
 class SSONFDI4CultureComponent extends createExtenderComponent() {
   waitingForResponse = signal(false);
+  #backend = inject(EXTENDER_BACKEND_SERVICE);
+  #isSamlAvailable$ = from(
+    this.#backend
+      .get(`/auth/saml/health`)
+      .then(res => !!res)
+      .catch(() => false),
+  );
+  readonly isSamlAvailable = toSignal(this.#isSamlAvailable$);
 
   constructor() {
     super();
@@ -64,6 +88,8 @@ class SSONFDI4CultureComponent extends createExtenderComponent() {
 
   // TODO: Implement communication about response status to host component
   public async loginWithSAML() {
+    const isAvailable = this.isSamlAvailable();
+    if (!isAvailable) return;
     try {
       // this.waitingForResponse = true;
       // this.dialogRef.disableClose = true;
