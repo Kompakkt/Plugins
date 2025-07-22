@@ -2,6 +2,26 @@
 
 :host {
   display: block;
+
+  &.is-finalize-preview {
+    mat-expansion-panel {
+      // Due to ::ng-deep in main Repo, we need to use this ugly pixel hack
+      transform: translateX(-35px) !important;
+      .mat-expansion-panel-header {
+        pointer-events: none !important;
+        padding: 0px 35px !important;
+        border: none !important;
+      }
+      .mat-expansion-panel-content-wrapper {
+        padding: 0 !important;
+      }
+
+      a {
+        text-decoration: none !important;
+        color: inherit !important;
+      }
+    }
+  }
 }
 
 h2 {
@@ -29,9 +49,8 @@ p {
 }
 
 .mat-expansion-panel-header-title {
-  font-size: 1rem;
   color: var(--brand-color);
-  line-height: 1rem;
+  line-height: 2 !important;
 }
 
 div.licence-block {

@@ -1,7 +1,7 @@
 @if (digitalEntity(); as digitalEntity) {
   @if (wikibaseData(); as wikibaseData) {
     @if (hasAgents()) {
-      <mat-expansion-panel [expanded]="false">
+      <mat-expansion-panel [expanded]="finalizePreviewMode()" [hideToggle]="finalizePreviewMode()">
         <mat-expansion-panel-header>
           <mat-panel-title>Related agents</mat-panel-title>
           <mat-panel-description></mat-panel-description>
@@ -23,7 +23,7 @@
     }
 
     @if (usedLicense(); as licence) {
-      <mat-expansion-panel [expanded]="false">
+      <mat-expansion-panel [expanded]="finalizePreviewMode()" [hideToggle]="finalizePreviewMode()">
         <mat-expansion-panel-header>
           <mat-panel-title> Licence </mat-panel-title>
         </mat-expansion-panel-header>
@@ -44,7 +44,7 @@
     }
 
     @if (hasCreationData()) {
-      <mat-expansion-panel [expanded]="false">
+      <mat-expansion-panel [expanded]="finalizePreviewMode()" [hideToggle]="finalizePreviewMode()">
         <mat-expansion-panel-header>
           <mat-panel-title>Creation</mat-panel-title>
           <mat-panel-description></mat-panel-description>
@@ -86,7 +86,7 @@
     }
 
     @if (hasExternalLinks()) {
-      <mat-expansion-panel [expanded]="false">
+      <mat-expansion-panel [expanded]="finalizePreviewMode()" [hideToggle]="finalizePreviewMode()">
         <mat-expansion-panel-header>
           <mat-panel-title>External Links</mat-panel-title>
           <mat-panel-description></mat-panel-description>
@@ -101,7 +101,7 @@
     }
 
     @if (hasBibliograpicRefs()) {
-      <mat-expansion-panel [expanded]="false">
+      <mat-expansion-panel [expanded]="finalizePreviewMode()" [hideToggle]="finalizePreviewMode()">
         <mat-expansion-panel-header>
           <mat-panel-title>Bibliography</mat-panel-title>
           <mat-panel-description></mat-panel-description>
@@ -120,7 +120,7 @@
     }
 
     @if (hasHierarchies()) {
-      <mat-expansion-panel [expanded]="false">
+      <mat-expansion-panel [expanded]="finalizePreviewMode()" [hideToggle]="finalizePreviewMode()">
         <mat-expansion-panel-header>
           <mat-panel-title>Related object structure</mat-panel-title>
           <mat-panel-description></mat-panel-description>
@@ -187,7 +187,10 @@
 
     @if (digitalEntity.externalId; as externalIds) {
       @if (externalIds.length > 0) {
-        <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel
+          [expanded]="finalizePreviewMode()"
+          [hideToggle]="finalizePreviewMode()"
+        >
           <mat-expansion-panel-header>
             <mat-panel-title>External identifiers</mat-panel-title>
             <mat-panel-description></mat-panel-description>
@@ -207,7 +210,10 @@
 
     @if (digitalEntity.externalLink; as externalLinks) {
       @if (externalLinks.length > 0) {
-        <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel
+          [expanded]="finalizePreviewMode()"
+          [hideToggle]="finalizePreviewMode()"
+        >
           <mat-expansion-panel-header>
             <mat-panel-title>External links</mat-panel-title>
             <mat-panel-description></mat-panel-description>
@@ -233,7 +239,10 @@
 
     @if (digitalEntity.biblioRefs; as biblioRefs) {
       @if (biblioRefs.length > 0) {
-        <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel
+          [expanded]="finalizePreviewMode()"
+          [hideToggle]="finalizePreviewMode()"
+        >
           <mat-expansion-panel-header>
             <mat-panel-title>Bibliographic references</mat-panel-title>
             <mat-panel-description></mat-panel-description>
@@ -259,7 +268,10 @@
 
     @if (digitalEntity.other; as others) {
       @if (others.length > 0) {
-        <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel
+          [expanded]="finalizePreviewMode()"
+          [hideToggle]="finalizePreviewMode()"
+        >
           <mat-expansion-panel-header>
             <mat-panel-title>Other</mat-panel-title>
             <mat-panel-description></mat-panel-description>
@@ -285,7 +297,10 @@
 
     @if (digitalEntity.metadata_files; as metadata_files) {
       @if (metadata_files.length > 0) {
-        <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel
+          [expanded]="finalizePreviewMode()"
+          [hideToggle]="finalizePreviewMode()"
+        >
           <mat-expansion-panel-header>
             <mat-panel-title>Attached files</mat-panel-title>
             <mat-panel-description></mat-panel-description>

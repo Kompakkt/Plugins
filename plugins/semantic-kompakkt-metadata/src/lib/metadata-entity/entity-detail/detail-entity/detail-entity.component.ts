@@ -1,4 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, HostBinding, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
@@ -34,11 +34,17 @@ export class DetailEntityComponent {
   readonly content = inject(ContentProviderService);
 
   digitalEntity = input.required<IDigitalEntity<IWikibaseDigitalEntityExtension>>();
+  finalizePreviewMode = input<boolean>(false);
   wikibaseData = computed(() => {
     const digitalEntity = this.digitalEntity();
     if (!digitalEntity?.extensions?.wikibase) return undefined;
     return digitalEntity.extensions.wikibase;
   });
+
+  @HostBinding('class.is-finalize-preview')
+  get isFinalizePreview() {
+    return this.finalizePreviewMode();
+  }
 
   public Licenses: { [key: string]: ILicence } = {
     CC0: {
