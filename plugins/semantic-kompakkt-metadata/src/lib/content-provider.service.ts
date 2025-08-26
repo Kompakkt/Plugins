@@ -97,7 +97,7 @@ export class ContentProviderService {
 
   public async updateAnnotationLinkChoices() {
     return this.#backend
-      .get(`/wikibase/choices/annotation-link`)
+      .get(`wikibase/choices/annotation-link`)
       .then(result => result as IAnnotationLinkChoices)
       .then(result => {
         console.debug('annotation link choices', result);
