@@ -109,8 +109,8 @@ const ANNO_PROPS = ['body', 'target'];
  * @type {Boolean}
  */
 const isDigitalEntity = (obj: any): obj is IDigitalEntity =>
-  /* isMetadataEntity(obj) &&  */checkProps(DIG_ENTITY_PROPS, obj);
-const DIG_ENTITY_PROPS = ['type', 'licence'];
+  /* isMetadataEntity(obj) &&  */ checkProps(DIG_ENTITY_PROPS, obj);
+const DIG_ENTITY_PROPS = ['type'];
 
 /**
  * Checks whether an object is a physical entity
