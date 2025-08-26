@@ -43,7 +43,7 @@ export class SemanticKompakktMetadataPlugin extends createExtenderPlugin({
           entities: [],
           licenses: [],
           media: [],
-          mediaUrls: undefined,
+          mediaUrls: [],
         },
       };
       const transformed: IAnnotation<IWikibaseAnnotationExtension> = {

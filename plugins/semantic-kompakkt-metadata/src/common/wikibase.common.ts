@@ -79,7 +79,7 @@ export type IWikibaseAnnotationExtensionData = Partial<{
   authors: IWikibaseItem[];
   licenses: IWikibaseItem[];
   media: IWikibaseItem[];
-  mediaUrls: string;
+  mediaUrls: string[];
   entities: IWikibaseItem[];
 }>;
 
