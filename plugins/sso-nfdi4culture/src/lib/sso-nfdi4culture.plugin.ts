@@ -76,7 +76,7 @@ class SSONFDI4CultureComponent extends createExtenderComponent() {
   #backend = inject(EXTENDER_BACKEND_SERVICE);
   #isSamlAvailable$ = from(
     this.#backend
-      .get(`/auth/saml/health`)
+      .get(`sso-nfdi4culture/saml/health`)
       .then(res => !!res)
       .catch(() => false),
   );
@@ -95,7 +95,7 @@ class SSONFDI4CultureComponent extends createExtenderComponent() {
       // this.dialogRef.disableClose = true;
 
       // Call backend to initiate SAML request
-      window.location.href = `server/user-management/auth/saml`;
+      window.location.href = `server/sso-nfdi4culture/saml`;
       // const response = await this.account.initiateLoginWithSAML();
       // console.debug(response);
     } catch (error) {
