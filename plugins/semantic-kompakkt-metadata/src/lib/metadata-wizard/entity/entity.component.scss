@@ -40,19 +40,20 @@ button.mdc-list-item {
   margin-top: 1rem;
 }
 
+@keyframes entityCardComponentFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0%);
+  }
+}
+
 ::ng-deep {
   div.card {
-    @keyframes card-fade-in {
-      0% {
-        opacity: 0;
-        transform: translateY(-10%);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0%);
-      }
-    }
-    animation: card-fade-in cubic-bezier(0.25, 1, 0.5, 1) both 1 250ms;
+    animation: entityCardComponentFadeIn cubic-bezier(0.25, 1, 0.5, 1) both 1 250ms;
 
     display: flex;
     flex-direction: column;
@@ -66,6 +67,7 @@ button.mdc-list-item {
     background: white;
     padding: 0.75rem 1rem 1rem 1rem;
     border-radius: 0.5rem;
+    position: relative;
 
     transition: filter 250ms ease-in-out;
     border: solid 0.1rem var(--brand-color, #00afe7);
@@ -87,7 +89,6 @@ button.mdc-list-item {
       }
     }
 
-    position: relative;
     .actions {
       position: absolute;
       top: 0;
