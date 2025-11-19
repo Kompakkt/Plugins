@@ -32,6 +32,11 @@ export type ExtenderOptions = {
   };
 };
 
+export interface ExtenderPluginConstructor {
+  new (...args: any[]): ExtenderPlugin;
+  providerToken?: InjectionToken<any>;
+}
+
 export const PLUGIN_MANAGER = new InjectionToken<ExtenderPluginManager>(
   'KOMPAKKT_EXTENDER_PLUGIN_MANAGER',
 );
@@ -60,7 +65,7 @@ export const provideExtender = ({
   services,
   pipes,
 }: ExtenderOptions): EnvironmentProviders => {
-  const servicesByPlugins = plugins.map(p => Object.values((p as any).services)).flat();
+  const servicesByPlugins = plugins.map(p => (p.services ? Object.values(p.services) : [])).flat();
   return makeEnvironmentProviders([
     {
       provide: EXTENDER_PLUGINS,
@@ -87,12 +92,15 @@ export const provideExtender = ({
       provide: EXTENDER_TRANSLATE_PIPE,
       useClass: pipes.translatePipe,
     },
-    servicesByPlugins.map(c => ({ provide: c, useClass: c })),
+    ...servicesByPlugins.map(service => ({ provide: service, useClass: service })),
     ...plugins
-      .filter(p => !!(p.constructor as any)?.providerToken)
-      .map(p => {
-        const provide = (p.constructor as any).providerToken;
-        return { provide, useValue: p };
-      }),
+      .filter(
+        (p): p is ExtenderPlugin & { constructor: ExtenderPluginConstructor } =>
+          !!(p.constructor as ExtenderPluginConstructor)?.providerToken,
+      )
+      .map(p => ({
+        provide: (p.constructor as ExtenderPluginConstructor).providerToken!,
+        useValue: p,
+      })),
   ]);
 };

@@ -1,5 +1,5 @@
 import { Component, computed, HostBinding, inject, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import type { IDigitalEntity } from '../../../../common';
@@ -23,12 +23,11 @@ interface ILicence {
   templateUrl: './detail-entity.component.html',
   styleUrls: ['../../../theme.scss', './detail-entity.component.scss'],
   imports: [
-    CommonModule,
     MatExpansionModule,
     MatIconModule,
     GetLabelPipe,
-    GetWikibaseItemAddressPipe,
-  ],
+    GetWikibaseItemAddressPipe
+],
 })
 export class DetailEntityComponent {
   readonly content = inject(ContentProviderService);
