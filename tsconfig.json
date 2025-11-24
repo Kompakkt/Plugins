@@ -17,7 +17,7 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
-    "lib": ["ES2022", "dom"],
+    "rootDir": ".",
     "paths": {
       "@kompakkt/plugins/extender": ["./extender/src"]
     }

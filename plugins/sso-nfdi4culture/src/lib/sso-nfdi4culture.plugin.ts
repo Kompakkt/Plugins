@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -69,7 +69,7 @@ class NFDI4CLogoComponent {}
       }
     }
   `,
-  imports: [CommonModule, MatButtonModule, NFDI4CLogoComponent, TranslatePipe, MatTooltipModule],
+  imports: [MatButtonModule, NFDI4CLogoComponent, TranslatePipe, MatTooltipModule],
 })
 class SSONFDI4CultureComponent extends createExtenderComponent() {
   waitingForResponse = signal(false);
