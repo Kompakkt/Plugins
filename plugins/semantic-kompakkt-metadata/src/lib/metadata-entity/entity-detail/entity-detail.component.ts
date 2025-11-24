@@ -1,5 +1,5 @@
 import { type AfterViewInit, Component, computed, effect, inject } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { createExtenderComponent } from '@kompakkt/extender';
 import { type IDigitalEntity, isDigitalEntity, isEntity } from '../../../common';
 import type {
@@ -19,7 +19,7 @@ import {
   selector: 'app-entity-detail',
   templateUrl: './entity-detail.component.html',
   styleUrls: ['../../theme.scss', './entity-detail.component.scss'],
-  imports: [DetailEntityComponent],
+  imports: [CommonModule, DetailEntityComponent],
 })
 export class EntityDetailComponent extends createExtenderComponent() implements AfterViewInit {
   readonly content = inject(ContentProviderService);

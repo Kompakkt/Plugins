@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { MatChipsModule } from '@angular/material/chips';
 import { IAddress, IInstitution } from '../../../../common';
 
@@ -9,7 +9,7 @@ const firstKey = (obj: any) => Object.keys(obj)[0] ?? '';
   selector: 'app-detail-institution',
   templateUrl: './detail-institution.component.html',
   styleUrls: ['../../../theme.scss', './detail-institution.component.scss'],
-  imports: [MatChipsModule],
+  imports: [CommonModule, MatChipsModule],
 })
 export class DetailInstitutionComponent {
   institution = input.required<IInstitution>();
