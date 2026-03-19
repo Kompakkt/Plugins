@@ -12,6 +12,10 @@
     "postinstall": "bun run ./prepare-exports.ts"
   },
   "private": true,
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "packageManager": "^bun@1.0.0",
   "dependencies": {
     "@angular/animations": "^19.2.6",
     "@angular/cdk": "^19.2.9",

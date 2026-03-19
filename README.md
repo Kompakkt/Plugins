@@ -9,6 +9,10 @@ Plugins depend on the `Extender` library, which is also home in this repository.
 
 More information about the `Extender` and how to use it can be found in the [`extender/README.md`-file](./extender/README.md).
 
+# Requirements
+
+Due to [Bun](https://bun.sh/) being used as the runtime for scripts, you need to have Bun installed on your system. You can find installation instructions on the [Bun website](https://bun.sh/).
+
 ## Creating a new plugin
 
 Run the following command, replacing with the name of your plugin.
@@ -16,7 +20,7 @@ Run the following command, replacing with the name of your plugin.
 Note: The full plugin name will be extended to `@kompakkt/pluginname-plugin`.
 
 ```sh
-npm run new-plugin pluginname
+bun run new-plugin pluginname
 ```
 
 ## Building plugins
@@ -24,13 +28,13 @@ npm run new-plugin pluginname
 To build a single plugin, run:
 
 ```sh
-npm run build pluginname
+bun run build pluginname
 ```
 
 To build all plugins, you can run the CI build script:
 
 ```sh
-npm run ci:build
+bun run ci:build
 ```
 
 ## Developing plugins
