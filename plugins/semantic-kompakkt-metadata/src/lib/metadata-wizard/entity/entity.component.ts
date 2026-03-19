@@ -28,7 +28,7 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { createExtenderComponent } from '@kompakkt/extender';
+import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import { isDigitalEntity, isPhysicalEntity } from '../../../common';
 import { getWikibaseItemID, IMediaAgent, IWikibaseItem } from '../../../common/wikibase.common';
 import { AutocompleteOptionComponent } from '../../autocomplete/autocomplete-option.component';

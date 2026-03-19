@@ -6,7 +6,7 @@ import {
   createExtenderPlugin,
   createExtenderComponent,
   EXTENDER_BACKEND_SERVICE,
-} from '@kompakkt/extender';
+} from '@kompakkt/plugins/extender';
 import { TranslatePipe } from './translate.pipe';
 import { from } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';

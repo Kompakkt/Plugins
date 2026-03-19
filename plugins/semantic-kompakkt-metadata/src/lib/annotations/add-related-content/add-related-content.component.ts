@@ -3,7 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { createExtenderComponent } from '@kompakkt/extender';
+import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import {
   AutocompleteComponent,
   ButtonComponent,

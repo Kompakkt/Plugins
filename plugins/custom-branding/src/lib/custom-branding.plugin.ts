@@ -1,5 +1,5 @@
 import { signal } from '@angular/core';
-import { createExtenderPlugin } from '@kompakkt/extender';
+import { createExtenderPlugin } from '@kompakkt/plugins/extender';
 
 type CustomBrandingSettings = Partial<{
   explorePageLogoText: string;
