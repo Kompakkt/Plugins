@@ -1,5 +1,5 @@
 {
-  "name": "@kompakkt/plugins-source",
+  "name": "@kompakkt/plugins",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
