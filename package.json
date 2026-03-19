@@ -8,7 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "new-plugin": "bun run ./create-new-plugin.ts",
-    "ci:build": "bun run ./build-all.ts"
+    "ci:build": "bun run ./build-all.ts",
+    "postinstall": "bun run ./prepare-exports.ts"
   },
   "private": true,
   "dependencies": {
@@ -45,5 +46,14 @@
     "ng-packagr": "^19.1.0",
     "tsx": "^4.19.0",
     "typescript": "~5.5.2"
+  },
+  "exports": {
+    "./extender": "./extender/src/index.ts",
+    "./plugin-hello-world": "./plugins/hello-world/src/index.ts",
+    "./plugin-template": "./plugins/template/src/index.ts",
+    "./plugin-privacy-and-contact": "./plugins/privacy-and-contact/src/index.ts",
+    "./plugin-semantic-kompakkt-metadata": "./plugins/semantic-kompakkt-metadata/src/index.ts",
+    "./plugin-sso-nfdi4culture": "./plugins/sso-nfdi4culture/src/index.ts",
+    "./plugin-custom-branding": "./plugins/custom-branding/src/index.ts"
   }
 }
