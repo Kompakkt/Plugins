@@ -49,11 +49,11 @@
   },
   "exports": {
     "./extender": "./extender/src/index.ts",
-    "./plugin-hello-world": "./plugins/hello-world/src/index.ts",
-    "./plugin-template": "./plugins/template/src/index.ts",
-    "./plugin-privacy-and-contact": "./plugins/privacy-and-contact/src/index.ts",
-    "./plugin-semantic-kompakkt-metadata": "./plugins/semantic-kompakkt-metadata/src/index.ts",
-    "./plugin-sso-nfdi4culture": "./plugins/sso-nfdi4culture/src/index.ts",
-    "./plugin-custom-branding": "./plugins/custom-branding/src/index.ts"
+    "./hello-world": "./plugins/hello-world/src/index.ts",
+    "./template": "./plugins/template/src/index.ts",
+    "./privacy-and-contact": "./plugins/privacy-and-contact/src/index.ts",
+    "./semantic-kompakkt-metadata": "./plugins/semantic-kompakkt-metadata/src/index.ts",
+    "./sso-nfdi4culture": "./plugins/sso-nfdi4culture/src/index.ts",
+    "./custom-branding": "./plugins/custom-branding/src/index.ts"
   }
 }
