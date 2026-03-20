@@ -6,7 +6,8 @@ const main = async () => {
 
   const exports: Record<string, string> = {};
   for (const [name, project] of Object.entries(angularJson.projects)) {
-    exports[name.replace('@kompakkt/', './').replace('plugin-', '')] = './' + join(project.root, 'src/index.ts');
+    exports[name.replace('@kompakkt/', './').replace('plugin-', '')] =
+      './' + join(project.root, 'src/index.ts');
   }
 
   const packageJson = await Bun.file('package.json').json();

@@ -37,16 +37,15 @@ const checkProps = (props: string[], obj: unknown) => {
 const isUnresolved = (obj: any): obj is IDocument =>
   Object.keys(obj).length === 1 && obj._id !== undefined;
 
-
 /**
  * Checks whether an object has extensions
- * @param obj 
- * @returns 
+ * @param obj
+ * @returns
  */
 const hasExtensions = (obj: any): obj is { extensions: Record<string, unknown> } => {
   if (!isDefined(obj)) return false;
   return checkProps(['extensions'], obj);
-}
+};
 
 /**
  * Checks whether an object is a group entry
@@ -85,9 +84,10 @@ const isEntity = (obj: any): obj is IEntity => checkProps(ENTITY_PROPS, obj);
 const ENTITY_PROPS = ['name', 'mediaType', 'online', 'finished'];
 
 /**
- * 
+ *
  */
-const isEntitySettings = (obj: any): obj is IEntitySettings => checkProps(ENTITY_SETTINGS_PROPS, obj);
+const isEntitySettings = (obj: any): obj is IEntitySettings =>
+  checkProps(ENTITY_SETTINGS_PROPS, obj);
 const ENTITY_SETTINGS_PROPS = ['preview', 'cameraPositionInitial', 'background', 'lights'];
 
 /**

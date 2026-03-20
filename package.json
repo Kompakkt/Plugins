@@ -6,7 +6,10 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "new-plugin": "bun run ./create-new-plugin.ts",
     "ci:build": "bun run ./build-all.ts",
     "postinstall": "bun run ./prepare-exports.ts"
@@ -48,6 +51,9 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "ng-packagr": "^19.1.0",
+    "oxfmt": "^0.41.0",
+    "oxlint": "^1.56.0",
+    "oxlint-tsgolint": "^0.17.1",
     "tsx": "^4.19.0",
     "typescript": "~5.5.2"
   },
