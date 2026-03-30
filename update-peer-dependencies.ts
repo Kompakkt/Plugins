@@ -43,6 +43,8 @@ const main = async () => {
         console.log(`Updated ${dep} in ${file} to version ${mainVersion}`);
       }
     }
+
+    await Bun.write(file, JSON.stringify(content, null, 2));
   }
 };
 
