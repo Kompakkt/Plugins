@@ -1,6 +1,6 @@
 import { type AfterViewInit, Component, computed, effect, inject } from '@angular/core';
 
-import { createExtenderComponent } from '@kompakkt/extender';
+import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import { type IDigitalEntity, isDigitalEntity, isEntity } from '../../../common';
 import type {
   IWikibaseDigitalEntityExtension,
