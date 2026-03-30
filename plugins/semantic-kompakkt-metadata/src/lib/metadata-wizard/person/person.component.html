@@ -6,13 +6,13 @@
       hideToggle
       expanded
       class="has-required"
-      [class.invalid]="!generalInformationValid"
+      [class.invalid]="!generalInformationValid()"
       >
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon
             matTooltip="Section contains required fields"
-            [color]="generalInformationValid ? 'primary' : 'accent'"
+            [color]="generalInformationValid() ? 'primary' : 'accent'"
             class="required-info"
             >
             label_important

@@ -1,4 +1,4 @@
-import { Component, input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, computed, input, OnChanges, SimpleChanges } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MatAutocompleteModule,
@@ -108,9 +108,10 @@ export class PersonComponent implements OnChanges {
     return this.anyRoleSelected.asObservable();
   }
 
-  get generalInformationValid() {
-    return this.person().title.length > 0;
-  }
+  generalInformationValid = computed(() => {
+    const person = this.person();
+    return person.title.trim().length > 0;
+  });
 
   get contactValid() {
     return true;
