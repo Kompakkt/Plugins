@@ -163,6 +163,29 @@
           "defaultConfiguration": "production"
         }
       }
+    },
+    "@kompakkt/plugin-oidc": {
+      "projectType": "library",
+      "root": "./plugins/oidc",
+      "sourceRoot": "./plugins/oidc/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "plugins/oidc/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "plugins/oidc/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "plugins/oidc/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        }
+      }
     }
   },
   "cli": {
