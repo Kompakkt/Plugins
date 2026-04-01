@@ -63,6 +63,7 @@
     "./privacy-and-contact": "./plugins/privacy-and-contact/src/index.ts",
     "./semantic-kompakkt-metadata": "./plugins/semantic-kompakkt-metadata/src/index.ts",
     "./sso-nfdi4culture": "./plugins/sso-nfdi4culture/src/index.ts",
-    "./custom-branding": "./plugins/custom-branding/src/index.ts"
+    "./custom-branding": "./plugins/custom-branding/src/index.ts",
+    "./oidc": "./plugins/oidc/src/index.ts"
   }
 }

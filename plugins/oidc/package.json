@@ -1,5 +1,5 @@
 {
-  "name": "@kompakkt/plugin-oidc-nfdi4culture",
+  "name": "@kompakkt/plugin-oidc",
   "version": "0.0.1",
   "peerDependencies": {
     "@angular/common": "21.2.6",

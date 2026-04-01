@@ -1,4 +1,3 @@
-
 import { Component, computed, effect, input, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
@@ -9,10 +8,10 @@ import { AddressComponent } from '../address/address.component';
 import { Address, Institution } from '../metadata';
 
 @Component({
-    selector: 'app-institution',
-    templateUrl: './institution.component.html',
-    styleUrls: ['../../theme.scss', './institution.component.scss'],
-    imports: [
+  selector: 'app-institution',
+  templateUrl: './institution.component.html',
+  styleUrls: ['../../theme.scss', './institution.component.scss'],
+  imports: [
     FormsModule,
     ReactiveFormsModule,
     MatFormField,
@@ -22,8 +21,8 @@ import { Address, Institution } from '../metadata';
     MatExpansionModule,
     MatIcon,
     AddressComponent,
-    MatInputModule
-]
+    MatInputModule,
+  ],
 })
 export class InstitutionComponent {
   public entityId = input.required<string>();

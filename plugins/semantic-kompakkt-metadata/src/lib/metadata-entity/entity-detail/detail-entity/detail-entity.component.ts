@@ -22,12 +22,7 @@ interface ILicence {
   selector: 'app-detail-entity',
   templateUrl: './detail-entity.component.html',
   styleUrls: ['../../../theme.scss', './detail-entity.component.scss'],
-  imports: [
-    MatExpansionModule,
-    MatIconModule,
-    GetLabelPipe,
-    GetWikibaseItemAddressPipe
-],
+  imports: [MatExpansionModule, MatIconModule, GetLabelPipe, GetWikibaseItemAddressPipe],
 })
 export class DetailEntityComponent {
   readonly content = inject(ContentProviderService);

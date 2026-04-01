@@ -7,14 +7,14 @@
       expanded
       class="has-required"
       [class.invalid]="!generalInformationValid()"
-      >
+    >
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon
             matTooltip="Section contains required fields"
             [color]="generalInformationValid() ? 'primary' : 'accent'"
             class="required-info"
-            >
+          >
             label_important
           </mat-icon>
           <span>General Information</span>
@@ -34,14 +34,14 @@
       hideToggle
       class="has-required"
       [class.invalid]="!(anyRoleSelected$ | async)"
-      >
+    >
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon
             matTooltip="Section contains required fields"
             [color]="(anyRoleSelected$ | async) ? 'primary' : 'accent'"
             class="required-info"
-            >
+          >
             label_important
           </mat-icon>
           <span>Role selection</span>
@@ -68,7 +68,7 @@
             matTooltip="Section contains required fields"
             [color]="contactValid ? 'primary' : 'accent'"
             class="required-info"
-            >
+          >
             label_important
           </mat-icon>
           <span>Contact</span>
@@ -122,12 +122,12 @@
           matInput
           [formControl]="searchInstitution"
           [matAutocomplete]="instAutocomplete"
-          />
+        />
         <mat-autocomplete
           #instAutocomplete="matAutocomplete"
           (optionSelected)="selectInstitution($event)"
           [displayWith]="displayInstitutionName"
-          >
+        >
           @for (institution of filteredInstitutions$ | async; track institution) {
             <mat-option [value]="institution._id">
               {{ institution.name }}
