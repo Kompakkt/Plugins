@@ -37,7 +37,7 @@ export const getAngularJson = (() => {
   let cached: AngularConfig | null = null;
   return async () => {
     if (cached === null) {
-      const angularJson = await readFile("./angular.json", "utf8");
+      const angularJson = await readFile('./angular.json', 'utf8');
       cached = JSON.parse(angularJson) as AngularConfig;
     }
     return cached;

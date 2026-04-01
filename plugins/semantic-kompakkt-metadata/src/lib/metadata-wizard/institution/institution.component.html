@@ -6,15 +6,15 @@
       hideToggle
       expanded
       class="has-required"
-      [class.invalid]="!generalInformationValid"
-    >
+      [class.invalid]="!generalInformationValid()"
+      >
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon
             matTooltip="Section contains required fields"
             [color]="generalInformationValid() ? 'primary' : 'accent'"
             class="required-info"
-          >
+            >
             label_important
           </mat-icon>
           <span>General Information</span>
@@ -27,7 +27,9 @@
 
         <p>{{ institution.name }}</p>
 
-        <p *ngIf="institution.university">{{ institution.university }}</p>
+        @if (institution.university) {
+          <p>{{ institution.university }}</p>
+        }
       } @else {
         <p>Add a new institution</p>
 
@@ -40,7 +42,7 @@
             placeholder="Enter the name of the institution"
             [(ngModel)]="institution.name"
             required
-          />
+            />
         </mat-form-field>
 
         <mat-form-field>
@@ -51,7 +53,7 @@
             name="university"
             placeholder="Enter the name of the university this institution belongs to"
             [(ngModel)]="institution.university"
-          />
+            />
         </mat-form-field>
       }
     </mat-expansion-panel>
@@ -63,7 +65,7 @@
             matTooltip="Section contains required fields"
             [color]="anyRoleSelected() ? 'primary' : 'accent'"
             class="required-info"
-          >
+            >
             label_important
           </mat-icon>
           <span>Role selection</span>
@@ -71,7 +73,9 @@
         <mat-panel-description></mat-panel-description>
       </mat-expansion-panel-header>
 
-      <p *ngIf="!anyRoleSelected()">You need to select at least one role</p>
+      @if (!anyRoleSelected()) {
+        <p>You need to select at least one role</p>
+      }
       <div class="role-selection">
         @for (role of availableRoles; track role) {
           <mat-checkbox [(ngModel)]="role.checked" (change)="updateRoles()">
@@ -88,7 +92,7 @@
             matTooltip="Section contains required fields"
             [color]="isAddressValid() ? 'primary' : 'accent'"
             class="required-info"
-          >
+            >
             label_important
           </mat-icon>
           <span>Address</span>
@@ -146,7 +150,7 @@
           name="note"
           placeholder="Add a note"
           [(ngModel)]="institution.notes[entityId()]"
-        />
+          />
       </mat-form-field>
     </mat-expansion-panel>
   </mat-accordion>

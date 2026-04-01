@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, effect, input, signal } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
@@ -13,18 +13,17 @@ import { Address, Institution } from '../metadata';
     templateUrl: './institution.component.html',
     styleUrls: ['../../theme.scss', './institution.component.scss'],
     imports: [
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatFormField,
-        MatLabel,
-        MatSelectModule,
-        MatAccordion,
-        MatExpansionModule,
-        MatIcon,
-        AddressComponent,
-        MatInputModule,
-    ]
+    FormsModule,
+    ReactiveFormsModule,
+    MatFormField,
+    MatLabel,
+    MatSelectModule,
+    MatAccordion,
+    MatExpansionModule,
+    MatIcon,
+    AddressComponent,
+    MatInputModule
+]
 })
 export class InstitutionComponent {
   public entityId = input.required<string>();

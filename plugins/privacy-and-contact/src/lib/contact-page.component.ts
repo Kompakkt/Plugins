@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { createExtenderComponent } from '@kompakkt/extender';
+import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import { TranslatePipe } from './translate.pipe';
 
 @Component({

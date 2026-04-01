@@ -6,15 +6,15 @@
       hideToggle
       expanded
       class="has-required"
-      [class.invalid]="!generalInformationValid"
-    >
+      [class.invalid]="!generalInformationValid()"
+      >
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon
             matTooltip="Section contains required fields"
-            [color]="generalInformationValid ? 'primary' : 'accent'"
+            [color]="generalInformationValid() ? 'primary' : 'accent'"
             class="required-info"
-          >
+            >
             label_important
           </mat-icon>
           <span>General Information</span>
@@ -22,28 +22,26 @@
         <mat-panel-description></mat-panel-description>
       </mat-expansion-panel-header>
 
-      <ng-container *ngIf="isExisting$ | async; else newPerson">
+      @if (isExisting$ | async) {
         <p>You are adding onto an existing person.</p>
-
         <p>{{ person.title }}</p>
-      </ng-container>
-      <ng-template #newPerson>
+      } @else {
         <p>Add a new person</p>
-      </ng-template>
+      }
     </mat-expansion-panel>
 
     <mat-expansion-panel
       hideToggle
       class="has-required"
       [class.invalid]="!(anyRoleSelected$ | async)"
-    >
+      >
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon
             matTooltip="Section contains required fields"
             [color]="(anyRoleSelected$ | async) ? 'primary' : 'accent'"
             class="required-info"
-          >
+            >
             label_important
           </mat-icon>
           <span>Role selection</span>
@@ -51,7 +49,9 @@
         <mat-panel-description></mat-panel-description>
       </mat-expansion-panel-header>
 
-      <p *ngIf="!(anyRoleSelected$ | async)">You need to select at least one role</p>
+      @if (!(anyRoleSelected$ | async)) {
+        <p>You need to select at least one role</p>
+      }
       <div class="role-selection">
         @for (role of availableRoles; track role) {
           <mat-checkbox [(ngModel)]="role.checked" (change)="updateRoles()">
@@ -68,7 +68,7 @@
             matTooltip="Section contains required fields"
             [color]="contactValid ? 'primary' : 'accent'"
             class="required-info"
-          >
+            >
             label_important
           </mat-icon>
           <span>Contact</span>
@@ -76,13 +76,12 @@
         <mat-panel-description></mat-panel-description>
       </mat-expansion-panel-header>
 
-      <ng-container *ngIf="availableContacts$ | async as availableContacts">
-        <ng-container *ngIf="selectedContact$ | async as selectedContact">
+      @if (availableContacts$ | async; as availableContacts) {
+        @if (selectedContact$ | async; as selectedContact) {
           <p>
             You can choose an existing contact reference or attach a new one. We've already selected
             the most recent contact for you.
           </p>
-
           <mat-form-field appearance="fill">
             <mat-label>Existing contact reference</mat-label>
             <mat-select (selectionChange)="selectContact($event)">
@@ -97,8 +96,8 @@
               }
             </mat-select>
           </mat-form-field>
-        </ng-container>
-      </ng-container>
+        }
+      }
     </mat-expansion-panel>
 
     <mat-expansion-panel hideToggle>
@@ -123,12 +122,12 @@
           matInput
           [formControl]="searchInstitution"
           [matAutocomplete]="instAutocomplete"
-        />
+          />
         <mat-autocomplete
           #instAutocomplete="matAutocomplete"
           (optionSelected)="selectInstitution($event)"
           [displayWith]="displayInstitutionName"
-        >
+          >
           @for (institution of filteredInstitutions$ | async; track institution) {
             <mat-option [value]="institution._id">
               {{ institution.name }}

@@ -319,7 +319,7 @@ export interface IPosition {
 }
 
 export interface IEntitySettings {
-  position?: IPosition
+  position?: IPosition;
   preview: string;
   cameraPositionInitial: {
     position: IPosition;
@@ -360,7 +360,8 @@ interface IAnnotationList {
  *
  * Makes use of IWhitelist and IAnnotationList.
  */
-export interface IEntity<T = Record<string, unknown>> extends IWhitelist, IAnnotationList, IDocument {
+export interface IEntity<T = Record<string, unknown>>
+  extends IWhitelist, IAnnotationList, IDocument {
   name: string;
 
   files: IFile[];

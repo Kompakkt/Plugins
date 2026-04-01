@@ -1,4 +1,4 @@
-import { createExtenderPlugin, ExtenderTransformer } from '@kompakkt/extender';
+import { createExtenderPlugin, ExtenderTransformer } from '@kompakkt/plugins/extender';
 import { RelatedContentComponent } from './annotations/related-content/related-content.component';
 import { ContentProviderService } from './content-provider.service';
 import { EntityDetailComponent } from './metadata-entity/entity-detail/entity-detail.component';

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 
-import { EXTENDER_BACKEND_SERVICE } from '@kompakkt/extender';
+import { EXTENDER_BACKEND_SERVICE } from '@kompakkt/plugins/extender';
 import { Institution, MediaAgent, Tag, WikibaseItem } from './metadata-wizard/metadata';
 
 import { BehaviorSubject, combineLatest } from 'rxjs';

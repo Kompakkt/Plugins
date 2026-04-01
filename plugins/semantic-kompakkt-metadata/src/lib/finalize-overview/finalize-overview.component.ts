@@ -1,5 +1,5 @@
 import { Component, computed } from '@angular/core';
-import { createExtenderComponent } from '@kompakkt/extender';
+import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import { isDigitalEntity } from '../../common';
 import { DetailEntityComponent } from '../metadata-entity/entity-detail/detail-entity/detail-entity.component';
 

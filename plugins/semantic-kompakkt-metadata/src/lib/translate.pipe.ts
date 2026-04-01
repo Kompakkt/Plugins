@@ -1,5 +1,5 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
-import { EXTENDER_TRANSLATE_PIPE } from '@kompakkt/extender';
+import { EXTENDER_TRANSLATE_PIPE } from '@kompakkt/plugins/extender';
 
 @Pipe({
   name: 'translate',

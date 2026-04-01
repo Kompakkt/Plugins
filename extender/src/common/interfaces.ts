@@ -360,7 +360,8 @@ interface IAnnotationList {
  *
  * Makes use of IWhitelist and IAnnotationList.
  */
-export interface IEntity<T = Record<string, unknown>> extends IWhitelist, IAnnotationList, IDocument {
+export interface IEntity<T = Record<string, unknown>>
+  extends IWhitelist, IAnnotationList, IDocument {
   name: string;
 
   files: IFile[];
