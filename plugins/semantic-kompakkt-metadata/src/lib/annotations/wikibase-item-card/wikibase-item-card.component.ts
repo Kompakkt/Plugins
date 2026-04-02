@@ -2,7 +2,7 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import { IWikibaseItem } from '../../../common/wikibase.common';
 import { ContentProviderService } from '../../content-provider.service';
 import { getWikibaseItemAddress } from '../../wikibase-item-address.pipe';
-import { ButtonComponent, ButtonRowComponent } from 'komponents';
+import { ButtonComponent, ButtonRowComponent } from '@kompakkt/komponents';
 import { MatIconModule } from '@angular/material/icon';
 import { firstValueFrom } from 'rxjs';
 
