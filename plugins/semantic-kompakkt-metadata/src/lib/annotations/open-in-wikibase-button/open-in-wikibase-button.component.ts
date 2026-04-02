@@ -2,7 +2,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
-import { ButtonComponent } from 'komponents';
+import { ButtonComponent } from '@kompakkt/komponents';
 import { map } from 'rxjs';
 import { IAnnotation, isAnnotation } from '../../../common';
 import { IWikibaseAnnotationExtension, IWikibaseItem } from '../../../common/wikibase.common';

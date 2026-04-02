@@ -9,7 +9,7 @@ import {
   ButtonComponent,
   ButtonRowComponent,
   InputComponent,
-} from 'komponents';
+} from '@kompakkt/komponents';
 import { combineLatestWith, firstValueFrom, interval, map, startWith, switchMap } from 'rxjs';
 import { IAnnotation, isAnnotation } from '../../../common';
 import { IWikibaseAnnotationExtension, IWikibaseItem } from '../../../common/wikibase.common';
