@@ -1,6 +1,7 @@
 import { Component, computed } from '@angular/core';
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
-import { isDigitalEntity } from '../../common';
+import { isDigitalEntity } from '@kompakkt/common';
+import { isWikibaseExtendedDigitalEntity } from '../../common/wikibase.common';
 import { DetailEntityComponent } from '../metadata-entity/entity-detail/detail-entity/detail-entity.component';
 
 @Component({
@@ -12,7 +13,11 @@ import { DetailEntityComponent } from '../metadata-entity/entity-detail/detail-e
 export class FinalizeOverviewComponent extends createExtenderComponent() {
   entity = computed(() => {
     const slotData = this.slotData();
-    console.log('EntityDetailComponentPlugin', slotData, isDigitalEntity(slotData));
-    return isDigitalEntity(slotData) ? slotData : undefined;
+    console.log('EntityDetailComponentPlugin', {
+      slotData,
+      isDigital: isDigitalEntity(slotData),
+      isWikibaseExtendedDigital: isWikibaseExtendedDigitalEntity(slotData),
+    });
+    return isWikibaseExtendedDigitalEntity(slotData) ? slotData : undefined;
   });
 }

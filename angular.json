@@ -186,6 +186,29 @@
           "defaultConfiguration": "production"
         }
       }
+    },
+    "@kompakkt/plugin-dfg-3d-mets": {
+      "projectType": "library",
+      "root": "./plugins/dfg-3d-mets",
+      "sourceRoot": "./plugins/dfg-3d-mets/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "options": {
+            "project": "plugins/dfg-3d-mets/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "plugins/dfg-3d-mets/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "plugins/dfg-3d-mets/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        }
+      }
     }
   },
   "cli": {

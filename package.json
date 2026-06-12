@@ -12,7 +12,8 @@
     "format:check": "oxfmt --check",
     "new-plugin": "bun run ./create-new-plugin.ts",
     "ci:build": "bun run ./build-all.ts",
-    "postinstall": "bun run ./prepare-exports.ts"
+    "postinstall": "bun run ./prepare-exports.ts",
+    "update:kompakkt:common": "bun run update-git-dependency.ts -d @kompakkt/common -o Kompakkt -r Common -b master"
   },
   "private": true,
   "engines": {
@@ -29,12 +30,14 @@
     "@angular/platform-browser": "21.2.6",
     "@angular/platform-browser-dynamic": "21.2.6",
     "@angular/router": "21.2.6",
+    "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#b91f8c01a8cf504a1a3f33510b120dcf45204f15",
     "@kompakkt/komponents": "git+https://github.com/Kompakkt/Komponents#445b8ac",
     "bson": "^7.2.0",
     "bson-objectid": "^2.0.4",
     "rxjs": "7.8.2",
     "slugify": "^1.6.6",
     "tslib": "^2.3.0",
+    "uuid": "^14.0.0",
     "zone.js": "0.16.1"
   },
   "devDependencies": {
@@ -64,6 +67,7 @@
     "./semantic-kompakkt-metadata": "./plugins/semantic-kompakkt-metadata/src/index.ts",
     "./sso-nfdi4culture": "./plugins/sso-nfdi4culture/src/index.ts",
     "./custom-branding": "./plugins/custom-branding/src/index.ts",
-    "./oidc": "./plugins/oidc/src/index.ts"
+    "./oidc": "./plugins/oidc/src/index.ts",
+    "./dfg-3d-mets": "./plugins/dfg-3d-mets/src/index.ts"
   }
 }

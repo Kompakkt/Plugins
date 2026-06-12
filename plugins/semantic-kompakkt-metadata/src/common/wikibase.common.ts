@@ -1,3 +1,11 @@
+import {
+  isDigitalEntity,
+  type IAnnotation,
+  type IBaseEntity,
+  type IDigitalEntity,
+  type IPhysicalEntity,
+} from '@kompakkt/common';
+
 export type IWikibaseItem = {
   id: string;
   internalID?: string;
@@ -45,45 +53,64 @@ export type IMediaHierarchy = {
 
 export type IWikibaseLabel = Record<string, string>;
 
-export type IWikibaseDigitalEntityExtension = {
-  wikibase?: IWikibaseDigitalEntityExtensionData;
+export type IWikibaseBaseEntityExtension = {
+  wikibase?: Partial<{
+    label: IWikibaseLabel;
+    description: IWikibaseLabel;
+    id: string;
+    address: string;
+    agents: IMediaAgent[];
+    techniques: Array<string | IWikibaseItem>;
+    software: Array<string | IWikibaseItem>;
+    equipment: Array<string | IWikibaseItem>;
+    creationDate: string | IWikibaseItem | undefined;
+    externalLinks: Array<string | IWikibaseItem>; // Is this supposed to happen?
+    bibliographicRefs: Array<string | IWikibaseItem>;
+    physicalObjs: Array<string | IWikibaseItem>;
+    licence: string;
+    hierarchies: IMediaHierarchy[];
+    claims: Record<string, unknown>;
+  }>;
 };
-
-export type IWikibaseDigitalEntityExtensionData = Partial<{
-  label: IWikibaseLabel;
-  description: IWikibaseLabel;
-  id: string;
-  address: string;
-  agents: IMediaAgent[];
-  techniques: Array<string | IWikibaseItem>;
-  software: Array<string | IWikibaseItem>;
-  equipment: Array<string | IWikibaseItem>;
-  creationDate: string | IWikibaseItem | undefined;
-  externalLinks: Array<string | IWikibaseItem>; // Is this supposed to happen?
-  bibliographicRefs: Array<string | IWikibaseItem>;
-  physicalObjs: Array<string | IWikibaseItem>;
-  licence: string;
-  hierarchies: IMediaHierarchy[];
-  claims: Record<string, unknown>;
-}>;
 
 export type IWikibaseAnnotationExtension = {
-  wikibase?: IWikibaseAnnotationExtensionData;
+  wikibase?: Partial<{
+    id: string;
+    address: string;
+    label: IWikibaseLabel;
+    description: IWikibaseLabel;
+    authors: IWikibaseItem[];
+    licenses: IWikibaseItem[];
+    media: IWikibaseItem[];
+    mediaUrls: string[];
+    entities: IWikibaseItem[];
+  }>;
 };
-
-export type IWikibaseAnnotationExtensionData = Partial<{
-  id: string;
-  address: string;
-  label: IWikibaseLabel;
-  description: IWikibaseLabel;
-  authors: IWikibaseItem[];
-  licenses: IWikibaseItem[];
-  media: IWikibaseItem[];
-  mediaUrls: string[];
-  entities: IWikibaseItem[];
-}>;
 
 export const getPQNumberFromID = (id: string) => {
   const match = id.match(/[PQ](\d+)/i)?.at(1);
   return match ? Number.parseInt(match) : undefined;
+};
+
+export type WikibaseExtendedBaseEntity = IBaseEntity & { extensions: IWikibaseBaseEntityExtension };
+export type WikibaseExtendedDigitalEntity = IDigitalEntity & {
+  extensions: IWikibaseBaseEntityExtension;
+};
+export type WikibaseExtendedPhysicalEntity = IPhysicalEntity & {
+  extensions: IWikibaseBaseEntityExtension;
+};
+export type WikibaseExtendedAnnotation = IAnnotation & { extensions: IWikibaseAnnotationExtension };
+
+export const isWikibaseExtendedDigitalEntity = (
+  entity: unknown,
+): entity is WikibaseExtendedDigitalEntity => {
+  if (!isDigitalEntity(entity)) {
+    return false;
+  }
+  const asWikibaseEntity = entity as WikibaseExtendedDigitalEntity;
+  return (
+    'extentsions' in asWikibaseEntity &&
+    typeof asWikibaseEntity.extensions === 'object' &&
+    'wikibase' in asWikibaseEntity.extensions
+  );
 };

@@ -29,7 +29,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
-import { isDigitalEntity, isPhysicalEntity } from '../../../common';
+import { isDigitalEntity, isPhysicalEntity } from '@kompakkt/common';
 import { getWikibaseItemID, IMediaAgent, IWikibaseItem } from '../../../common/wikibase.common';
 import { AutocompleteOptionComponent } from '../../autocomplete/autocomplete-option.component';
 import { ContentProviderService } from '../../content-provider.service';
@@ -96,8 +96,12 @@ export class EntityComponent extends createExtenderComponent() {
           : new DigitalEntity();
     }),
   );
-  digitalEntity$ = this.entity$.pipe(filter(entity => isDigitalEntity(entity)));
-  physicalEntity$ = this.entity$.pipe(filter(entity => isPhysicalEntity(entity)));
+  digitalEntity$ = this.entity$.pipe(
+    filter((entity): entity is DigitalEntity => isDigitalEntity(entity)),
+  );
+  physicalEntity$ = this.entity$.pipe(
+    filter((entity): entity is PhysicalEntity => isPhysicalEntity(entity)),
+  );
 
   public availableLicences = [
     {
@@ -265,7 +269,7 @@ export class EntityComponent extends createExtenderComponent() {
     combineLatestWith(this.digitalEntity$, this.availableTags$),
     map(([value, digitalEntity, availableTags]) =>
       availableTags
-        .filter(t => !digitalEntity.tags.find(tt => tt.value === t.value))
+        .filter(t => !digitalEntity.tags.find(tt => 'value' in tt && tt.value === t.value))
         .filter(t => t.value.toLowerCase().includes(value)),
     ),
   );
@@ -372,7 +376,7 @@ export class EntityComponent extends createExtenderComponent() {
         const customEvent = new CustomEvent('entity-changed', {
           detail: {
             entity,
-            isValid: entity.isDigital
+            isValid: isDigitalEntity(entity)
               ? DigitalEntity.checkIsValid(entity as DigitalEntity)
               : PhysicalEntity.checkIsValid(entity as PhysicalEntity),
           },

@@ -2,10 +2,10 @@ import { Component, computed, HostBinding, inject, input } from '@angular/core';
 
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
-import type { IDigitalEntity } from '../../../../common';
+import type { IDigitalEntity } from '@kompakkt/common';
 import type {
   IMediaHierarchy,
-  IWikibaseDigitalEntityExtension,
+  WikibaseExtendedDigitalEntity,
 } from '../../../../common/wikibase.common';
 import { GetLabelPipe } from '../../../get-label.pipe';
 import { GetWikibaseItemAddressPipe } from '../../../wikibase-item-address.pipe';
@@ -27,7 +27,7 @@ interface ILicence {
 export class DetailEntityComponent {
   readonly content = inject(ContentProviderService);
 
-  digitalEntity = input.required<IDigitalEntity<IWikibaseDigitalEntityExtension>>();
+  digitalEntity = input.required<WikibaseExtendedDigitalEntity>();
   finalizePreviewMode = input<boolean>(false);
   wikibaseData = computed(() => {
     const digitalEntity = this.digitalEntity();

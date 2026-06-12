@@ -1,11 +1,10 @@
 {
-  "name": "@kompakkt/extender",
+  "name": "@kompakkt/plugin-dfg-3d-mets",
   "version": "0.0.1",
   "peerDependencies": {
     "@angular/common": "21.2.6",
     "@angular/core": "21.2.6",
-    "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#b91f8c01a8cf504a1a3f33510b120dcf45204f15",
-    "uuid": "^14.0.0"
+    "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#b91f8c01a8cf504a1a3f33510b120dcf45204f15"
   },
   "dependencies": {
     "tslib": "^2.3.0"

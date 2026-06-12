@@ -4,8 +4,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import { ButtonComponent } from '@kompakkt/komponents';
 import { map } from 'rxjs';
-import { IAnnotation, isAnnotation } from '../../../common';
-import { IWikibaseAnnotationExtension, IWikibaseItem } from '../../../common/wikibase.common';
+import { IAnnotation, isAnnotation } from '@kompakkt/common';
+import {
+  IWikibaseAnnotationExtension,
+  IWikibaseItem,
+  WikibaseExtendedAnnotation,
+} from '../../../common/wikibase.common';
 import { getWikibaseItemAddress } from '../../wikibase-item-address.pipe';
 
 @Component({
@@ -18,7 +22,7 @@ export class OpenInWikibaseButtonComponent extends createExtenderComponent() {
   annotation$ = this.dataSubject.pipe(
     map(data => {
       if (!isAnnotation(data)) return;
-      return data as IAnnotation<IWikibaseAnnotationExtension>;
+      return data as WikibaseExtendedAnnotation;
     }),
   );
 

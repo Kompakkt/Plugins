@@ -1,7 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 
 import { MatChipsModule } from '@angular/material/chips';
-import { IAddress, IInstitution } from '../../../../common';
+import { IAddress, IInstitution } from '@kompakkt/common';
 
 const firstKey = (obj: any) => Object.keys(obj)[0] ?? '';
 

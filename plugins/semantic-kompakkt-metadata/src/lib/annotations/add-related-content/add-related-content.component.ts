@@ -11,8 +11,12 @@ import {
   InputComponent,
 } from '@kompakkt/komponents';
 import { combineLatestWith, firstValueFrom, interval, map, startWith, switchMap } from 'rxjs';
-import { IAnnotation, isAnnotation } from '../../../common';
-import { IWikibaseAnnotationExtension, IWikibaseItem } from '../../../common/wikibase.common';
+import { IAnnotation, isAnnotation } from '@kompakkt/common';
+import {
+  IWikibaseAnnotationExtension,
+  IWikibaseItem,
+  WikibaseExtendedAnnotation,
+} from '../../../common/wikibase.common';
 import { ContentProviderService } from '../../content-provider.service';
 import { WikibaseItemCardComponent } from '../wikibase-item-card/wikibase-item-card.component';
 import { TranslatePipe } from '../../translate.pipe';
@@ -40,7 +44,7 @@ export class AddRelatedContentComponent extends createExtenderComponent() {
   annotation$ = this.dataSubject.pipe(
     map(data => {
       if (!isAnnotation(data)) return;
-      return data as IAnnotation<IWikibaseAnnotationExtension>;
+      return data as WikibaseExtendedAnnotation;
     }),
   );
 
@@ -49,6 +53,7 @@ export class AddRelatedContentComponent extends createExtenderComponent() {
       annotation =>
         [
           ...(annotation?.extensions?.wikibase?.mediaUrls ?? []),
+          // @ts-ignore - this is for backward compatibility, we should remove it in the future
           ...(annotation?.body?.content?.['relatedMediaUrls'] ?? []),
         ] as string[],
     ),
@@ -59,6 +64,7 @@ export class AddRelatedContentComponent extends createExtenderComponent() {
       annotation =>
         [
           ...(annotation?.extensions?.wikibase?.media ?? []),
+          // @ts-ignore - this is for backward compatibility, we should remove it in the future
           ...(annotation?.body?.content?.['relatedMedia'] ?? []),
         ] as IWikibaseItem[],
     ),
@@ -69,6 +75,7 @@ export class AddRelatedContentComponent extends createExtenderComponent() {
       annotation =>
         [
           ...(annotation?.extensions?.wikibase?.entities ?? []),
+          // @ts-ignore - this is for backward compatibility, we should remove it in the future
           ...(annotation?.body?.content?.['relatedEntities'] ?? []),
         ] as IWikibaseItem[],
     ),
@@ -79,6 +86,7 @@ export class AddRelatedContentComponent extends createExtenderComponent() {
       annotation =>
         [
           ...(annotation?.extensions?.wikibase?.authors ?? []),
+          // @ts-ignore - this is for backward compatibility, we should remove it in the future
           ...(annotation?.body?.content?.['relatedAgents'] ?? []),
         ] as IWikibaseItem[],
     ),
@@ -89,6 +97,7 @@ export class AddRelatedContentComponent extends createExtenderComponent() {
       annotation =>
         [
           ...(annotation?.extensions?.wikibase?.licenses ?? []),
+          // @ts-ignore - this is for backward compatibility, we should remove it in the future
           ...(annotation?.body?.content?.['relatedLicenses'] ?? []),
         ] as IWikibaseItem[],
     ),

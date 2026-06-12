@@ -1,4 +1,3 @@
-import { debounceTime, ReplaySubject } from 'rxjs';
 import type {
   IDigitalEntity,
   IPhysicalEntity,
@@ -14,12 +13,14 @@ import type {
   ICreationTuple,
   IFile,
   IPlaceTuple,
-  IRelatedMap,
-} from '../../common';
+} from '@kompakkt/common';
 import type {
   IMediaAgent,
-  IWikibaseDigitalEntityExtension,
+  IWikibaseBaseEntityExtension,
   IWikibaseItem,
+  WikibaseExtendedBaseEntity,
+  WikibaseExtendedDigitalEntity,
+  WikibaseExtendedPhysicalEntity,
 } from '../../common/wikibase.common';
 import ObjectId from 'bson-objectid';
 
@@ -75,8 +76,8 @@ class MediaAgent extends WikibaseItem implements IMediaAgent {
   }
 }
 
-export const createWikibaseExtension = (): UndoPartial<IWikibaseDigitalEntityExtension> => {
-  const wikibase: IWikibaseDigitalEntityExtension['wikibase'] = {
+export const createWikibaseExtension = (): UndoPartial<IWikibaseBaseEntityExtension> => {
+  const wikibase: IWikibaseBaseEntityExtension['wikibase'] = {
     label: {},
     description: {},
     agents: [],
@@ -117,9 +118,7 @@ export const mergeExistingEntityWikibaseExtension = <T extends DigitalEntity | P
 };
 
 export const transformOldWikibaseEntityToExtension = <
-  T extends
-    | IDigitalEntity<IWikibaseDigitalEntityExtension>
-    | IPhysicalEntity<IWikibaseDigitalEntityExtension>,
+  T extends WikibaseExtendedDigitalEntity | WikibaseExtendedPhysicalEntity,
 >(
   entity: T,
 ): T => {
@@ -137,7 +136,7 @@ export const transformOldWikibaseEntityToExtension = <
   return entity;
 };
 
-class BaseEntity implements IBaseEntity<IWikibaseDigitalEntityExtension> {
+class BaseEntity implements WikibaseExtendedBaseEntity {
   _id: string = getObjectId();
 
   extensions = createWikibaseExtension();
@@ -173,7 +172,6 @@ class BaseEntity implements IBaseEntity<IWikibaseDigitalEntityExtension> {
           }
           break;
         default:
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this as any)[key] = value;
       }
     }
@@ -228,16 +226,9 @@ class BaseEntity implements IBaseEntity<IWikibaseDigitalEntityExtension> {
 
     return true;
   }
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-  // @ts-ignore: "Abstract methods can only appear within an abstract class"
-  abstract get isPhysical(): this is IDigitalEntity;
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-  // @ts-ignore: "Abstract methods can only appear within an abstract class"
-  abstract get isDigital(): this is IPhysicalEntity;
 }
 
-class DigitalEntity extends BaseEntity implements IDigitalEntity<IWikibaseDigitalEntityExtension> {
+class DigitalEntity extends BaseEntity implements WikibaseExtendedDigitalEntity {
   type = '';
   licence = '';
 
@@ -270,7 +261,6 @@ class DigitalEntity extends BaseEntity implements IDigitalEntity<IWikibaseDigita
           (value as IPhysicalEntity[]).forEach(p => this.addPhysicalEntity(p));
           break;
         default:
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this as any)[key] = value;
       }
     }
@@ -326,14 +316,6 @@ class DigitalEntity extends BaseEntity implements IDigitalEntity<IWikibaseDigita
     return true;
   }
 
-  get isPhysical() {
-    return false;
-  }
-
-  get isDigital() {
-    return true;
-  }
-
   public static override checkIsValid(entity: DigitalEntity): boolean {
     console.debug('DigitalEntity.checkIsValid', entity, {
       validGeneralInfo: DigitalEntity.checkValidGeneralInfo(entity),
@@ -348,12 +330,10 @@ class DigitalEntity extends BaseEntity implements IDigitalEntity<IWikibaseDigita
   }
 }
 
-class PhysicalEntity
-  extends BaseEntity
-  implements IPhysicalEntity<IWikibaseDigitalEntityExtension>
-{
+class PhysicalEntity extends BaseEntity implements WikibaseExtendedPhysicalEntity {
   place = new PlaceTuple();
   collection = '';
+  dimensions = new Array<IDimensionTuple>();
 
   constructor(obj: Partial<IPhysicalEntity> = {}) {
     super(obj);
@@ -367,7 +347,6 @@ class PhysicalEntity
           this.place = new PlaceTuple(value as IPlaceTuple);
           break;
         default:
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this as any)[key] = value;
       }
     }
@@ -384,14 +363,6 @@ class PhysicalEntity
 
     return true;
   }
-
-  get isPhysical() {
-    return true;
-  }
-
-  get isDigital() {
-    return false;
-  }
 }
 
 class Person implements IPerson {
@@ -400,27 +371,26 @@ class Person implements IPerson {
   prename = '';
   name = '';
 
-  roles: IRelatedMap<string[]> = {};
-  institutions: IRelatedMap<Institution[]> = {};
-  contact_references: IRelatedMap<IContact> = {};
+  roles: Record<string, string[]> = {};
+  institutions: Record<string, Institution[]> = {};
+  contact_references: Record<string, IContact> = {};
 
   constructor(obj: Partial<IPerson> = {}) {
     for (const [key, value] of Object.entries(obj)) {
       if (!Object.prototype.hasOwnProperty.call(this, key)) continue;
       switch (key) {
         case 'institutions':
-          for (const [id, insts] of Object.entries(value as IRelatedMap<Institution[]>)) {
+          for (const [id, insts] of Object.entries(value as Record<string, Institution[]>)) {
             insts?.forEach(i => this.addInstitution(i, id));
           }
           break;
         case 'contact_references':
-          for (const [id, contact] of Object.entries(value as IRelatedMap<IContact>)) {
+          for (const [id, contact] of Object.entries(value as Record<string, IContact>)) {
             if (!contact) continue;
             this.setContactRef(contact, id);
           }
           break;
         default:
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this as any)[key] = value;
       }
     }
@@ -517,22 +487,21 @@ class Institution implements IInstitution {
   name = '';
   university = '';
 
-  roles: IRelatedMap<string[]> = {};
-  notes: IRelatedMap<string> = {};
-  addresses: IRelatedMap<Address> = {};
+  roles: Record<string, string[]> = {};
+  notes: Record<string, string> = {};
+  addresses: Record<string, Address> = {};
 
   constructor(obj: Partial<IInstitution> = {}) {
     for (const [key, value] of Object.entries(obj)) {
       if (!Object.prototype.hasOwnProperty.call(this, key)) continue;
       switch (key) {
         case 'addresses':
-          for (const [id, addr] of Object.entries(value as IRelatedMap<Address>)) {
+          for (const [id, addr] of Object.entries(value as Record<string, Address>)) {
             if (!addr) continue;
             this.setAddress(addr, id);
           }
           break;
         default:
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (this as any)[key] = value;
       }
     }
@@ -607,7 +576,6 @@ class Tag implements ITag {
   constructor(obj: Partial<ITag> = {}) {
     for (const [key, value] of Object.entries(obj)) {
       if (!Object.prototype.hasOwnProperty.call(this, key)) continue;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this as any)[key] = value;
     }
   }
@@ -638,7 +606,6 @@ class Address implements IAddress {
   constructor(obj: Partial<IAddress> = {}) {
     for (const [key, value] of Object.entries(obj)) {
       if (!Object.prototype.hasOwnProperty.call(this, key)) continue;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this as any)[key] = value;
     }
   }
@@ -677,7 +644,6 @@ class ContactReference implements IContact {
   constructor(obj: Partial<IContact> = {}) {
     for (const [key, value] of Object.entries(obj)) {
       if (!Object.prototype.hasOwnProperty.call(this, key)) continue;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this as any)[key] = value;
     }
   }
@@ -706,7 +672,6 @@ class DimensionTuple implements IDimensionTuple {
   constructor(obj: Partial<IDimensionTuple> = {}) {
     for (const [key, value] of Object.entries(obj)) {
       if (!Object.prototype.hasOwnProperty.call(this, key)) continue;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this as any)[key] = value;
     }
   }
@@ -731,7 +696,6 @@ class TypeValueTuple implements ITypeValueTuple {
   constructor(obj: Partial<ITypeValueTuple> = {}) {
     for (const [key, value] of Object.entries(obj)) {
       if (!Object.prototype.hasOwnProperty.call(this, key)) continue;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this as any)[key] = value;
     }
   }
@@ -757,7 +721,6 @@ class CreationTuple implements ICreationTuple {
   constructor(obj: Partial<ICreationTuple> = {}) {
     for (const [key, value] of Object.entries(obj)) {
       if (!Object.prototype.hasOwnProperty.call(this, key)) continue;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this as any)[key] = value;
     }
   }
@@ -783,7 +746,6 @@ class DescriptionValueTuple implements IDescriptionValueTuple {
   constructor(obj: Partial<IDescriptionValueTuple> = {}) {
     for (const [key, value] of Object.entries(obj)) {
       if (!Object.prototype.hasOwnProperty.call(this, key)) continue;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this as any)[key] = value;
     }
   }
@@ -808,7 +770,6 @@ class PlaceTuple implements IPlaceTuple {
   constructor(obj: Partial<IPlaceTuple> = {}) {
     for (const [key, value] of Object.entries(obj)) {
       if (!Object.prototype.hasOwnProperty.call(this, key)) continue;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       switch (key) {
         case 'address':
           this.address = new Address(value as IAddress);
@@ -844,7 +805,6 @@ class FileTuple implements IFile {
   constructor(obj: Partial<IFile> = {}) {
     for (const [key, value] of Object.entries(obj)) {
       if (!Object.prototype.hasOwnProperty.call(this, key)) continue;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this as any)[key] = value;
     }
   }

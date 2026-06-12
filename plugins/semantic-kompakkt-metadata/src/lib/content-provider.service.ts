@@ -5,7 +5,7 @@ import { Institution, MediaAgent, Tag, WikibaseItem } from './metadata-wizard/me
 
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Collection, ITag } from '../common';
+import { Collection, ITag } from '@kompakkt/common';
 import { IAnnotationLinkChoices, IMetadataChoices } from '../common/wikibase.common';
 import { toSignal } from '@angular/core/rxjs-interop';
 

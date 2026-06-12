@@ -1,10 +1,10 @@
 import { type AfterViewInit, Component, computed, effect, inject } from '@angular/core';
 
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
-import { type IDigitalEntity, isDigitalEntity, isEntity } from '../../../common';
+import { type IDigitalEntity, isDigitalEntity, isEntity } from '@kompakkt/common';
 import type {
-  IWikibaseDigitalEntityExtension,
   IWikibaseLabel,
+  WikibaseExtendedDigitalEntity,
 } from '../../../common/wikibase.common';
 import { getLabel } from '../../get-label.pipe';
 import { transformOldWikibaseEntityToExtension } from '../../metadata-wizard/metadata';
@@ -32,7 +32,7 @@ export class EntityDetailComponent extends createExtenderComponent() implements 
   digitalEntity = computed(() => {
     const entity = this.entity();
     if (!isDigitalEntity(entity?.relatedDigitalEntity)) return undefined;
-    return entity.relatedDigitalEntity as IDigitalEntity<IWikibaseDigitalEntityExtension>;
+    return entity.relatedDigitalEntity as WikibaseExtendedDigitalEntity;
   });
   wikibaseData = computed(() => {
     let digitalEntity = this.digitalEntity();
