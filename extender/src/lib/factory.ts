@@ -9,7 +9,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { ExtenderPluginManager } from './manager';
+import { ExtenderPluginManager } from './plugin-manager';
 import { ExtenderPlugin } from './provider';
 import { BehaviorSubject } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';

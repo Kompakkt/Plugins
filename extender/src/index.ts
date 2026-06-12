@@ -1,7 +1,5 @@
 export {
   type ExtenderOptions,
-  PLUGIN_COMPONENT_SET,
-  PLUGIN_MANAGER,
   EXTENDER_BACKEND_SERVICE,
   EXTENDER_TRANSLATE_PIPE,
   type BackendService,
@@ -13,7 +11,7 @@ export {
   createExtenderPlugin,
   type ExtenderPluginBaseComponent,
 } from './lib/factory';
-export { ExtenderSlotDirective, type ExtenderSlotEvent } from './lib/slot.directive';
+export { ExtenderSlotManager, type ExtenderSlotEvent } from './lib/slot-manager';
 export { type ExtenderPlugin } from './lib/provider';
-export { type ExtenderPluginManager } from './lib/manager';
+export { ExtenderPluginManager } from './lib/plugin-manager';
 export { ExtenderTransformer } from './lib/transformer';

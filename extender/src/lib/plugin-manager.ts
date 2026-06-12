@@ -1,34 +1,25 @@
-import { Injectable, Injector, Type, inject, runInInjectionContext } from '@angular/core';
+import { Type } from '@angular/core';
 import { ExtenderPluginBaseComponent } from './factory';
 import { ExtenderPlugin } from './provider';
-import { EXTENDER_PLUGINS, EXTENDER_SERVICES, PLUGIN_COMPONENT_SET } from './extender';
 
-@Injectable()
-export class ExtenderPluginManager {
-  readonly serviceMap = new Map<string, Type<unknown>>();
-  readonly injectedServicesMap = new Map<string, unknown>();
+class ExtenderPluginManagerImpl {
+  plugins: ExtenderPlugin[] = [];
+  services: Record<string, Type<unknown>> = {};
+  componentSet: 'viewerComponents' | 'repoComponents' = 'repoComponents';
+  disabledPlugins = new Set<string>();
 
-  #injector = inject(Injector);
-  readonly plugins = inject(EXTENDER_PLUGINS);
-  readonly services = inject(EXTENDER_SERVICES);
-  readonly componentSet = inject(PLUGIN_COMPONENT_SET);
-
-  readonly disabledPlugins = new Set<string>();
   get enabledPlugins(): ExtenderPlugin[] {
     return Array.from(this.plugins.values()).filter(p => !this.disabledPlugins.has(p.name));
   }
 
-  constructor() {
-    for (const [key, service] of Object.entries(this.services)) {
-      this.serviceMap.set(key, service);
-    }
-
-    runInInjectionContext(this.#injector, () => {
-      for (const [key, service] of this.serviceMap) {
-        const injected = inject(service);
-        this.injectedServicesMap.set(key, injected);
-      }
-    });
+  public initialize(options: {
+    plugins: ExtenderPlugin[];
+    services: Record<string, Type<unknown>>;
+    componentSet: 'viewerComponents' | 'repoComponents';
+  }) {
+    this.plugins = options.plugins;
+    this.services = options.services;
+    this.componentSet = options.componentSet;
   }
 
   public getComponentsForSlot(slot: string) {
@@ -59,3 +50,6 @@ export class ExtenderPluginManager {
     this.disabledPlugins.add(name);
   }
 }
+
+export const ExtenderPluginManager = new ExtenderPluginManagerImpl();
+export type ExtenderPluginManager = ExtenderPluginManagerImpl;

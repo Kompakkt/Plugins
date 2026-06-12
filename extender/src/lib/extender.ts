@@ -5,7 +5,7 @@ import {
   Type,
   makeEnvironmentProviders,
 } from '@angular/core';
-import { ExtenderPluginManager } from './manager';
+import { ExtenderPluginManager } from './plugin-manager';
 import { ExtenderPlugin } from './provider';
 
 abstract class BackendServiceClass {
@@ -37,14 +37,6 @@ export interface ExtenderPluginConstructor {
   providerToken?: InjectionToken<any>;
 }
 
-export const PLUGIN_MANAGER = new InjectionToken<ExtenderPluginManager>(
-  'KOMPAKKT_EXTENDER_PLUGIN_MANAGER',
-);
-
-export const PLUGIN_COMPONENT_SET = new InjectionToken<ExtenderOptions['componentSet']>(
-  'KOMPAKKT_EXTENDER_PLUGIN_COMPONENT_SET',
-);
-
 export const EXTENDER_BACKEND_SERVICE = new InjectionToken<BackendServiceClass>(
   'KOMPAKKT_EXTENDER_BACKEND_SERVICE',
 );
@@ -65,6 +57,8 @@ export const provideExtender = ({
   services,
   pipes,
 }: ExtenderOptions): EnvironmentProviders => {
+  ExtenderPluginManager.initialize({ componentSet, plugins, services });
+
   const servicesByPlugins = plugins.map(p => (p.services ? Object.values(p.services) : [])).flat();
   return makeEnvironmentProviders([
     {
@@ -74,15 +68,6 @@ export const provideExtender = ({
     {
       provide: EXTENDER_SERVICES,
       useValue: services,
-    },
-    {
-      provide: PLUGIN_COMPONENT_SET,
-      useValue: componentSet,
-    },
-    {
-      provide: PLUGIN_MANAGER,
-      useClass: ExtenderPluginManager,
-      deps: [EXTENDER_PLUGINS, EXTENDER_SERVICES, PLUGIN_COMPONENT_SET],
     },
     {
       provide: EXTENDER_BACKEND_SERVICE,
