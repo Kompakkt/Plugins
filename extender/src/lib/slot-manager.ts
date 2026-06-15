@@ -1,16 +1,5 @@
-import {
-  ComponentRef,
-  Directive,
-  ElementRef,
-  OnDestroy,
-  ViewContainerRef,
-  computed,
-  effect,
-  inject,
-  input,
-  output,
-} from '@angular/core';
-import { Observable, ReplaySubject, Subscription } from 'rxjs';
+import { ComponentRef, ElementRef, ViewContainerRef } from '@angular/core';
+import { Observable, ReplaySubject } from 'rxjs';
 import { type ExtenderPluginBaseComponent } from './factory';
 import { type ExtenderPlugin } from './provider';
 import { ExtenderPluginManager } from './plugin-manager';
@@ -22,7 +11,6 @@ export type ExtenderSlotEvent<T = unknown> = {
 };
 
 export const ExtenderSlotManager = new (class ExtenderSlotManager {
-  #slots = new Map<string, Set<ExtenderPluginBaseComponent>>();
   #refs = new Map<string, Array<ComponentRef<ExtenderPluginBaseComponent>>>();
 
   events$ = new ReplaySubject<ExtenderSlotEvent>(100);
@@ -40,20 +28,23 @@ export const ExtenderSlotManager = new (class ExtenderSlotManager {
     viewContainerRef: ViewContainerRef;
     dataObservable?: Observable<unknown>;
   }) {
-    if (!this.#slots.has(slotName)) {
-      this.#slots.set(slotName, new Set());
-    }
     if (!this.#refs.has(slotName)) {
       this.#refs.set(slotName, []);
     }
     // Get components for slot
     const componentMap = ExtenderPluginManager.getComponentsForSlot(slotName);
+    const replaySubject = new ReplaySubject<ExtenderSlotEvent>(100);
     for (const [plugin, components] of componentMap) {
       for (const component of components) {
         const ref = viewContainerRef.createComponent<ExtenderPluginBaseComponent>(component);
         ref.setInput('pluginManager', ExtenderPluginManager);
         ref.instance.event.subscribe(event => {
           this.events$.next({
+            componentName: ref.instance.constructor.name,
+            plugin,
+            event,
+          });
+          replaySubject.next({
             componentName: ref.instance.constructor.name,
             plugin,
             event,
@@ -74,14 +65,34 @@ export const ExtenderSlotManager = new (class ExtenderSlotManager {
             elementRef.nativeElement.append(ref.location.nativeElement);
             break;
         }
+
+        console.log('Registered component for slot', {
+          slotName,
+          component: ref.instance.constructor.name,
+          plugin,
+        });
       }
     }
 
-    dataObservable?.subscribe(data => {
-      const refs = this.#refs.get(slotName) ?? [];
-      for (const ref of refs) {
-        ref.instance.dataSubject.next(data);
-      }
-    });
+    if (dataObservable) {
+      console.log('Subscribing to dataObservable for slot', { slotName });
+      dataObservable.subscribe(data => {
+        console.log('Received data for slot', { slotName, data });
+        const refs = this.#refs.get(slotName) ?? [];
+        for (const ref of refs) {
+          ref.instance.dataSubject.next(data);
+        }
+      });
+    }
+
+    return replaySubject.asObservable();
+  }
+
+  public unregisterSlot(slotName: string) {
+    const refs = this.#refs.get(slotName) ?? [];
+    for (const ref of refs) {
+      ref.destroy();
+    }
+    this.#refs.delete(slotName);
   }
 })();

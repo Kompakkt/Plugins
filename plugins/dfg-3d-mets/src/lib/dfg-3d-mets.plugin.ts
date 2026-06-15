@@ -48,16 +48,17 @@ class Dfg3dMetsToggleComponent extends createExtenderComponent() {
     this.event.emit(new CustomEvent<boolean>('dfg3d-mets-usage-changed', { detail: allowed }));
   }
 
-  /*#transformerId = ExtenderTransformer.registerTransformer(Collection.entity, async entity => {
+  #transformerId = ExtenderTransformer.registerTransformer(Collection.entity, async entity => {
     entity.extensions ??= {};
     (entity.extensions as DfgMetsExtensionData).dfgMets ??= {};
     (entity.extensions as DfgMetsExtensionData).dfgMets!.sharingEnabled = this.allowUsage();
     return entity;
-  });*/
+  });
 
   constructor() {
     super();
     this.dataSubject.subscribe(data => {
+      console.log('Dfg3dMetsToggleComponent received data:', data);
       // Data from Visibility & Access will either be an array of Entities, or an array of Comilations.
       // We are only interested in the Entity case
       if (Array.isArray(data)) {
@@ -82,7 +83,7 @@ class Dfg3dMetsToggleComponent extends createExtenderComponent() {
   }
 
   override ngOnDestroy(): void {
-    // ExtenderTransformer.unregisterTransformer(Collection.entity, this.#transformerId);
+    ExtenderTransformer.unregisterTransformer(Collection.entity, this.#transformerId);
     super.ngOnDestroy();
   }
 }
