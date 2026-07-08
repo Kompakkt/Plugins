@@ -15,10 +15,10 @@
         "@angular/platform-browser": "21.2.6",
         "@angular/platform-browser-dynamic": "21.2.6",
         "@angular/router": "21.2.6",
-        "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#b91f8c01a8cf504a1a3f33510b120dcf45204f15",
-        "@kompakkt/komponents": "git+https://github.com/Kompakkt/Komponents#445b8ac",
+        "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#532e7bd4ec3a8db19a6212638089e4c3d0fdb457",
         "bson": "^7.2.0",
         "bson-objectid": "^2.0.4",
+        "@kompakkt/komponents": "git+https://github.com/Kompakkt/Komponents.git#3681d5c7674b6c059a9447356a3a50289ccd689f",
         "rxjs": "7.8.2",
         "slugify": "^1.6.6",
         "tslib": "^2.3.0",
@@ -267,9 +267,9 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.25", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ=="],
 
-    "@kompakkt/common": ["@kompakkt/common@github:Kompakkt/Common#b91f8c0", { "dependencies": { "elysia": "^1.4.28" } }, "Kompakkt-Common-b91f8c0", "sha512-b3zJvGpLPpfIQqoQK7+ow4NKX38W9iHZcRRH/SdR7sUWAb75gpWL0e9s3AAoAkPlSvOGAgiF+5UVIkK7zAOBvQ=="],
+    "@kompakkt/common": ["@kompakkt/common@github:Kompakkt/Common#532e7bd", { "dependencies": { "elysia": "^1.4.28" } }, "Kompakkt-Common-532e7bd", "sha512-btbkIlWd4X9+6SMAK8ozdeHJ6s8KQjFShEqY5BK1n6YkXm4aqqL8O+V5hYYwH09Jx6Dlk7sDJ93Ac9CtAq29Xg=="],
 
-    "@kompakkt/komponents": ["@kompakkt/komponents@github:Kompakkt/Komponents#445b8ac", { "dependencies": { "@angular/common": "21.2.6", "@angular/core": "21.2.6", "@angular/forms": "21.2.6", "@angular/platform-browser": "21.2.6", "rxjs": "7.8.2", "tslib": "^2.8.1", "zone.js": "0.16.1" } }, "Kompakkt-Komponents-445b8ac", "sha512-CCN6xkjgI3aSu2h9iDVVVa2biFd6FLR/+to0mLfy4SDIGV/5UOulrKfJwQz9pYYIFjXCHhqTVDDYNh8HmB9SSw=="],
+    "@kompakkt/komponents": ["@kompakkt/komponents@github:Kompakkt/Komponents#3681d5c", { "dependencies": { "@angular/common": "21.2.6", "@angular/core": "21.2.6", "@angular/forms": "21.2.6", "@angular/platform-browser": "21.2.6", "rxjs": "7.8.2", "tslib": "^2.8.1", "zone.js": "0.16.1" } }, "Kompakkt-Komponents-3681d5c", "sha512-805yurwpDREPcbEpqRP2S3SvQiev1H7izk4CDGkpu6lLIXObOinmqEXNgMGfgMZD/LanV07J5/muI9jB+abo9w=="],
 
     "@listr2/prompt-adapter-inquirer": ["@listr2/prompt-adapter-inquirer@3.0.5", "", { "dependencies": { "@inquirer/type": "^3.0.8" }, "peerDependencies": { "@inquirer/prompts": ">= 3 < 8", "listr2": "9.0.5" } }, "sha512-WELs+hj6xcilkloBXYf9XXK8tYEnKsgLj01Xl5ONUJpKjmT5hGVUzNUS5tooUxs7pGMrw+jFD/41WpqW4V3LDA=="],
 
@@ -757,7 +757,7 @@
 
     "electron-to-chromium": ["electron-to-chromium@1.5.328", "", {}, "sha512-QNQ5l45DzYytThO21403XN3FvK0hOkWDG8viNf6jqS42msJ8I4tGDSpBCgvDRRPnkffafiwAym2X2eHeGD2V0w=="],
 
-    "elysia": ["elysia@1.4.28", "", { "dependencies": { "cookie": "^1.1.1", "exact-mirror": "^0.2.7", "fast-decode-uri-component": "^1.0.1", "memoirist": "^0.4.0" }, "peerDependencies": { "@sinclair/typebox": ">= 0.34.0 < 1", "@types/bun": ">= 1.2.0", "file-type": ">= 20.0.0", "openapi-types": ">= 12.0.0", "typescript": ">= 5.0.0" }, "optionalPeers": ["@types/bun", "typescript"] }, "sha512-Vrx8sBnvq8squS/3yNBzR1jBXI+SgmnmvwawPjNuEHndUe5l1jV2Gp6JJ4ulDkEB8On6bWmmuyPpA+bq4t+WYg=="],
+    "elysia": ["elysia@1.4.29", "", { "dependencies": { "cookie": "^1.1.1", "exact-mirror": "^0.2.7", "fast-decode-uri-component": "^1.0.1", "memoirist": "^0.4.0" }, "peerDependencies": { "@sinclair/typebox": ">= 0.34.0 < 1", "@types/bun": ">= 1.2.0", "file-type": ">= 20.0.0", "openapi-types": ">= 12.0.0", "typescript": ">= 5.0.0" }, "optionalPeers": ["@types/bun", "typescript"] }, "sha512-GwMRGGwSdjfPt+w3LA0fqTuYJtS8uVRJicvoar98/HrO5qdFKDc9CwjIb6Kja+v39lkY+58hr2JvdR9jQzlUuA=="],
 
     "emoji-regex": ["emoji-regex@10.4.0", "", {}, "sha512-EC+0oUMY1Rqm4O6LLrgjtYDvcVYTy7chDnM4Q7030tP4Kwj3u/pR6gP9ygnp2CJMK5Gq+9Q2oqmrFJAz01DXjw=="],
 

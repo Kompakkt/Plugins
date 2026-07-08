@@ -13,7 +13,8 @@
     "new-plugin": "bun run ./create-new-plugin.ts",
     "ci:build": "bun run ./build-all.ts",
     "postinstall": "bun run ./prepare-exports.ts",
-    "update:kompakkt:common": "bun run update-git-dependency.ts -d @kompakkt/common -o Kompakkt -r Common -b master"
+    "update:kompakkt:common": "bun run update-git-dependency.ts -d @kompakkt/common -o Kompakkt -r Common -b master",
+    "update:kompakkt:komponents": "bun run update-git-dependency.ts -d @kompakkt/komponents -o Kompakkt -r Komponents -b main"
   },
   "private": true,
   "engines": {
@@ -30,8 +31,8 @@
     "@angular/platform-browser": "21.2.6",
     "@angular/platform-browser-dynamic": "21.2.6",
     "@angular/router": "21.2.6",
-    "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#b91f8c01a8cf504a1a3f33510b120dcf45204f15",
-    "@kompakkt/komponents": "git+https://github.com/Kompakkt/Komponents#445b8ac",
+    "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#532e7bd4ec3a8db19a6212638089e4c3d0fdb457",
+    "@kompakkt/komponents": "git+https://github.com/Kompakkt/Komponents.git#3681d5c7674b6c059a9447356a3a50289ccd689f",
     "bson": "^7.2.0",
     "bson-objectid": "^2.0.4",
     "rxjs": "7.8.2",
