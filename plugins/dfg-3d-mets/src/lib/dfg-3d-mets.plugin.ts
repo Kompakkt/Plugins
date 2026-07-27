@@ -20,17 +20,31 @@ type DfgMetsExtensionData = {
   template: `
     <div class="toggle-row">
       <mat-icon>open_in_browser</mat-icon>
-      <p>{{ 'Allow usage in DFG 3D-Viewer' }}</p>
+      <p>
+        <a
+          href="https://dfg-viewer.de/en/dfg-3d-viewer"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Allow usage in DFG 3D-Viewer (opens in new tab)"
+          >Allow usage in DFG 3D-Viewer</a
+        >
+      </p>
       <mat-slide-toggle
         [checked]="allowUsage()"
         (change)="setUsage($event.checked)"
         name="allowDfg3dViewerUsage"
+        aria-label="Allow usage in DFG 3D-Viewer"
       />
     </div>
   `,
   styles: `
     p {
       margin: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: underline;
     }
 
     .toggle-row {
