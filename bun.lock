@@ -15,10 +15,10 @@
         "@angular/platform-browser": "21.2.6",
         "@angular/platform-browser-dynamic": "21.2.6",
         "@angular/router": "21.2.6",
-        "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#532e7bd4ec3a8db19a6212638089e4c3d0fdb457",
+        "@kompakkt/komponents": "git+https://github.com/Kompakkt/Komponents.git#3681d5c7674b6c059a9447356a3a50289ccd689f",
         "bson": "^7.2.0",
         "bson-objectid": "^2.0.4",
-        "@kompakkt/komponents": "git+https://github.com/Kompakkt/Komponents.git#3681d5c7674b6c059a9447356a3a50289ccd689f",
+        "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#be74f4e2fa2280029ebb0b89360427b7b383cdec",
         "rxjs": "7.8.2",
         "slugify": "^1.6.6",
         "tslib": "^2.3.0",
@@ -267,7 +267,7 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.25", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ=="],
 
-    "@kompakkt/common": ["@kompakkt/common@github:Kompakkt/Common#532e7bd", { "dependencies": { "elysia": "^1.4.28" } }, "Kompakkt-Common-532e7bd", "sha512-btbkIlWd4X9+6SMAK8ozdeHJ6s8KQjFShEqY5BK1n6YkXm4aqqL8O+V5hYYwH09Jx6Dlk7sDJ93Ac9CtAq29Xg=="],
+    "@kompakkt/common": ["@kompakkt/common@github:Kompakkt/Common#be74f4e", { "dependencies": { "elysia": "^1.4.28" } }, "Kompakkt-Common-be74f4e", "sha512-FFYTvKJt1LqmsNSdiQo1ww56+GO6MlOxqIWFnzUJPi/Zm5RR/wKkJzj8eujU1pWF/eEuLxNvzZ1V/yLIh3uenw=="],
 
     "@kompakkt/komponents": ["@kompakkt/komponents@github:Kompakkt/Komponents#3681d5c", { "dependencies": { "@angular/common": "21.2.6", "@angular/core": "21.2.6", "@angular/forms": "21.2.6", "@angular/platform-browser": "21.2.6", "rxjs": "7.8.2", "tslib": "^2.8.1", "zone.js": "0.16.1" } }, "Kompakkt-Komponents-3681d5c", "sha512-805yurwpDREPcbEpqRP2S3SvQiev1H7izk4CDGkpu6lLIXObOinmqEXNgMGfgMZD/LanV07J5/muI9jB+abo9w=="],
 
@@ -575,7 +575,7 @@
 
     "@sigstore/verify": ["@sigstore/verify@3.1.0", "", { "dependencies": { "@sigstore/bundle": "^4.0.0", "@sigstore/core": "^3.1.0", "@sigstore/protobuf-specs": "^0.5.0" } }, "sha512-mNe0Iigql08YupSOGv197YdHpPPr+EzDZmfCgMc7RPNaZTw5aLN01nBl6CHJOh3BGtnMIj83EeN4butBchc8Ag=="],
 
-    "@sinclair/typebox": ["@sinclair/typebox@0.34.49", "", {}, "sha512-brySQQs7Jtn0joV8Xh9ZV/hZb9Ozb0pmazDIASBkYKCjXrXU3mpcFahmK/z4YDhGkQvP9mWJbVyahdtU5wQA+A=="],
+    "@sinclair/typebox": ["@sinclair/typebox@0.34.52", "", {}, "sha512-XiMQh7qqVlxZzcVD+kkGMNGMzcTrDMLWI7S4x7z1MkCkbDPrekpZXEUK0eZqZFMuHQg2a2DZOcDIh9o5v3Gonw=="],
 
     "@socket.io/component-emitter": ["@socket.io/component-emitter@3.1.2", "", {}, "sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA=="],
 
