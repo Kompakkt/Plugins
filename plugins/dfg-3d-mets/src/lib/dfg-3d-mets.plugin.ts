@@ -7,7 +7,6 @@ import {
   createExtenderPlugin,
   ExtenderTransformer,
 } from '@kompakkt/plugins/extender';
-import { BehaviorSubject } from 'rxjs';
 import { Collection, isEntity } from '@kompakkt/common';
 
 type DfgMetsExtensionData = {
@@ -18,22 +17,24 @@ type DfgMetsExtensionData = {
 
 @Component({
   template: `
-    <div class="toggle-row">
+    <div class="toggle-row" [class.disabled]="!hasEntities()">
       <mat-icon>open_in_browser</mat-icon>
       <p>
+        Allow usage in
         <a
           href="https://dfg-viewer.de/en/dfg-3d-viewer"
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="Allow usage in DFG 3D-Viewer (opens in new tab)"
-          >Allow usage in DFG 3D-Viewer</a
+          aria-label="Link to DFG 3D-Viewer (opens in new tab)"
+          >DFG 3D-Viewer</a
         >
       </p>
       <mat-slide-toggle
         [checked]="allowUsage()"
         (change)="setUsage($event.checked)"
         name="allowDfg3dViewerUsage"
-        aria-label="Allow usage in DFG 3D-Viewer"
+        aria-label="Toggle usage in DFG 3D-Viewer"
+        [disabled]="!hasEntities()"
       />
     </div>
   `,
@@ -51,11 +52,17 @@ type DfgMetsExtensionData = {
       display: flex;
       flex-direction: row;
       gap: 16px;
+
+      &.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+      }
     }
   `,
   imports: [MatSlideToggleModule, MatIconModule],
 })
 class Dfg3dMetsToggleComponent extends createExtenderComponent() {
+  hasEntities = signal(false);
   allowUsage = signal(false);
   setUsage(allowed: boolean) {
     this.allowUsage.set(allowed);
@@ -73,14 +80,14 @@ class Dfg3dMetsToggleComponent extends createExtenderComponent() {
     super();
     this.dataSubject.subscribe(data => {
       console.log('Dfg3dMetsToggleComponent received data:', data);
-      // Data from Visibility & Access will either be an array of Entities, or an array of Comilations.
+      // Data from Visibility & Access will either be an array of Entities, or an array of Compilations.
       // We are only interested in the Entity case
       if (Array.isArray(data)) {
         const entities = data.filter(isEntity);
-        if (entities.length === 0) {
-          this.allowUsage.set(false);
-          return;
-        }
+        const hasEntities = entities.length > 0;
+        this.hasEntities.set(hasEntities);
+        if (!hasEntities) return;
+
         const isAnyEnabled = entities.some(entity => {
           const extensionData = entity.extensions as DfgMetsExtensionData;
           return (
