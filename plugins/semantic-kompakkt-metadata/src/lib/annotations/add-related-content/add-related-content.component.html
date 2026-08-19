@@ -3,7 +3,7 @@
     class="hide-label"
     label="Author"
     placeholder="Add description author"
-    (valueChanged)="searchAgent.setValue($event.value)"
+    (valueChange)="searchAgent.setValue($event)"
     #searchAgentInput
   />
   <mat-icon>search</mat-icon>
@@ -37,7 +37,7 @@
     class="hide-label"
     label="Licenses"
     placeholder="Add description license"
-    (valueChanged)="searchLicense.setValue($event.value)"
+    (valueChange)="searchLicense.setValue($event)"
     #searchLicenseInput
   />
   <mat-icon>search</mat-icon>
@@ -71,7 +71,7 @@
     class="hide-label"
     label="Media"
     placeholder="Add related media from Kompakkt"
-    (valueChanged)="searchMedia.setValue($event.value)"
+    (valueChange)="searchMedia.setValue($event)"
     #searchMediaInput
   />
   <mat-icon>search</mat-icon>
@@ -105,7 +105,7 @@
     class="hide-label"
     label="Semantic concepts"
     placeholder="Add semantic concept"
-    (valueChanged)="searchConcept.setValue($event.value)"
+    (valueChange)="searchConcept.setValue($event)"
     #searchConceptInput
   />
   <mat-icon>search</mat-icon>
