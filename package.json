@@ -31,7 +31,7 @@
     "@angular/platform-browser": "21.2.6",
     "@angular/platform-browser-dynamic": "21.2.6",
     "@angular/router": "21.2.6",
-    "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#29d458dc48678f615bc2f5adb24604cab5248e55",
+    "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#1ec9e452e73a999d2b5ff725febd95dc0774a19f",
     "@kompakkt/komponents": "git+https://github.com/Kompakkt/Komponents.git#b3d39c96cb22c682999ca180de2ab584bca03a8d",
     "bson": "^7.2.0",
     "bson-objectid": "^2.0.4",
