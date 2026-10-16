@@ -16,7 +16,7 @@
         "@angular/platform-browser-dynamic": "21.2.6",
         "@angular/router": "21.2.6",
         "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#1ec9e452e73a999d2b5ff725febd95dc0774a19f",
-        "@kompakkt/komponents": "git+https://github.com/Kompakkt/Komponents.git#b3d39c96cb22c682999ca180de2ab584bca03a8d",
+        "@kompakkt/komponents": "git+https://github.com/Kompakkt/Komponents.git#0e5037e4f289d0f257791db1181d454c9f8333d8",
         "bson": "^7.2.0",
         "bson-objectid": "^2.0.4",
         "rxjs": "7.8.2",
@@ -269,7 +269,7 @@
 
     "@kompakkt/common": ["@kompakkt/common@github:Kompakkt/Common#1ec9e45", { "dependencies": { "elysia": "^1.4.28" } }, "Kompakkt-Common-1ec9e45", "sha512-pnXFvIqvl1ru2E5Hhdd049LHLfDrpokPC9L/ogzhdaaohXhekSduwBMLh1iBvgKQ6OOb43bOjxg3ZY8132AlkA=="],
 
-    "@kompakkt/komponents": ["@kompakkt/komponents@github:Kompakkt/Komponents#b3d39c9", { "dependencies": { "@angular/common": "21.2.6", "@angular/compiler": "^22.0.6", "@angular/core": "21.2.6", "@angular/platform-browser": "21.2.6", "rxjs": "7.8.2", "tslib": "^2.8.1", "zone.js": "0.16.1" } }, "Kompakkt-Komponents-b3d39c9", "sha512-6AaQMdK/NKpLxZK7uakgckRDKsIt8+5d6u4so56CWnVi2T8VKZDIUiXIPMdgmjVBgxBVdILy8RjIim2qk3e3hg=="],
+    "@kompakkt/komponents": ["@kompakkt/komponents@github:Kompakkt/Komponents#0e5037e", { "dependencies": { "@angular/common": "21.2.6", "@angular/compiler": "21.2.6", "@angular/core": "21.2.6", "@angular/platform-browser": "21.2.6", "rxjs": "7.8.2", "tslib": "^2.8.1", "zone.js": "0.16.1" } }, "Kompakkt-Komponents-0e5037e", "sha512-Xk0HRJ6jNqRKYWL7i2K87dBOHMDeuLiYBNY69YnbJ5RcmiHr3NbSkvaDRZ3HELPzXajMvPe7Ej+22IhvBxHCxA=="],
 
     "@listr2/prompt-adapter-inquirer": ["@listr2/prompt-adapter-inquirer@3.0.5", "", { "dependencies": { "@inquirer/type": "^3.0.8" }, "peerDependencies": { "@inquirer/prompts": ">= 3 < 8", "listr2": "9.0.5" } }, "sha512-WELs+hj6xcilkloBXYf9XXK8tYEnKsgLj01Xl5ONUJpKjmT5hGVUzNUS5tooUxs7pGMrw+jFD/41WpqW4V3LDA=="],
 
@@ -1410,8 +1410,6 @@
     "@isaacs/cliui/string-width": ["string-width@5.1.2", "", { "dependencies": { "eastasianwidth": "^0.2.0", "emoji-regex": "^9.2.2", "strip-ansi": "^7.0.1" } }, "sha512-HnLOCR3vjcY8beoNLtcjZ5/nxn2afmME6lhrDrebokqMap+XbeW8n9TXpPDOqdGK5qcI3oT0GKTW6wC7EMiVqA=="],
 
     "@isaacs/cliui/wrap-ansi": ["wrap-ansi@8.1.0", "", { "dependencies": { "ansi-styles": "^6.1.0", "string-width": "^5.0.1", "strip-ansi": "^7.0.1" } }, "sha512-si7QWI6zUMq56bESFvagtmzMdGOtoxfR+Sez11Mobfc7tm+VkUckk9bW2UeffTGVUbOksxmSw0AA2gs8g71NCQ=="],
-
-    "@kompakkt/komponents/@angular/compiler": ["@angular/compiler@22.1.5", "", { "dependencies": { "tslib": "^2.3.0" } }, "sha512-GvM0oNCuI09Up5Lk0ZQCX5yA2cGyHYB/rZsa/EGTnzwuxgLDlhOOa19QaVaoxDCo9vO43Ix9rG7SLppEv+qd1w=="],
 
     "@npmcli/agent/lru-cache": ["lru-cache@11.2.7", "", {}, "sha512-aY/R+aEsRelme17KGQa/1ZSIpLpNYYrhcrepKTZgE+W3WM16YMCaPwOHLHsmopZHELU0Ojin1lPVxKR0MihncA=="],
 
