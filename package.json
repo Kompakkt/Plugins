@@ -32,7 +32,7 @@
     "@angular/platform-browser-dynamic": "21.2.6",
     "@angular/router": "21.2.6",
     "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#1ec9e452e73a999d2b5ff725febd95dc0774a19f",
-    "@kompakkt/komponents": "git+https://github.com/Kompakkt/Komponents.git#0e5037e4f289d0f257791db1181d454c9f8333d8",
+    "@kompakkt/komponents": "git+https://github.com/Kompakkt/Komponents.git#2bd681606d9b50f24856d6764b5aaf56953a4a39",
     "bson": "^7.2.0",
     "bson-objectid": "^2.0.4",
     "rxjs": "7.8.2",
@@ -42,7 +42,7 @@
     "zone.js": "0.16.1"
   },
   "devDependencies": {
-    "@angular/build": "21.2.5",
+    "@angular/build": "21.2.6",
     "@angular/cli": "21.2.5",
     "@angular/compiler-cli": "21.2.6",
     "@types/bun": "^1.2.0",
