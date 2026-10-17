@@ -3,6 +3,7 @@ import { type AfterViewInit, Component, computed, effect, inject } from '@angula
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import { type IDigitalEntity, isDigitalEntity, isEntity } from '@kompakkt/common';
 import type {
+  IWikibaseDigitalEntityExtensionData,
   IWikibaseLabel,
   WikibaseExtendedDigitalEntity,
 } from '../../../common/wikibase.common';
@@ -34,7 +35,7 @@ export class EntityDetailComponent extends createExtenderComponent() implements 
     if (!isDigitalEntity(entity?.relatedDigitalEntity)) return undefined;
     return entity.relatedDigitalEntity as WikibaseExtendedDigitalEntity;
   });
-  wikibaseData = computed(() => {
+  wikibaseData = computed<IWikibaseDigitalEntityExtensionData | undefined>(() => {
     let digitalEntity = this.digitalEntity();
     if (!digitalEntity) return undefined;
     digitalEntity = transformOldWikibaseEntityToExtension(digitalEntity);

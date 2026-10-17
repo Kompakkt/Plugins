@@ -5,6 +5,8 @@ import { MatIconModule } from '@angular/material/icon';
 import type { IDigitalEntity } from '@kompakkt/common';
 import type {
   IMediaHierarchy,
+  IWikibaseDigitalEntityExtensionData,
+  IWikibaseItem,
   WikibaseExtendedDigitalEntity,
 } from '../../../../common/wikibase.common';
 import { GetLabelPipe } from '../../../get-label.pipe';
@@ -29,7 +31,7 @@ export class DetailEntityComponent {
 
   digitalEntity = input.required<WikibaseExtendedDigitalEntity>();
   finalizePreviewMode = input<boolean>(false);
-  wikibaseData = computed(() => {
+  wikibaseData = computed<IWikibaseDigitalEntityExtensionData | undefined>(() => {
     const digitalEntity = this.digitalEntity();
     if (!digitalEntity?.extensions?.wikibase) return undefined;
     return digitalEntity.extensions.wikibase;
@@ -103,7 +105,7 @@ export class DetailEntityComponent {
     return agents ? agents > 0 : false;
   });
 
-  creationDate = computed(() => {
+  creationDate = computed<string | IWikibaseItem | undefined>(() => {
     const wikibaseData = this.wikibaseData();
     if (!wikibaseData?.creationDate) return undefined;
     return Array.isArray(wikibaseData.creationDate)

@@ -16,7 +16,7 @@ import type {
 } from '@kompakkt/common';
 import type {
   IMediaAgent,
-  IWikibaseBaseEntityExtension,
+  IWikibaseDigitalEntityExtension,
   IWikibaseItem,
   WikibaseExtendedBaseEntity,
   WikibaseExtendedDigitalEntity,
@@ -76,8 +76,8 @@ class MediaAgent extends WikibaseItem implements IMediaAgent {
   }
 }
 
-export const createWikibaseExtension = (): UndoPartial<IWikibaseBaseEntityExtension> => {
-  const wikibase: IWikibaseBaseEntityExtension['wikibase'] = {
+export const createWikibaseExtension = (): UndoPartial<IWikibaseDigitalEntityExtension> => {
+  const wikibase: IWikibaseDigitalEntityExtension['wikibase'] = {
     label: {},
     description: {},
     agents: [],
@@ -139,7 +139,7 @@ export const transformOldWikibaseEntityToExtension = <
 class BaseEntity implements WikibaseExtendedBaseEntity {
   _id: string = getObjectId();
 
-  extensions = createWikibaseExtension();
+  extensions: UndoPartial<IWikibaseDigitalEntityExtension> = createWikibaseExtension();
 
   title = '';
   description = '';
