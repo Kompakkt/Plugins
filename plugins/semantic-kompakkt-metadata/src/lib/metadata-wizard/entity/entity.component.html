@@ -132,8 +132,9 @@
             placeholder="Search for person or institution"
             [formControl]="searchPerson"
             [matAutocomplete]="personAutocomplete"
+            [disabled]="isUpdatingContent()"
           />
-          <mat-icon matSuffix>search</mat-icon>
+          <mat-icon matSuffix (click)="updateContent()">refresh</mat-icon>
           <mat-autocomplete
             #personAutocomplete="matAutocomplete"
             [displayWith]="displayPersonName"
@@ -146,6 +147,10 @@
             }
           </mat-autocomplete>
         </mat-form-field>
+
+        @if (isUpdatingContent()) {
+            <mat-progress-bar mode="indeterminate" />
+        }
 
         <!-- <mat&#45;radio&#45;button *ngFor="let role of roles$ | async" class="role&#45;selector" [value]="475">{{ role.label['en'] }}</mat&#45;radio&#45;button> -->
         @for (role of availableRolesKompakkt; track role) {

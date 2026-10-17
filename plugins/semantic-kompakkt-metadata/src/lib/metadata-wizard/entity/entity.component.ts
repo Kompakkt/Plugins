@@ -1,5 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   MatAutocompleteModule,
@@ -16,6 +16,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatRadioChange, MatRadioModule } from '@angular/material/radio';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { BehaviorSubject, combineLatest, firstValueFrom } from 'rxjs';
 import {
   combineLatestWith,
@@ -70,6 +71,7 @@ type AnyEntity = DigitalEntity | PhysicalEntity;
     MatListModule,
     MatIconModule,
     MatRadioModule,
+    MatProgressBarModule,
     AutocompleteOptionComponent,
     MatInputModule,
     GetLabelPipe,
@@ -444,6 +446,15 @@ export class EntityComponent extends createExtenderComponent() {
         entity.extensions.wikibase.description['en'] = description;
         this.emitEntity();
       });
+  }
+
+  isUpdatingContent = signal(false);
+  public async updateContent() {
+    this.isUpdatingContent.set(true);
+    await this.#content.updateMetadataChoices().catch((err) => {
+      console.warn('Failed updating content', err);
+    });
+    this.isUpdatingContent.set(false);
   }
 
   public async selectTag(event: MatAutocompleteSelectedEvent, digitalEntity: DigitalEntity) {
