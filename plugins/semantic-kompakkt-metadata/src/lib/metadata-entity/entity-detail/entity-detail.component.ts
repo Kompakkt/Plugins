@@ -1,4 +1,11 @@
-import { type AfterViewInit, Component, computed, effect, inject } from '@angular/core';
+import {
+  type AfterViewInit,
+  Component,
+  computed,
+  effect,
+  inject,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import { type IDigitalEntity, isDigitalEntity, isEntity } from '@kompakkt/common';
@@ -20,6 +27,7 @@ import {
   selector: 'app-entity-detail',
   templateUrl: './entity-detail.component.html',
   styleUrls: ['../../theme.scss', './entity-detail.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [DetailEntityComponent],
 })
 export class EntityDetailComponent extends createExtenderComponent() implements AfterViewInit {

@@ -116,9 +116,7 @@ If a token was given to the factory, the plugin can be injected anywhere in the 
 import { Component, inject } from '@angular/core';
 import { HelloWorldPlugin } from '@kompakkt/extender';
 
-@Component({
-  /*...*/
-})
+@Component({/*...*/})
 class ExampleComponent {
   pluginReference = inject<HelloWorldPlugin>(HelloWorldPlugin.providerToken);
 }

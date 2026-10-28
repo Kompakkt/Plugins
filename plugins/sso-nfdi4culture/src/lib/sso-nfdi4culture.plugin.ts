@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {
@@ -14,6 +14,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
   selector: 'nfdi4c-logo',
   templateUrl: './nfdi4c-logo.html',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: `
     :host {
       display: grid;
@@ -68,6 +69,7 @@ class NFDI4CLogoComponent {}
       }
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatButtonModule, NFDI4CLogoComponent, TranslatePipe, MatTooltipModule],
 })
 class SSONFDI4CultureComponent extends createExtenderComponent() {

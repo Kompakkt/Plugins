@@ -1,4 +1,11 @@
-import { Component, computed, HostBinding, inject, input } from '@angular/core';
+import {
+  Component,
+  computed,
+  HostBinding,
+  inject,
+  input,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,6 +31,7 @@ interface ILicence {
   selector: 'app-detail-entity',
   templateUrl: './detail-entity.component.html',
   styleUrls: ['../../../theme.scss', './detail-entity.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatExpansionModule, MatIconModule, GetLabelPipe, GetWikibaseItemAddressPipe],
 })
 export class DetailEntityComponent {

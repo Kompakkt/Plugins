@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import { ButtonComponent } from '@kompakkt/komponents';
@@ -16,6 +16,7 @@ import { getWikibaseItemAddress } from '../../wikibase-item-address.pipe';
   selector: 'lib-open-in-wikibase-button',
   imports: [ButtonComponent, MatIconModule, AsyncPipe],
   templateUrl: './open-in-wikibase-button.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './open-in-wikibase-button.component.scss',
 })
 export class OpenInWikibaseButtonComponent extends createExtenderComponent() {

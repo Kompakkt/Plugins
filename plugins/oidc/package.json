@@ -2,10 +2,10 @@
   "name": "@kompakkt/plugin-oidc",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "21.2.6",
-    "@angular/core": "21.2.6",
-    "@angular/material": "21.2.4",
-    "@angular/cdk": "21.2.4"
+    "@angular/common": "22.2.3",
+    "@angular/core": "22.2.3",
+    "@angular/material": "22.2.4",
+    "@angular/cdk": "22.2.4"
   },
   "dependencies": {
     "tslib": "^2.3.0"

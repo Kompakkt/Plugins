@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, ChangeDetectionStrategy } from '@angular/core';
 
 import { MatChipsModule } from '@angular/material/chips';
 import { IAddress, IInstitution } from '@kompakkt/common';
@@ -9,6 +9,7 @@ const firstKey = (obj: any) => Object.keys(obj)[0] ?? '';
   selector: 'app-detail-institution',
   templateUrl: './detail-institution.component.html',
   styleUrls: ['../../../theme.scss', './detail-institution.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatChipsModule],
 })
 export class DetailInstitutionComponent {

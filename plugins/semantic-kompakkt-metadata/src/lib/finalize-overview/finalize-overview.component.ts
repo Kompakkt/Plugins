@@ -1,4 +1,4 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import { isDigitalEntity } from '@kompakkt/common';
 import { isWikibaseExtendedDigitalEntity } from '../../common/wikibase.common';
@@ -8,6 +8,7 @@ import { DetailEntityComponent } from '../metadata-entity/entity-detail/detail-e
   selector: 'app-finalize-overview',
   imports: [DetailEntityComponent],
   templateUrl: './finalize-overview.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './finalize-overview.component.css',
 })
 export class FinalizeOverviewComponent extends createExtenderComponent() {

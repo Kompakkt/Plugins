@@ -1,4 +1,4 @@
-import { signal } from '@angular/core';
+import { signal, ChangeDetectionStrategy } from '@angular/core';
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -59,6 +59,7 @@ type DfgMetsExtensionData = {
       }
     }
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatSlideToggleModule, MatIconModule],
 })
 class Dfg3dMetsToggleComponent extends createExtenderComponent() {

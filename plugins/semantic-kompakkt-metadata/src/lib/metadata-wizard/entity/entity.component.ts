@@ -1,5 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   MatAutocompleteModule,
@@ -58,6 +58,7 @@ type AnyEntity = DigitalEntity | PhysicalEntity;
   selector: 'app-entity',
   templateUrl: './entity.component.html',
   styleUrls: ['../../theme.scss', './entity.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     CommonModule,
     FormsModule,
@@ -451,7 +452,7 @@ export class EntityComponent extends createExtenderComponent() {
   isUpdatingContent = signal(false);
   public async updateContent() {
     this.isUpdatingContent.set(true);
-    await this.#content.updateMetadataChoices().catch((err) => {
+    await this.#content.updateMetadataChoices().catch(err => {
       console.warn('Failed updating content', err);
     });
     this.isUpdatingContent.set(false);

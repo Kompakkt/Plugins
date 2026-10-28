@@ -1,4 +1,11 @@
-import { Component, computed, input, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  computed,
+  input,
+  OnChanges,
+  SimpleChanges,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MatAutocompleteModule,
@@ -19,6 +26,7 @@ import { ContactReference, Institution, MediaAgent } from '../metadata';
   selector: 'app-person',
   templateUrl: './person.component.html',
   styleUrls: ['../../theme.scss', './person.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     CommonModule,
     FormsModule,

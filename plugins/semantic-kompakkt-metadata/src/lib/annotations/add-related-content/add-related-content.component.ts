@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { FormControl } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -38,6 +38,7 @@ const searchWikibaseItem = (query: string, item: IWikibaseItem) => {
     WikibaseItemCardComponent,
   ],
   templateUrl: './add-related-content.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './add-related-content.component.scss',
 })
 export class AddRelatedContentComponent extends createExtenderComponent() {

@@ -1,10 +1,11 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, ChangeDetectionStrategy } from '@angular/core';
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
 
 @Component({
   selector: 'lib-hello-world',
   standalone: true,
   template: '<p>Hello {{ name() }}</p>',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: '',
 })
 export class HelloWorldComponent extends createExtenderComponent() {

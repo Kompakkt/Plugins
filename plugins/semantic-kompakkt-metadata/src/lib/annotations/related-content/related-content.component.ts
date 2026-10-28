@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import { map } from 'rxjs';
@@ -15,6 +15,7 @@ import { WikibaseItemCardComponent } from '../wikibase-item-card/wikibase-item-c
   selector: 'lib-related-content',
   imports: [MatIconModule, AsyncPipe, WikibaseItemCardComponent],
   templateUrl: './related-content.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './related-content.component.scss',
 })
 export class RelatedContentComponent extends createExtenderComponent() {

@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { IWikibaseItem } from '../../../common/wikibase.common';
 import { ContentProviderService } from '../../content-provider.service';
 import { getWikibaseItemAddress } from '../../wikibase-item-address.pipe';
@@ -10,6 +10,7 @@ import { firstValueFrom } from 'rxjs';
   selector: 'k-wikibase-item-card',
   imports: [ButtonComponent, ButtonRowComponent, MatIconModule],
   templateUrl: './wikibase-item-card.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './wikibase-item-card.component.scss',
 })
 export class WikibaseItemCardComponent {
