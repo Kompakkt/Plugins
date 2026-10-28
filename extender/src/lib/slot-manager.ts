@@ -10,8 +10,16 @@ export type ExtenderSlotEvent<T = unknown> = {
   event: CustomEvent<T>;
 };
 
+type Teardown = { unsubscribe(): void };
+
+type SlotRegistration = {
+  refs: Array<ComponentRef<ExtenderPluginBaseComponent>>;
+  teardowns: Teardown[];
+  replaySubject: ReplaySubject<ExtenderSlotEvent>;
+};
+
 export const ExtenderSlotManager = new (class ExtenderSlotManager {
-  #refs = new Map<string, Array<ComponentRef<ExtenderPluginBaseComponent>>>();
+  #slots = new Map<string, SlotRegistration>();
 
   events$ = new ReplaySubject<ExtenderSlotEvent>(100);
 
@@ -28,30 +36,35 @@ export const ExtenderSlotManager = new (class ExtenderSlotManager {
     viewContainerRef: ViewContainerRef;
     dataObservable?: Observable<unknown>;
   }) {
-    if (!this.#refs.has(slotName)) {
-      this.#refs.set(slotName, []);
-    }
+    const registration: SlotRegistration = {
+      refs: [],
+      teardowns: [],
+      replaySubject: new ReplaySubject<ExtenderSlotEvent>(100),
+    };
+    this.#slots.set(slotName, registration);
+
     // Get components for slot
     const componentMap = ExtenderPluginManager.getComponentsForSlot(slotName);
-    const replaySubject = new ReplaySubject<ExtenderSlotEvent>(100);
     for (const [plugin, components] of componentMap) {
       for (const component of components) {
         const ref = viewContainerRef.createComponent<ExtenderPluginBaseComponent>(component);
         ref.setInput('pluginManager', ExtenderPluginManager);
-        ref.instance.event.subscribe(event => {
-          this.events$.next({
-            componentName: ref.instance.constructor.name,
-            plugin,
-            event,
-          });
-          replaySubject.next({
-            componentName: ref.instance.constructor.name,
-            plugin,
-            event,
-          });
-        });
+        registration.teardowns.push(
+          ref.instance.event.subscribe(event => {
+            this.events$.next({
+              componentName: ref.instance.constructor.name,
+              plugin,
+              event,
+            });
+            registration.replaySubject.next({
+              componentName: ref.instance.constructor.name,
+              plugin,
+              event,
+            });
+          }),
+        );
 
-        this.#refs.get(slotName)?.push(ref);
+        registration.refs.push(ref);
 
         switch (slotBehaviour) {
           case 'prepend':
@@ -76,23 +89,29 @@ export const ExtenderSlotManager = new (class ExtenderSlotManager {
 
     if (dataObservable) {
       console.log('Subscribing to dataObservable for slot', { slotName });
-      dataObservable.subscribe(data => {
-        console.log('Received data for slot', { slotName, data });
-        const refs = this.#refs.get(slotName) ?? [];
-        for (const ref of refs) {
-          ref.instance.dataSubject.next(data);
-        }
-      });
+      registration.teardowns.push(
+        dataObservable.subscribe(data => {
+          console.log('Received data for slot', { slotName, data });
+          for (const ref of registration.refs) {
+            ref.instance.dataSubject.next(data);
+          }
+        }),
+      );
     }
 
-    return replaySubject.asObservable();
+    return registration.replaySubject.asObservable();
   }
 
   public unregisterSlot(slotName: string) {
-    const refs = this.#refs.get(slotName) ?? [];
-    for (const ref of refs) {
+    const registration = this.#slots.get(slotName);
+    if (!registration) return;
+    for (const teardown of registration.teardowns) {
+      teardown.unsubscribe();
+    }
+    for (const ref of registration.refs) {
       ref.destroy();
     }
-    this.#refs.delete(slotName);
+    registration.replaySubject.complete();
+    this.#slots.delete(slotName);
   }
 })();

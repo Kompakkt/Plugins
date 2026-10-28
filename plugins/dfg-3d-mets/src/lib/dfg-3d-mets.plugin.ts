@@ -1,4 +1,4 @@
-import { signal, ChangeDetectionStrategy } from '@angular/core';
+import { effect, signal } from '@angular/core';
 import { Component } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -59,7 +59,6 @@ type DfgMetsExtensionData = {
       }
     }
   `,
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatSlideToggleModule, MatIconModule],
 })
 class Dfg3dMetsToggleComponent extends createExtenderComponent() {
@@ -79,7 +78,8 @@ class Dfg3dMetsToggleComponent extends createExtenderComponent() {
 
   constructor() {
     super();
-    this.dataSubject.subscribe(data => {
+    effect(() => {
+      const data = this.slotData();
       console.log('Dfg3dMetsToggleComponent received data:', data);
       // Data from Visibility & Access will either be an array of Entities, or an array of Compilations.
       // We are only interested in the Entity case
@@ -104,9 +104,8 @@ class Dfg3dMetsToggleComponent extends createExtenderComponent() {
     });
   }
 
-  override ngOnDestroy(): void {
+  ngOnDestroy(): void {
     ExtenderTransformer.unregisterTransformer(Collection.entity, this.#transformerId);
-    super.ngOnDestroy();
   }
 }
 

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
@@ -46,7 +46,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
       }
     }
   `,
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [CommonModule, MatButtonModule, TranslatePipe, MatTooltipModule, MatIconModule],
 })
 class OIDCComponent extends createExtenderComponent() {
