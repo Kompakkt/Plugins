@@ -1,6 +1,6 @@
-import { inject, Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core';
 import { getWikibaseItemID, IWikibaseItem } from '../common/wikibase.common';
-import { ContentProviderService, InstanceInfo } from './content-provider.service';
+import { InstanceInfo } from './content-provider.service';
 
 type AddressData = { address?: string; instance?: string };
 const isAddressData = (data: any): data is AddressData => {

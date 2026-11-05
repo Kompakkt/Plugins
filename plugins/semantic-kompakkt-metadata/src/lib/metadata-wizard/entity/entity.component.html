@@ -1,84 +1,43 @@
-@if (digitalEntity$ | async; as digitalEntity) {
+@if (entityForm().value(); as entity) {
   <mat-action-list>
-    <button
-      mat-list-item
-      (click)="metaDataIndex = 0"
-      [ngClass]="metaDataIndex === 0 ? 'metaActive' : ''"
-    >
-      <mat-icon
-        class="sidenav-link"
-        [color]="DigitalEntity.checkValidGeneralInfo(digitalEntity) ? 'primary' : 'warn'"
+    <button mat-list-item (click)="tabIndex.set(0)" [class.is-active]="tabIndex() === 0">
+      <mat-icon class="sidenav-link" [color]="generalValid() ? 'primary' : 'warn'"
         >label_important</mat-icon
       >
       General Information
     </button>
-    <button
-      mat-list-item
-      (click)="metaDataIndex = 1"
-      [ngClass]="metaDataIndex === 1 ? 'metaActive' : ''"
-    >
-      <mat-icon
-        class="sidenav-link"
-        [color]="DigitalEntity.checkValidRelatedAgents(digitalEntity) ? 'primary' : 'warn'"
+    <button mat-list-item (click)="tabIndex.set(1)" [class.is-active]="tabIndex() === 1">
+      <mat-icon class="sidenav-link" [color]="agentsValid() ? 'primary' : 'warn'"
         >label_important</mat-icon
       >
       Related Agents
     </button>
-    <button
-      mat-list-item
-      (click)="metaDataIndex = 2"
-      [ngClass]="metaDataIndex === 2 ? 'metaActive' : ''"
-    >
-      <mat-icon
-        class="sidenav-link"
-        [color]="DigitalEntity.checkValidLicence(digitalEntity) ? 'primary' : 'warn'"
+    <button mat-list-item (click)="tabIndex.set(2)" [class.is-active]="tabIndex() === 2">
+      <mat-icon class="sidenav-link" [color]="licenceValid() ? 'primary' : 'warn'"
         >label_important</mat-icon
       >
       License
     </button>
-    <button
-      mat-list-item
-      (click)="metaDataIndex = 3"
-      [ngClass]="metaDataIndex === 3 ? 'metaActive' : ''"
-    >
+    <button mat-list-item (click)="tabIndex.set(3)" [class.is-active]="tabIndex() === 3">
       <mat-icon class="sidenav-link" color="primary">label</mat-icon> Creation
     </button>
-    <button
-      mat-list-item
-      (click)="metaDataIndex = 4"
-      [ngClass]="metaDataIndex === 4 ? 'metaActive' : ''"
-    >
+    <button mat-list-item (click)="tabIndex.set(4)" [class.is-active]="tabIndex() === 4">
       <mat-icon class="sidenav-link" color="primary">label</mat-icon> External Links
     </button>
-    <button
-      mat-list-item
-      (click)="metaDataIndex = 5"
-      [ngClass]="metaDataIndex === 5 ? 'metaActive' : ''"
-    >
+    <button mat-list-item (click)="tabIndex.set(5)" [class.is-active]="tabIndex() === 5">
       <mat-icon class="sidenav-link" color="primary">label</mat-icon> Bibliographic References
     </button>
-    <button
-      mat-list-item
-      (click)="metaDataIndex = 6"
-      [ngClass]="metaDataIndex === 6 ? 'metaActive' : ''"
-    >
+    <button mat-list-item (click)="tabIndex.set(6)" [class.is-active]="tabIndex() === 6">
       <mat-icon class="sidenav-link" color="primary">label</mat-icon> Related Physical Objects
     </button>
   </mat-action-list>
-  <mat-tab-group [(selectedIndex)]="metaDataIndex" class="header-less-tabs" animationDuration="0ms">
+  <mat-tab-group [selectedIndex]="tabIndex()" class="header-less-tabs" animationDuration="0ms">
     <mat-tab>
       <div class="form-fields">
         <!-- Title -->
         <mat-form-field>
           <mat-label>Title:</mat-label>
-          <input
-            matInput
-            type="text"
-            name="title"
-            placeholder="Enter a title"
-            [formControl]="title"
-            required
-          />
+          <input matInput type="text" placeholder="Enter a title" [formField]="dataForm.title" />
         </mat-form-field>
 
         <!-- Description -->
@@ -86,21 +45,19 @@
           <mat-label>Description:</mat-label>
           <textarea
             matInput
-            name="description"
             placeholder="Enter a description"
-            [formControl]="description"
-            required
+            [formField]="dataForm.description"
             rows="4"
-            maxlength="250"
           ></textarea>
         </mat-form-field>
         <small> Maximum length: 250 characters </small>
 
         <!-- display an error if title and decription are matching -->
         <!-- TODO: Does wikibase use the default description property or the extension property?? -->
-        @if (digitalEntity.extensions.wikibase.label; as label) {
-          @if ({ label } | getLabel; as label) {
-            @if (label === digitalEntity.description) {
+        @let labelItem = entity.extensions.wikibase?.label;
+        @if (labelItem) {
+          @if ({ label: labelItem } | getLabel; as label) {
+            @if (label === entity.description) {
               <mat-error>
                 <div class="error-icon">
                   <mat-icon>error</mat-icon>
@@ -110,14 +67,6 @@
             }
           }
         }
-
-        <!-- Language -->
-        <!-- <mat-form-field>
-        <mat-label>Language:</mat-label>
-        <mat-select>
-        <mat-option value="option1" *ngFor="let item of locales">{{item}}</mat-option>
-        </mat-select>
-    </mat-form-field> -->
       </div>
     </mat-tab>
     <mat-tab>
@@ -128,9 +77,8 @@
           <input
             matInput
             type="text"
-            name="title"
             placeholder="Search for person or institution"
-            [formControl]="searchPerson"
+            [formField]="searchForm.agent"
             [matAutocomplete]="personAutocomplete"
             [disabled]="isUpdatingContent()"
           />
@@ -138,9 +86,9 @@
           <mat-autocomplete
             #personAutocomplete="matAutocomplete"
             [displayWith]="displayPersonName"
-            (optionSelected)="selectPerson($event)"
+            (optionSelected)="selectAgent($event.option)"
           >
-            @for (person of filteredPersons$ | async; track person) {
+            @for (person of filteredAgents(); track person) {
               <mat-option [value]="person">
                 <app-autocomplete-option [optionItem]="person" />
               </mat-option>
@@ -152,79 +100,61 @@
           <mat-progress-bar mode="indeterminate" />
         }
 
-        <!-- <mat&#45;radio&#45;button *ngFor="let role of roles$ | async" class="role&#45;selector" [value]="475">{{ role.label['en'] }}</mat&#45;radio&#45;button> -->
-        @for (role of availableRolesKompakkt; track role) {
-          <mat-checkbox
-            [formControl]="role.checked"
-            (change)="role.checked.setValue($event.checked)"
-          >
+        @for (role of availableRolesForm().value(); track role) {
+          <mat-checkbox [checked]="role.checked" (change)="toggleRole(role.type, $event.checked)">
             {{ role.value.concat(role.is_required ? ' *' : '') }}
           </mat-checkbox>
         }
 
-        <!--
-    <mat-radio-group class="role-selection"
-                        [(ngModel)]="selectedRole"
-                        name="roleSelection"
-    >
-
-        <mat-radio-button class="role-selector" [value]="475">Creator*</mat-radio-button>
-        <mat-radio-button class="role-selector" [value]="476">Editor</mat-radio-button>
-        <mat-radio-button class="role-selector" [value]="520">Rightsowner*</mat-radio-button>
-        <mat-radio-button class="role-selector" [value]="521">Raw data creator</mat-radio-button>
-        <mat-radio-button class="role-selector" [value]="522">Contact person</mat-radio-button>
-    </mat-radio-group>
-    -->
         <button
           mat-flat-button
           class="mt-2em"
           color="primary"
-          (click)="addPerson()"
+          (click)="addAgent()"
           id="addPersonButton"
         >
           Add
         </button>
 
-        <div class="role-footnote" [ngClass]="validationRelatedAgentsWB() ? '' : 'invalid'">
+        <div
+          class="role-footnote"
+          [class.invalid]="entityForm().getError('Related Agents') !== undefined"
+        >
           *You <b>must</b> specify at least one agent for each of these roles.
         </div>
 
-        @if (digitalEntity.extensions.wikibase!.agents?.length) {
+        @let agents = entity.extensions.wikibase?.agents ?? [];
+        @if (agents.length > 0) {
           <hr class="result-separator" />
         }
 
-        <div class="">
-          @for (person of digitalEntity.extensions.wikibase!.agents; track person) {
-            <div class="card">
-              {{ person | getLabel }} ({{ person.roleTitle }})
+        @for (person of agents; track person) {
+          <div class="card">
+            {{ person | getLabel }} ({{ person.roleTitle }})
 
-              <div class="actions">
-                <button
-                  mat-icon-button
-                  color="warn"
-                  aria-label="Remove link"
-                  (click)="removePerson(person)"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
+            <div class="actions">
+              <button
+                mat-icon-button
+                color="warn"
+                aria-label="Remove link"
+                (click)="removePerson(person)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
             </div>
-          }
-        </div>
+          </div>
+        }
       </div>
     </mat-tab>
     <mat-tab>
       <div class="form-fields">
         <mat-radio-group
           class="licence-selection"
-          [value]="digitalEntity.licence"
+          [value]="entity.licence"
           (change)="selectLicence($event)"
         >
           @for (licence of availableLicences; track licence) {
-            <mat-radio-button
-              [value]="licence.title"
-              [checked]="licence.title === digitalEntity.licence"
-            >
+            <mat-radio-button [value]="licence.title" [checked]="licence.title === entity.licence">
               <img [src]="licence.src" [alt]="licence.title" />
               <a
                 [href]="licence.link"
@@ -247,9 +177,8 @@
           <input
             matInput
             type="text"
-            name="technique"
             placeholder="Search for technique"
-            [formControl]="searchTechnique"
+            [formField]="searchForm.technique"
             [matAutocomplete]="techniqueAutocomplete"
           />
           <mat-icon matSuffix>search</mat-icon>
@@ -258,7 +187,7 @@
             [displayWith]="displayWikibaseItemLabel"
             (optionSelected)="selectTechnique($event.option)"
           >
-            @for (technique of filteredTechniques$ | async; track technique) {
+            @for (technique of filteredTechniques(); track technique) {
               <mat-option [value]="technique">
                 <app-autocomplete-option [optionItem]="technique" />
               </mat-option>
@@ -271,9 +200,8 @@
           <input
             matInput
             type="text"
-            name="software"
             placeholder="Search for software"
-            [formControl]="searchSoftware"
+            [formField]="searchForm.software"
             [matAutocomplete]="softwareAutocomplete"
           />
           <mat-icon matSuffix>search</mat-icon>
@@ -282,7 +210,7 @@
             [displayWith]="displayWikibaseItemLabel"
             (optionSelected)="selectSoftware($event.option)"
           >
-            @for (software of filteredSoftware$ | async; track software) {
+            @for (software of filteredSoftware(); track software) {
               <mat-option [value]="software">
                 <app-autocomplete-option [optionItem]="software" />
               </mat-option>
@@ -295,9 +223,8 @@
           <input
             matInput
             type="text"
-            name="equipment"
             placeholder="Enter equipment type or brand"
-            [formControl]="customEquipment"
+            [formField]="dataForm.equipment"
           />
         </mat-form-field>
         <!-- Creation Date Field -->
@@ -306,25 +233,23 @@
           <input
             matInput
             type="date"
-            name="creationDate"
             placeholder="e.g. 12/04/1995"
-            [formControl]="creationDate"
+            [formField]="dataForm.creationDate"
           />
         </mat-form-field>
         <button
           mat-flat-button
           color="primary"
-          [disabled]="disableSaveCreationData$ | async"
+          [disabled]="!canSaveCreationData()"
           (click)="addCreationData()"
         >
           Add
         </button>
 
-        @if (hasAnyCreationData$ | async) {
-          <hr class="result-separator" />
-        }
+        <hr class="result-separator" />
 
-        @for (technique of digitalEntity.extensions.wikibase.techniques; track technique) {
+        @let techniques = entity.extensions.wikibase?.techniques ?? [];
+        @for (technique of techniques; track technique) {
           <div class="card">
             Technique: {{ technique | getLabel }}
             <div class="actions">
@@ -340,7 +265,8 @@
           </div>
         }
 
-        @for (software of digitalEntity.extensions.wikibase!.software; track software) {
+        @let softwares = entity.extensions.wikibase?.software ?? [];
+        @for (software of softwares; track software) {
           <div class="card">
             Software: {{ software | getLabel }}
             <div class="actions">
@@ -356,7 +282,8 @@
           </div>
         }
 
-        @for (equipment of digitalEntity.extensions.wikibase!.equipment; track equipment) {
+        @let equipments = entity.extensions.wikibase?.equipment ?? [];
+        @for (equipment of equipments; track equipment) {
           <div class="card">
             Equipment: {{ equipment }}
             <div class="actions">
@@ -372,7 +299,8 @@
           </div>
         }
 
-        @if (digitalEntity.extensions.wikibase!.creationDate; as creationDate) {
+        @let creationDate = entity.extensions.wikibase?.creationDate;
+        @if (creationDate) {
           <div class="card">
             Creation Date: {{ creationDate }}
             <div class="actions">
@@ -396,12 +324,11 @@
           <input
             matInput
             type="url"
-            name="externalLink"
             placeholder="Enter or paste external link URL here"
-            [formControl]="externalLink"
+            [formField]="dataForm.link"
           />
         </mat-form-field>
-        @if (externalLink.errors) {
+        @if (dataForm().getError('invalidUrl')) {
           <mat-error>
             Please enter a valid URL. (e.g. https://example.com or http://example.com)
           </mat-error>
@@ -412,17 +339,18 @@
         <button
           mat-flat-button
           color="primary"
-          [disabled]="externalLink.value.length === 0 || !externalLink.valid"
+          [disabled]="dataForm.link().invalid()"
           (click)="addExternalLink()"
         >
           Add
         </button>
 
-        @if (digitalEntity.extensions.wikibase!.externalLinks?.length) {
+        @let externalLinks = entity.extensions.wikibase?.externalLinks ?? [];
+        @if (externalLinks.length > 0) {
           <hr class="result-separator" />
         }
 
-        @for (link of digitalEntity.extensions.wikibase!.externalLinks; track link) {
+        @for (link of externalLinks; track link) {
           <div class="card">
             {{ link }}
 
@@ -448,18 +376,17 @@
           <input
             matInput
             type="text"
-            name="bibref"
             placeholder="Search for Reference Title"
-            [formControl]="searchBibRef"
+            [formField]="searchForm.bibref"
             [matAutocomplete]="bibRefAutocomplete"
           />
           <mat-icon matSuffix>search</mat-icon>
           <mat-autocomplete
             #bibRefAutocomplete="matAutocomplete"
             [displayWith]="displayWikibaseItemLabel"
-            (optionSelected)="selectBibRef($event)"
+            (optionSelected)="selectBibRef($event.option)"
           >
-            @for (ref of filteredBibRefs$ | async; track ref) {
+            @for (ref of filteredBibRefs(); track ref) {
               <mat-option [value]="ref">
                 <app-autocomplete-option [optionItem]="ref" />
               </mat-option>
@@ -469,34 +396,33 @@
         <button
           mat-flat-button
           color="primary"
-          [disabled]="selectedBibRef$.value === undefined"
+          [disabled]="selectedBibRef() === undefined"
           (click)="addBibRef()"
         >
           Add
         </button>
 
-        @if (digitalEntity.extensions.wikibase!.bibliographicRefs?.length) {
+        @let bibRefs = entity.extensions.wikibase?.bibliographicRefs ?? [];
+        @if (bibRefs.length > 0) {
           <hr class="result-separator" />
         }
 
-        <div class="">
-          @for (ref of digitalEntity.extensions.wikibase!.bibliographicRefs; track ref) {
-            <div class="card">
-              {{ displayWikibaseItemLabel(ref) }}
+        @for (ref of bibRefs; track ref) {
+          <div class="card">
+            {{ displayWikibaseItemLabel(ref) }}
 
-              <div class="actions">
-                <button
-                  mat-icon-button
-                  color="warn"
-                  aria-label="Remove reference"
-                  (click)="removeBibRef(ref)"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
+            <div class="actions">
+              <button
+                mat-icon-button
+                color="warn"
+                aria-label="Remove reference"
+                (click)="removeBibRef(ref)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
             </div>
-          }
-        </div>
+          </div>
+        }
       </div>
     </mat-tab>
     <mat-tab>
@@ -507,18 +433,17 @@
           <input
             matInput
             type="text"
-            name="bibref"
             placeholder="Search for object like a building, building part, painting or other"
-            [formControl]="searchPhyObjs"
+            [formField]="searchForm.phyObj"
             [matAutocomplete]="phyObjsAutocomplete"
           />
           <mat-icon matSuffix>search</mat-icon>
           <mat-autocomplete
             #phyObjsAutocomplete="matAutocomplete"
             [displayWith]="displayWikibaseItemLabel"
-            (optionSelected)="selectPhyObjs($event)"
+            (optionSelected)="selectPhyObj($event.option)"
           >
-            @for (obj of filteredPhyObjs$ | async; track obj) {
+            @for (obj of filteredPhyObjs(); track obj) {
               <mat-option [value]="obj">
                 <app-autocomplete-option [optionItem]="obj" />
               </mat-option>
@@ -528,34 +453,33 @@
         <button
           mat-flat-button
           color="primary"
-          [disabled]="selectedPhyObj$.value === undefined"
+          [disabled]="selectedPhyObj() === undefined"
           (click)="addPhyObj()"
         >
           Add
         </button>
 
-        @if (digitalEntity.extensions.wikibase!.physicalObjs?.length) {
+        @let physicalObjs = entity.extensions.wikibase?.physicalObjs ?? [];
+        @if (physicalObjs.length > 0) {
           <hr class="result-separator" />
         }
 
-        <div class="">
-          @for (obj of digitalEntity.extensions.wikibase!.physicalObjs; track obj) {
-            <div class="card">
-              {{ displayWikibaseItemLabel(obj) }}
+        @for (obj of physicalObjs; track obj) {
+          <div class="card">
+            {{ displayWikibaseItemLabel(obj) }}
 
-              <div class="actions">
-                <button
-                  mat-icon-button
-                  color="warn"
-                  aria-label="Remove physical object"
-                  (click)="removePhyObj(obj)"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
+            <div class="actions">
+              <button
+                mat-icon-button
+                color="warn"
+                aria-label="Remove physical object"
+                (click)="removePhyObj(obj)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
             </div>
-          }
-        </div>
+          </div>
+        }
       </div>
     </mat-tab>
   </mat-tab-group>

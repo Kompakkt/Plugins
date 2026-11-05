@@ -1,5 +1,4 @@
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
-
+import { Component, input } from '@angular/core';
 import { IMediaAgent } from '../../../../common/wikibase.common';
 import { GetLabelPipe } from '../../../get-label.pipe';
 
@@ -7,7 +6,6 @@ import { GetLabelPipe } from '../../../get-label.pipe';
   selector: 'app-detail-person',
   templateUrl: './detail-person.component.html',
   styleUrls: ['../../../theme.scss', './detail-person.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [GetLabelPipe],
 })
 export class DetailPersonComponent {

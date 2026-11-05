@@ -1,9 +1,8 @@
-@if (optionItem(); as optionItem) {
-  <div class="result-label-id">
-    <div class="result-label">{{ optionItem | getLabel }}</div>
-    <div class="result-id result-muted">{{ optionItem.id.split('/').pop() }}</div>
-  </div>
-  <div class="result-description result-muted">
-    {{ optionItem.description || 'No description available' }}
-  </div>
-}
+@let item = optionItem();
+<div class="result-label-id">
+  <div class="result-label">{{ item | getLabel }}</div>
+  <div class="result-id result-muted">{{ item.id.split('/').pop() }}</div>
+</div>
+<div class="result-description result-muted">
+  {{ item.description || 'No description available' }}
+</div>

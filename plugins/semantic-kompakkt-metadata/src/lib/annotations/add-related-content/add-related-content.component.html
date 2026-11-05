@@ -3,14 +3,14 @@
     class="hide-label"
     label="Author"
     placeholder="Add description author"
-    (valueChange)="searchAgent.setValue($event)"
+    (valueChange)="searchForm.agent().value.set($event)"
     #searchAgentInput
   />
   <mat-icon>search</mat-icon>
 </div>
 
 <k-autocomplete [inputElement]="searchAgentInput">
-  @for (agent of filteredAgents$ | async; track agent) {
+  @for (agent of filteredAgents(); track agent) {
     <k-wikibase-item-card
       class="autocomplete-item"
       [item]="agent"
@@ -22,7 +22,7 @@
 </k-autocomplete>
 
 <div class="existing-list">
-  @for (agent of relatedAgents$ | async; track agent) {
+  @for (agent of relatedAgents(); track agent) {
     <k-wikibase-item-card
       class="existing-item"
       [showDeleteButton]="true"
@@ -37,14 +37,14 @@
     class="hide-label"
     label="Licenses"
     placeholder="Add description license"
-    (valueChange)="searchLicense.setValue($event)"
+    (valueChange)="searchForm.licence().value.set($event)"
     #searchLicenseInput
   />
   <mat-icon>search</mat-icon>
 </div>
 
 <k-autocomplete [inputElement]="searchLicenseInput">
-  @for (license of filteredLicenses$ | async; track license) {
+  @for (license of filteredLicences(); track license) {
     <k-wikibase-item-card
       class="autocomplete-item"
       [item]="license"
@@ -56,7 +56,7 @@
 </k-autocomplete>
 
 <div class="existing-list">
-  @for (license of relatedLicenses$ | async; track license) {
+  @for (license of relatedLicenses(); track license) {
     <k-wikibase-item-card
       class="existing-item"
       [showDeleteButton]="true"
@@ -71,14 +71,14 @@
     class="hide-label"
     label="Media"
     placeholder="Add related media from Kompakkt"
-    (valueChange)="searchMedia.setValue($event)"
+    (valueChange)="searchForm.media().value.set($event)"
     #searchMediaInput
   />
   <mat-icon>search</mat-icon>
 </div>
 
 <k-autocomplete [inputElement]="searchMediaInput">
-  @for (media of filteredMedia$ | async; track media) {
+  @for (media of filteredMedia(); track media) {
     <k-wikibase-item-card
       class="autocomplete-item"
       [item]="media"
@@ -90,7 +90,7 @@
 </k-autocomplete>
 
 <div class="existing-list">
-  @for (media of relatedMedia$ | async; track media) {
+  @for (media of relatedMedia(); track media) {
     <k-wikibase-item-card
       class="existing-item"
       [showDeleteButton]="true"
@@ -105,14 +105,14 @@
     class="hide-label"
     label="Semantic concepts"
     placeholder="Add semantic concept"
-    (valueChange)="searchConcept.setValue($event)"
+    (valueChange)="searchForm.concept().value.set($event)"
     #searchConceptInput
   />
   <mat-icon>search</mat-icon>
 </div>
 
 <k-autocomplete [inputElement]="searchConceptInput">
-  @for (concept of filteredConcepts$ | async; track concept) {
+  @for (concept of filteredConcepts(); track concept) {
     <k-wikibase-item-card
       class="autocomplete-item"
       [item]="concept"
@@ -124,7 +124,7 @@
 </k-autocomplete>
 
 <div class="existing-list">
-  @for (concept of relatedConcepts$ | async; track concept) {
+  @for (concept of relatedConcepts(); track concept) {
     <k-wikibase-item-card
       class="existing-item"
       [showDeleteButton]="true"

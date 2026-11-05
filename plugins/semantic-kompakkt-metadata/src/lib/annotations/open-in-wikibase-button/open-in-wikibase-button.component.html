@@ -1,4 +1,4 @@
-@if (wikibaseUrl$ | async; as url) {
+@if (wikibaseUrl(); as url) {
   <k-button color="transparent" icon-button (click)="openInWikibase(url)">
     <mat-icon>open_in_new</mat-icon>
   </k-button>

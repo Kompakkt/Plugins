@@ -1,16 +1,14 @@
-import { Component, computed, inject, input, output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { IWikibaseItem } from '../../../common/wikibase.common';
 import { ContentProviderService } from '../../content-provider.service';
 import { getWikibaseItemAddress } from '../../wikibase-item-address.pipe';
 import { ButtonComponent, ButtonRowComponent } from '@kompakkt/komponents';
 import { MatIconModule } from '@angular/material/icon';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'k-wikibase-item-card',
   imports: [ButtonComponent, ButtonRowComponent, MatIconModule],
   templateUrl: './wikibase-item-card.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './wikibase-item-card.component.scss',
 })
 export class WikibaseItemCardComponent {
@@ -29,7 +27,7 @@ export class WikibaseItemCardComponent {
     return this.item().description?.trim() ?? '';
   });
 
-  async openInNewTab() {
+  openInNewTab() {
     const item = this.item();
     const instanceInfo = this.#content.instanceInfo();
     const url = getWikibaseItemAddress(item, instanceInfo);

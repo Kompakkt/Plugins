@@ -1,43 +1,62 @@
-import { AsyncPipe } from '@angular/common';
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import { ButtonComponent } from '@kompakkt/komponents';
-import { map } from 'rxjs';
-import { IAnnotation, isAnnotation } from '@kompakkt/common';
-import {
-  IWikibaseAnnotationExtension,
-  IWikibaseItem,
-  WikibaseExtendedAnnotation,
-} from '../../../common/wikibase.common';
+import { distinctUntilChanged, Subscription } from 'rxjs';
+import { isAnnotation } from '@kompakkt/common';
+import { IWikibaseItem, WikibaseExtendedAnnotation } from '../../../common/wikibase.common';
 import { getWikibaseItemAddress } from '../../wikibase-item-address.pipe';
+import { ContentProviderService } from '../../content-provider.service';
 
 @Component({
   selector: 'lib-open-in-wikibase-button',
-  imports: [ButtonComponent, MatIconModule, AsyncPipe],
+  imports: [ButtonComponent, MatIconModule],
   templateUrl: './open-in-wikibase-button.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './open-in-wikibase-button.component.scss',
 })
-export class OpenInWikibaseButtonComponent extends createExtenderComponent() {
-  annotation$ = this.dataSubject.pipe(
-    map(data => {
-      if (!isAnnotation(data)) return;
-      return data as WikibaseExtendedAnnotation;
-    }),
-  );
+export class OpenInWikibaseButtonComponent
+  extends createExtenderComponent()
+  implements OnInit, OnDestroy
+{
+  #content = inject(ContentProviderService);
+  annotation = signal<WikibaseExtendedAnnotation | undefined>(undefined);
 
-  wikibaseUrl$ = this.annotation$.pipe(
-    map(annotation => {
-      const extensionData = annotation?.extensions?.wikibase as IWikibaseItem & { address: string };
-      if (!extensionData?.id) return undefined;
-      if (!extensionData?.address) return undefined;
-      const url = getWikibaseItemAddress(extensionData, extensionData);
-      return url;
-    }),
-  );
+  #subscription?: Subscription;
+  ngOnInit(): void {
+    this.#subscription = this.dataSubject
+      .pipe(
+        // TODO: Use fast-is-equal library or similar?
+        distinctUntilChanged((prev, next) => JSON.stringify(prev) === JSON.stringify(next)),
+      )
+      .subscribe(annotation => {
+        if (!isAnnotation(annotation)) {
+          return console.warn('Annotation does not suffice as annotation', annotation);
+        }
+        const extendedAnnotation = structuredClone(annotation) as WikibaseExtendedAnnotation;
+        extendedAnnotation.extensions ??= {};
+        extendedAnnotation.extensions.wikibase ??= {};
+        this.annotation.set(extendedAnnotation);
+      });
+  }
+  ngOnDestroy(): void {
+    this.#subscription?.unsubscribe();
+  }
 
-  async openInWikibase(url: string) {
+  wikibaseUrl = computed(() => {
+    const annotation = this.annotation();
+    const instanceInfo = this.#content.instanceInfo();
+    const extensionData = annotation?.extensions?.wikibase;
+    if (!extensionData?.id) return undefined;
+    if (!extensionData?.address) return undefined;
+    const url = getWikibaseItemAddress(
+      { id: extensionData.id, label: {} },
+      { address: extensionData.address },
+      instanceInfo,
+    );
+    return url;
+  });
+
+  openInWikibase(url: string) {
     if (url.startsWith('http')) {
       window.open(url, '_blank');
     } else {

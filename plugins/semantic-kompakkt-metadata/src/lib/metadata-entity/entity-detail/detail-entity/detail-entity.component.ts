@@ -1,15 +1,11 @@
 import {
   Component,
   computed,
-  HostBinding,
   inject,
   input,
-  ChangeDetectionStrategy,
 } from '@angular/core';
-
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
-import type { IDigitalEntity } from '@kompakkt/common';
 import type {
   IMediaHierarchy,
   IWikibaseDigitalEntityExtensionData,
@@ -31,26 +27,19 @@ interface ILicence {
   selector: 'app-detail-entity',
   templateUrl: './detail-entity.component.html',
   styleUrls: ['../../../theme.scss', './detail-entity.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [MatExpansionModule, MatIconModule, GetLabelPipe, GetWikibaseItemAddressPipe],
 })
 export class DetailEntityComponent {
-  readonly content = inject(ContentProviderService);
+  content = inject(ContentProviderService);
 
   digitalEntity = input.required<WikibaseExtendedDigitalEntity>();
-  finalizePreviewMode = input<boolean>(false);
   wikibaseData = computed<IWikibaseDigitalEntityExtensionData | undefined>(() => {
     const digitalEntity = this.digitalEntity();
     if (!digitalEntity?.extensions?.wikibase) return undefined;
     return digitalEntity.extensions.wikibase;
   });
 
-  @HostBinding('class.is-finalize-preview')
-  get isFinalizePreview() {
-    return this.finalizePreviewMode();
-  }
-
-  public Licenses: { [key: string]: ILicence } = {
+  Licenses: { [key: string]: ILicence } = {
     CC0: {
       title: 'CC0',
       src: 'assets/licence/CC0.png',
@@ -99,7 +88,7 @@ export class DetailEntityComponent {
       description: 'All rights reserved',
       link: 'https://en.wikipedia.org/wiki/All_rights_reserved',
     },
-  };
+  } as const;
 
   usedLicense = computed(() => {
     const wikibaseData = this.wikibaseData();

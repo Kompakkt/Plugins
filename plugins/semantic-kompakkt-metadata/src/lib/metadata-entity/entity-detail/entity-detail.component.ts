@@ -4,52 +4,70 @@ import {
   computed,
   effect,
   inject,
-  ChangeDetectionStrategy,
+  OnDestroy,
+  OnInit,
+  signal,
 } from '@angular/core';
 
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
-import { type IDigitalEntity, isDigitalEntity, isEntity } from '@kompakkt/common';
+import { type IDigitalEntity, IEntityResolved, isDigitalEntity, isEntity } from '@kompakkt/common';
 import type {
   IWikibaseDigitalEntityExtensionData,
   IWikibaseLabel,
   WikibaseExtendedDigitalEntity,
 } from '../../../common/wikibase.common';
 import { getLabel } from '../../get-label.pipe';
-import { transformOldWikibaseEntityToExtension } from '../../metadata-wizard/metadata';
+import {
+  mergeExistingEntityWikibaseExtension,
+  transformOldWikibaseEntityToExtension,
+} from '../../metadata-wizard/metadata';
 import { DetailEntityComponent } from './detail-entity/detail-entity.component';
 import { ContentProviderService } from '../../content-provider.service';
 import {
   getWikibaseItemAddress,
   GetWikibaseItemAddressPipe,
 } from '../../wikibase-item-address.pipe';
+import { distinctUntilChanged, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-entity-detail',
   templateUrl: './entity-detail.component.html',
   styleUrls: ['../../theme.scss', './entity-detail.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [DetailEntityComponent],
 })
-export class EntityDetailComponent extends createExtenderComponent() implements AfterViewInit {
-  readonly content = inject(ContentProviderService);
+export class EntityDetailComponent extends createExtenderComponent() implements OnInit, OnDestroy {
+  #subscription?: Subscription;
+  ngOnInit(): void {
+    this.#subscription = this.dataSubject
+      .pipe(
+        // TODO: Use fast-is-equal library or similar?
+        distinctUntilChanged((prev, next) => JSON.stringify(prev) === JSON.stringify(next)),
+      )
+      .subscribe(entity => {
+        if (!isEntity(entity)) {
+          return console.warn('Entity does not suffice as Entity', entity);
+        }
+        this.entity.set(entity as IEntityResolved);
+      });
+  }
+  ngOnDestroy(): void {
+    this.#subscription?.unsubscribe();
+  }
 
-  entity = computed(() => {
-    const slotData = this.slotData();
-    console.log('EntityDetailComponentPlugin', slotData, isEntity(slotData));
-    return isEntity(slotData) ? slotData : undefined;
-  });
+  content = inject(ContentProviderService);
+  entity = signal<IEntityResolved | undefined>(undefined);
   digitalEntity = computed(() => {
     const entity = this.entity();
     if (!isDigitalEntity(entity?.relatedDigitalEntity)) return undefined;
-    return entity.relatedDigitalEntity as WikibaseExtendedDigitalEntity;
+    const clone = structuredClone(entity.relatedDigitalEntity) as WikibaseExtendedDigitalEntity;
+    clone.extensions ??= {};
+    clone.extensions.wikibase ??= {};
+    const digitalEntity = transformOldWikibaseEntityToExtension(structuredClone(clone));
+    return digitalEntity;
   });
-  wikibaseData = computed<IWikibaseDigitalEntityExtensionData | undefined>(() => {
-    let digitalEntity = this.digitalEntity();
-    if (!digitalEntity) return undefined;
-    digitalEntity = transformOldWikibaseEntityToExtension(digitalEntity);
-    if (!digitalEntity?.extensions?.wikibase) return undefined;
-    return digitalEntity.extensions.wikibase;
-  });
+  wikibaseData = computed<IWikibaseDigitalEntityExtensionData | undefined>(
+    () => this.digitalEntity()?.extensions.wikibase,
+  );
 
   entityUrl = computed(() => {
     const wikibaseData = this.wikibaseData();
@@ -90,15 +108,5 @@ export class EntityDetailComponent extends createExtenderComponent() implements 
       detail: _id.toString(),
     });
     window.dispatchEvent(copyIdEvent);
-  }
-
-  ngAfterViewInit() {
-    // Workaround for https://github.com/angular/components/issues/11478
-    const interval = setInterval(
-      () => document.querySelectorAll('mat-tooltip-component').forEach(item => item.remove()),
-      50,
-    );
-
-    setTimeout(() => clearInterval(interval), 500);
   }
 }

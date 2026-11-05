@@ -1,15 +1,15 @@
-@for (agent of relatedAgents$ | async; track agent) {
+@for (agent of relatedAgents(); track agent) {
   <k-wikibase-item-card class="existing-item" [item]="agent" context="Description author" />
 }
 
-@for (license of relatedLicenses$ | async; track license) {
+@for (license of relatedLicenses(); track license) {
   <k-wikibase-item-card class="existing-item" [item]="license" context="Description license" />
 }
 
-@for (media of relatedMedia$ | async; track media) {
+@for (media of relatedMedia(); track media) {
   <k-wikibase-item-card class="existing-item" [item]="media" context="Related media" />
 }
 
-@for (concept of relatedConcepts$ | async; track concept) {
+@for (concept of relatedConcepts(); track concept) {
   <k-wikibase-item-card class="existing-item" [item]="concept" context="Related semantic concept" />
 }

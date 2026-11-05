@@ -7,10 +7,9 @@ import {
   IWikibaseAnnotationExtension,
   WikibaseExtendedAnnotation,
 } from '../common/wikibase.common';
-import { Collection, IAnnotation, isAnnotation } from '@kompakkt/common';
+import { Collection, isAnnotation } from '@kompakkt/common';
 import { AddRelatedContentComponent } from './annotations/add-related-content/add-related-content.component';
 import { OpenInWikibaseButtonComponent } from './annotations/open-in-wikibase-button/open-in-wikibase-button.component';
-import { FinalizeOverviewComponent } from './finalize-overview/finalize-overview.component';
 
 export class SemanticKompakktMetadataPlugin extends createExtenderPlugin({
   name: 'Semantic Kompakkt Metadata',
@@ -24,7 +23,6 @@ export class SemanticKompakktMetadataPlugin extends createExtenderPlugin({
   },
   repoComponents: {
     'entity-wizard': [EntityComponent],
-    'entity-wizard-finalize': [FinalizeOverviewComponent],
     'entity-detail': [EntityDetailComponent],
   },
   services: {

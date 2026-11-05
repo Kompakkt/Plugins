@@ -1,10 +1,4 @@
-/*
-'app-autocomplete-option': AutocompleteOptionComponent,
-It holds a optionItem which gets displayed by the template.
-It is used by the AutocompleteComponent.
-*/
-
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { IWikibaseItem } from '../../common/wikibase.common';
 import { GetLabelPipe } from '../get-label.pipe';
 
@@ -12,9 +6,8 @@ import { GetLabelPipe } from '../get-label.pipe';
   selector: 'app-autocomplete-option',
   templateUrl: './autocomplete-option.component.html',
   styleUrls: ['../theme.scss', './autocomplete-option.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [GetLabelPipe],
 })
 export class AutocompleteOptionComponent {
-  optionItem = input<IWikibaseItem>();
+  optionItem = input.required<IWikibaseItem>();
 }
