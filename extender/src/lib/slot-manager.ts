@@ -1,4 +1,4 @@
-import { ComponentRef, ElementRef, ViewContainerRef } from '@angular/core';
+import { ComponentRef, effect, ElementRef, Signal, ViewContainerRef } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
 import { type ExtenderPluginBaseComponent } from './factory';
 import { type ExtenderPlugin } from './provider';
@@ -94,6 +94,7 @@ export const ExtenderSlotManager = new (class ExtenderSlotManager {
           console.log('Received data for slot', { slotName, data });
           for (const ref of registration.refs) {
             ref.instance.dataSubject.next(data);
+            ref.instance.dataSignal.set(data);
           }
         }),
       );

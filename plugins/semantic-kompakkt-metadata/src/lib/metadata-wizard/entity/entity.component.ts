@@ -3,8 +3,6 @@ import {
   Component,
   inject,
   signal,
-  OnInit,
-  OnDestroy,
   model,
   effect,
   computed,
@@ -20,8 +18,6 @@ import { MatRadioChange, MatRadioModule } from '@angular/material/radio';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { Subscription } from 'rxjs';
-import { distinctUntilChanged } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
@@ -43,6 +39,7 @@ import {
   ValidationError,
 } from '@angular/forms/signals';
 import { MatOption, provideNativeDateAdapter } from '@angular/material/core';
+import { fastIsEqual } from 'fast-is-equal'
 
 const filterWikibaseItem = (query: string) => (item: IWikibaseItem) =>
   (Object.values(item.label).join('') + (item.description ?? '')).toLowerCase().includes(query);
@@ -98,7 +95,7 @@ const ROLES = [
   ],
   providers: [provideNativeDateAdapter()],
 })
-export class EntityComponent extends createExtenderComponent() implements OnInit, OnDestroy {
+export class EntityComponent extends createExtenderComponent() {
   #content = inject(ContentProviderService);
   dialog = inject(MatDialog);
 
@@ -174,46 +171,42 @@ export class EntityComponent extends createExtenderComponent() implements OnInit
         .some(e => e.kind === 'License'),
   );
 
-  #subscription?: Subscription;
-  ngOnInit(): void {
-    this.#subscription = this.dataSubject
-      .pipe(
-        // TODO: Use fast-is-equal library or similar?
-        distinctUntilChanged((prev, next) => JSON.stringify(prev) === JSON.stringify(next)),
-      )
-      .subscribe(entity => {
-        if (!isDigitalEntity(entity)) {
-          return console.warn('Entity does not suffice as Digital Entity', entity);
-        }
-        const merged = mergeExistingEntityWikibaseExtension(entity);
-        console.info('Entity after merging', merged);
+  _dataChangedEffectRef = effect(() => {
+    const value = this.dataSignal();
+    if (!isDigitalEntity(value)) return console.info('Signal value does not suffice as digital entity', value);
+    const current = this.entityModel();
 
-        if (merged.extensions.wikibase) {
-          if (merged.licence && !merged.extensions.wikibase.licence) {
-            console.log('Setting K licence to SK');
-            merged.extensions.wikibase.licence = merged.licence;
-          } else if (!merged.licence && merged.extensions.wikibase.licence) {
-            console.log('Setting SK licence to K');
-            merged.licence = merged.extensions.wikibase.licence;
-          }
-          if (
-            this.dataForm().value().title !== merged.title ||
-            this.dataForm().value().description !== merged.description
-          ) {
-            this.dataModel.update(data => ({
-              ...data,
-              title: merged.title,
-              description: merged.description,
-            }));
-          }
-        }
+    if (fastIsEqual(current, value)) return;
+    const merged = mergeExistingEntityWikibaseExtension(value);
+    if (fastIsEqual(merged, value)) return;
+    console.info('Entity after merging', merged);
 
-        this.entityModel.set({ ...emptyDigitalEntity(), ...merged });
-      });
-  }
-  ngOnDestroy(): void {
-    this.#subscription?.unsubscribe();
-  }
+    if (merged.extensions.wikibase) {
+      if (merged.licence && !merged.extensions.wikibase.licence) {
+        console.log('Setting K licence to SK');
+        merged.extensions.wikibase.licence = merged.licence;
+      } else if (!merged.licence && merged.extensions.wikibase.licence) {
+        console.log('Setting SK licence to K');
+        merged.licence = merged.extensions.wikibase.licence;
+      }
+    }
+
+    if (fastIsEqual(merged, current)) return;
+
+    if (
+      this.dataForm().value().title !== merged.title ||
+      this.dataForm().value().description !== merged.description
+    ) {
+      this.dataModel.update(data => ({
+        ...data,
+        title: merged.title,
+        description: merged.description,
+      }));
+    }
+
+
+    this.entityModel.set({ ...emptyDigitalEntity(), ...merged });
+  })
 
   availableLicences = [
     {

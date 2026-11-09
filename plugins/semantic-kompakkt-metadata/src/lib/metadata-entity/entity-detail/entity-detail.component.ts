@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import { IEntityResolved, isDigitalEntity, isEntity } from '@kompakkt/common';
 import type {
@@ -15,7 +15,6 @@ import {
   getWikibaseItemAddress,
   GetWikibaseItemAddressPipe,
 } from '../../wikibase-item-address.pipe';
-import { distinctUntilChanged, Subscription } from 'rxjs';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -32,24 +31,15 @@ interface ILicence {
   styleUrls: ['../../theme.scss', './entity-detail.component.scss'],
   imports: [MatDividerModule, MatIconModule, GetLabelPipe, GetWikibaseItemAddressPipe],
 })
-export class EntityDetailComponent extends createExtenderComponent() implements OnInit, OnDestroy {
-  #subscription?: Subscription;
-  ngOnInit(): void {
-    this.#subscription = this.dataSubject
-      .pipe(
-        // TODO: Use fast-is-equal library or similar?
-        distinctUntilChanged((prev, next) => JSON.stringify(prev) === JSON.stringify(next)),
-      )
-      .subscribe(entity => {
-        if (!isEntity(entity)) {
-          return console.warn('Entity does not suffice as Entity', entity);
-        }
-        this.entity.set(entity as IEntityResolved);
-      });
-  }
-  ngOnDestroy(): void {
-    this.#subscription?.unsubscribe();
-  }
+export class EntityDetailComponent extends createExtenderComponent() {
+  _dataChangedEffectRef = effect(() => {
+    const value = this.dataSignal();
+    if (!isEntity(value)) return console.info('Signal value does not suffice as entity', value);
+    const current = this.entity();
+    // TODO: Use fast-is-equal library or similar?
+    if (JSON.stringify(current) === JSON.stringify(value)) return;
+    this.entity.set(value as IEntityResolved);
+  })
 
   content = inject(ContentProviderService);
   entity = signal<IEntityResolved | undefined>(undefined);

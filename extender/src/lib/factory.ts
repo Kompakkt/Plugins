@@ -1,4 +1,4 @@
-import { Directive, InjectionToken, Type, input, output } from '@angular/core';
+import { Directive, InjectionToken, Type, input, output, signal } from '@angular/core';
 import { ExtenderPluginManager } from './plugin-manager';
 import { ExtenderPlugin } from './provider';
 import { BehaviorSubject } from 'rxjs';
@@ -37,6 +37,7 @@ export const createExtenderPlugin = (options: {
 @Directive()
 export class ExtenderPluginBaseComponent {
   readonly dataSubject = new BehaviorSubject<unknown>(undefined);
+  readonly dataSignal = signal<unknown>(undefined);
   readonly slotData = toSignal(this.dataSubject);
   readonly event = output<CustomEvent>();
   readonly pluginManager = input<ExtenderPluginManager>();
