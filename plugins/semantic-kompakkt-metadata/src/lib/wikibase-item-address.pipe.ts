@@ -15,15 +15,15 @@ export const getWikibaseItemAddress = (
   const id = getWikibaseItemID(item);
 
   let url = (() => {
-    if (isAddressData(addressData)) {
+    if (instanceInfo?.instance) {
+      return `${instanceInfo.instance}/wiki/Item:${id}`;
+    } else if (isAddressData(addressData)) {
       if (addressData?.address) {
         return `${addressData.address}/wiki/Item:${id}`;
       }
       if (addressData?.instance) {
         return `${addressData.instance}/wiki/Item:${id}`;
       }
-    } else if (instanceInfo?.instance) {
-      return `${instanceInfo.instance}/wiki/Item:${id}`;
     }
     return `/wiki/Item:${id}`;
   })();
