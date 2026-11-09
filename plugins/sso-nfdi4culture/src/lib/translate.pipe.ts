@@ -4,7 +4,6 @@ import { EXTENDER_TRANSLATE_PIPE } from '@kompakkt/plugins/extender';
 @Pipe({
   name: 'translate',
   pure: false,
-  standalone: true,
 })
 export class TranslatePipe implements PipeTransform {
   #extendedPipe = inject(EXTENDER_TRANSLATE_PIPE);

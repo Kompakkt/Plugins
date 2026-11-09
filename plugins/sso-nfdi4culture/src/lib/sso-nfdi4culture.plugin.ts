@@ -13,7 +13,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 @Component({
   selector: 'nfdi4c-logo',
   templateUrl: './nfdi4c-logo.html',
-  standalone: true,
   styles: `
     :host {
       display: grid;

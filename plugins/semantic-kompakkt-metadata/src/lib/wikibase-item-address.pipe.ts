@@ -37,10 +37,7 @@ export const getWikibaseItemAddress = (
   return url;
 };
 
-@Pipe({
-  name: 'wikibaseItemAddress',
-  standalone: true,
-})
+@Pipe({ name: 'wikibaseItemAddress' })
 export class GetWikibaseItemAddressPipe implements PipeTransform {
   public transform(
     item: IWikibaseItem | string,

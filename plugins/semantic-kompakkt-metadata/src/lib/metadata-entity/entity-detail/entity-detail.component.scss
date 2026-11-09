@@ -1,16 +1,14 @@
-@use '@angular/material' as mat;
-
 .block {
   background: white;
-  padding: 1rem 0;
 
   &:first-child {
-    padding: 2rem;
+    padding-top: 2rem;
   }
 
-  h1 {
+  h2 {
     color: var(--brand-color);
     margin-top: 0;
+    font-weight: bold;
   }
 
   .button-row {
@@ -18,4 +16,15 @@
       box-shadow: none;
     }
   }
+
+  & + .block {
+    border-top: solid 0.01rem var(--brand-color);
+    margin-top: 1rem;
+  }
+}
+
+.title {
+  font-weight: bold;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
 }

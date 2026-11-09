@@ -35,10 +35,7 @@ export const getLabel = (item?: { label: IWikibaseLabel } | string, locale?: str
   return Array.isArray(firstLabel) ? firstLabel.join(' – ') : firstLabel;
 };
 
-@Pipe({
-  name: 'getLabel',
-  standalone: true,
-})
+@Pipe({ name: 'getLabel' })
 export class GetLabelPipe implements PipeTransform {
   public transform(value?: string | { label: IWikibaseLabel }, locale?: string): string {
     if (typeof value === 'string') {

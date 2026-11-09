@@ -3,17 +3,171 @@
     <div class="block">
       @if (entityUrl(); as url) {
         <a [href]="url" target="_blank"
-          ><h1>{{ label() }}</h1></a
+          ><h2>{{ label() }}</h2></a
         >
       } @else {
-        <h1>{{ label() }}</h1>
+        <h2>{{ label() }}</h2>
       }
 
       <p>{{ description() }}</p>
     </div>
-  }
 
-  <div class="block">
-    <app-detail-entity [digitalEntity]="digitalEntity"></app-detail-entity>
-  </div>
+    <div class="block">
+      <mat-divider />
+
+      @if (hasAgents()) {
+        <p class="title">Related agents</p>
+
+        @for (agent of wikibaseData.agents; track agent) {
+          <div class="block">
+            <ng-container>
+              {{ agent.roleTitle }}:
+              <a
+                target="_blank"
+                [href]="agent | wikibaseItemAddress: wikibaseData : content.instanceInfo()"
+                >{{ agent | getLabel }}</a
+              >
+            </ng-container>
+          </div>
+        }
+      }
+
+      @if (usedLicense(); as licence) {
+        <p class="title">Licence</p>
+
+        <div class="licence-block">
+          <a
+            [href]="licence.link"
+            target="_blank"
+            referrerpolicy="no-referrer"
+            rel="noreferrer"
+            [title]="licence.description"
+          >
+            <img [src]="licence.src" [alt]="licence.description" />
+          </a>
+
+          <a target="_blank" [href]="licence.link">{{ licence.description }}</a>
+        </div>
+      }
+
+      @if (hasCreationData()) {
+        <p class="title">Creation</p>
+
+        @for (technique of wikibaseData.techniques; track technique) {
+          <div class="creation-item">
+            Technique:
+            <a
+              target="_blank"
+              [href]="technique | wikibaseItemAddress: wikibaseData : content.instanceInfo()"
+              >{{ technique | getLabel }}</a
+            >
+          </div>
+        }
+
+        @for (tool of wikibaseData.software; track tool) {
+          <div class="creation-item">
+            Software:
+            <a
+              target="_blank"
+              [href]="tool | wikibaseItemAddress: wikibaseData : content.instanceInfo()"
+              >{{ tool | getLabel }}</a
+            >
+          </div>
+        }
+
+        @for (tool of wikibaseData.equipment; track tool) {
+          <div class="creation-item">Equipment: {{ tool | getLabel }}</div>
+        }
+
+        @if (creationDate(); as creationDate) {
+          <div class="creation-item">Date: {{ creationDate }}</div>
+        }
+      }
+
+      @if (hasExternalLinks()) {
+        <p class="title">External Links</p>
+
+        @for (link of wikibaseData.externalLinks; track link) {
+          <div class="block">
+            <a target="_blank" [href]="link">{{ link | getLabel }}</a>
+          </div>
+        }
+      }
+
+      @if (hasBibliograpicRefs()) {
+        <p class="title">Bibliography</p>
+
+        @for (ref of wikibaseData.bibliographicRefs; track ref) {
+          <div class="block">
+            <a
+              target="_blank"
+              [href]="ref | wikibaseItemAddress: wikibaseData : content.instanceInfo()"
+              >{{ ref | getLabel }}</a
+            >
+          </div>
+        }
+      }
+
+      @if (hasHierarchies()) {
+        <p class="title">Related object structure</p>
+
+        @for (hierarchy of wikibaseData.hierarchies; track hierarchy) {
+          <div class="block">
+            @for (parent of hierarchy.parents; track parent; let i = $index) {
+              <div
+                class="hierarchy-entry"
+                [style.padding-left]="(i === 1 ? 0 : (i - 1) * 24).toString() + 'px'"
+              >
+                @if (i > 0) {
+                  <mat-icon class="hierarchy-icon"> subdirectory_arrow_right </mat-icon>
+                }
+                <div class="hierarchy-label" [class.active]="i === hierarchy.parents.length - 1">
+                  <a
+                    target="_blank"
+                    [href]="parent | wikibaseItemAddress: wikibaseData : content.instanceInfo()"
+                    >{{ parent | getLabel }}</a
+                  >
+                </div>
+              </div>
+            }
+
+            @for (sibling of hierarchy.siblings; track sibling) {
+              <div
+                class="hierarchy-entry"
+                [style.padding-left]="
+                  'max(' + ((hierarchy.parents.length - 2) * 24).toString() + 'px, 0px)'
+                "
+              >
+                <mat-icon class="hierarchy-icon"> subdirectory_arrow_right </mat-icon>
+                <div class="hierarchy-label">
+                  <a
+                    target="_blank"
+                    [href]="sibling | wikibaseItemAddress: wikibaseData : content.instanceInfo()"
+                    >{{ sibling | getLabel }}</a
+                  >
+                </div>
+              </div>
+            }
+
+            <!-- TODO: Does this condition really make sense? -->
+            @if (hierarchy.parents.length + hierarchy.siblings.length === 0) {
+              <div class="hierarchy-label">
+                @if (wikibaseData.physicalObjs; as physicalObjects) {
+                  @for (phyObj of physicalObjects; track phyObj) {
+                    <div>
+                      <a
+                        target="_blank"
+                        [href]="phyObj | wikibaseItemAddress: wikibaseData : content.instanceInfo()"
+                        >{{ phyObj | getLabel }}</a
+                      >
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </div>
+        }
+      }
+    </div>
+  }
 }

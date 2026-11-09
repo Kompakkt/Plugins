@@ -3,7 +3,6 @@ import { createExtenderComponent } from '@kompakkt/plugins/extender';
 
 @Component({
   selector: 'lib-hello-world',
-  standalone: true,
   template: '<p>Hello {{ name() }}</p>',
   styles: '',
 })
