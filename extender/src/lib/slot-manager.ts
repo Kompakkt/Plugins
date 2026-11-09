@@ -1,8 +1,9 @@
-import { ComponentRef, effect, ElementRef, Signal, ViewContainerRef } from '@angular/core';
-import { Observable, ReplaySubject } from 'rxjs';
+import { ComponentRef, ElementRef, ViewContainerRef } from '@angular/core';
+import { distinctUntilChanged, Observable, ReplaySubject } from 'rxjs';
 import { type ExtenderPluginBaseComponent } from './factory';
 import { type ExtenderPlugin } from './provider';
 import { ExtenderPluginManager } from './plugin-manager';
+import { fastIsEqual } from 'fast-is-equal';
 
 export type ExtenderSlotEvent<T = unknown> = {
   componentName: string;
@@ -90,13 +91,15 @@ export const ExtenderSlotManager = new (class ExtenderSlotManager {
     if (dataObservable) {
       console.log('Subscribing to dataObservable for slot', { slotName });
       registration.teardowns.push(
-        dataObservable.subscribe(data => {
-          console.log('Received data for slot', { slotName, data });
-          for (const ref of registration.refs) {
-            ref.instance.dataSubject.next(data);
-            ref.instance.dataSignal.set(data);
-          }
-        }),
+        dataObservable
+          .pipe(distinctUntilChanged((prev, curr) => !fastIsEqual(prev, curr)))
+          .subscribe(data => {
+            console.log('Received data for slot', { slotName, data });
+            for (const ref of registration.refs) {
+              ref.instance.dataSubject.next(data);
+              ref.instance.dataSignal.set(data);
+            }
+          }),
       );
     }
 

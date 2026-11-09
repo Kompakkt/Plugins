@@ -1,4 +1,4 @@
-import { Component, computed, inject, model, effect, OnInit, OnDestroy } from '@angular/core';
+import { Component, computed, inject, model, effect } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { createExtenderComponent } from '@kompakkt/plugins/extender';
 import {
@@ -7,7 +7,6 @@ import {
   ButtonRowComponent,
   InputComponent,
 } from '@kompakkt/komponents';
-import { distinctUntilChanged, Subscription } from 'rxjs';
 import { isAnnotation } from '@kompakkt/common';
 import { IWikibaseItem, WikibaseExtendedAnnotation } from '../../../common/wikibase.common';
 import { ContentProviderService } from '../../content-provider.service';
@@ -33,33 +32,19 @@ const searchWikibaseItem = (query: string, item: IWikibaseItem) => {
   templateUrl: './add-related-content.component.html',
   styleUrl: './add-related-content.component.scss',
 })
-export class AddRelatedContentComponent
-  extends createExtenderComponent()
-  implements OnInit, OnDestroy
-{
+export class AddRelatedContentComponent extends createExtenderComponent() {
   annotationModel = model<WikibaseExtendedAnnotation | undefined>();
   annotationForm = form(this.annotationModel);
 
-  #subscription?: Subscription;
-  ngOnInit(): void {
-    this.#subscription = this.dataSubject
-      .pipe(
-        // TODO: Use fast-is-equal library or similar?
-        distinctUntilChanged((prev, next) => JSON.stringify(prev) === JSON.stringify(next)),
-      )
-      .subscribe(annotation => {
-        if (!isAnnotation(annotation)) {
-          return console.warn('Annotation does not suffice as annotation', annotation);
-        }
-        const extendedAnnotation = structuredClone(annotation) as WikibaseExtendedAnnotation;
-        extendedAnnotation.extensions ??= {};
-        extendedAnnotation.extensions.wikibase ??= {};
-        this.annotationModel.set(extendedAnnotation);
-      });
-  }
-  ngOnDestroy(): void {
-    this.#subscription?.unsubscribe();
-  }
+  _dataChangedEffectRef = effect(() => {
+    const value = this.dataSignal();
+    if (!isAnnotation(value))
+      return console.warn('Annotation does not suffice as annotation', value);
+    const extendedAnnotation = structuredClone(value) as WikibaseExtendedAnnotation;
+    extendedAnnotation.extensions ??= {};
+    extendedAnnotation.extensions.wikibase ??= {};
+    this.annotationModel.set(extendedAnnotation);
+  });
 
   relatedMediaUrls = computed(() => {
     const annotation = this.annotationForm().value();

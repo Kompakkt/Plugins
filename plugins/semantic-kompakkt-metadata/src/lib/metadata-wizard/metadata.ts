@@ -94,7 +94,7 @@ export const transformOldWikibaseEntityToExtension = <
   entity: T,
 ): T => {
   const extensionData = createWikibaseExtension();
-  if (!!entity.extensions?.wikibase) {
+  if (entity.extensions?.wikibase) {
     return entity;
   }
   entity.extensions = extensionData;

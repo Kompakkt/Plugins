@@ -1,12 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import {
-  Component,
-  inject,
-  signal,
-  model,
-  effect,
-  computed,
-} from '@angular/core';
+import { Component, inject, signal, model, effect, computed } from '@angular/core';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -39,7 +32,6 @@ import {
   ValidationError,
 } from '@angular/forms/signals';
 import { MatOption, provideNativeDateAdapter } from '@angular/material/core';
-import { fastIsEqual } from 'fast-is-equal'
 
 const filterWikibaseItem = (query: string) => (item: IWikibaseItem) =>
   (Object.values(item.label).join('') + (item.description ?? '')).toLowerCase().includes(query);
@@ -173,12 +165,9 @@ export class EntityComponent extends createExtenderComponent() {
 
   _dataChangedEffectRef = effect(() => {
     const value = this.dataSignal();
-    if (!isDigitalEntity(value)) return console.info('Signal value does not suffice as digital entity', value);
-    const current = this.entityModel();
-
-    if (fastIsEqual(current, value)) return;
+    if (!isDigitalEntity(value))
+      return console.info('Signal value does not suffice as digital entity', value);
     const merged = mergeExistingEntityWikibaseExtension(value);
-    if (fastIsEqual(merged, value)) return;
     console.info('Entity after merging', merged);
 
     if (merged.extensions.wikibase) {
@@ -191,8 +180,6 @@ export class EntityComponent extends createExtenderComponent() {
       }
     }
 
-    if (fastIsEqual(merged, current)) return;
-
     if (
       this.dataForm().value().title !== merged.title ||
       this.dataForm().value().description !== merged.description
@@ -204,9 +191,8 @@ export class EntityComponent extends createExtenderComponent() {
       }));
     }
 
-
     this.entityModel.set({ ...emptyDigitalEntity(), ...merged });
-  })
+  });
 
   availableLicences = [
     {
@@ -319,7 +305,7 @@ export class EntityComponent extends createExtenderComponent() {
       try {
         new URL(ctx.value());
         return null;
-      } catch (_) {
+      } catch {
         return { kind: 'invalidUrl', message: `Not a valid URL: ${ctx.value()}` };
       }
     });

@@ -53,7 +53,7 @@ export class SemanticKompakktMetadataPlugin extends createExtenderPlugin({
           ...annotation.extensions,
           wikibase: {
             ...extensions.wikibase,
-            ...((annotation as WikibaseExtendedAnnotation).extensions?.['wikibase'] ?? {}),
+            ...(annotation as WikibaseExtendedAnnotation).extensions?.['wikibase'],
           },
         },
       };

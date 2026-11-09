@@ -35,11 +35,8 @@ export class EntityDetailComponent extends createExtenderComponent() {
   _dataChangedEffectRef = effect(() => {
     const value = this.dataSignal();
     if (!isEntity(value)) return console.info('Signal value does not suffice as entity', value);
-    const current = this.entity();
-    // TODO: Use fast-is-equal library or similar?
-    if (JSON.stringify(current) === JSON.stringify(value)) return;
     this.entity.set(value as IEntityResolved);
-  })
+  });
 
   content = inject(ContentProviderService);
   entity = signal<IEntityResolved | undefined>(undefined);
