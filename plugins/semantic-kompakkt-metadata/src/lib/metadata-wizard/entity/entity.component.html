@@ -82,18 +82,30 @@
             [matAutocomplete]="personAutocomplete"
             [disabled]="isUpdatingContent()"
           />
-          <mat-icon matSuffix (click)="updateContent()">refresh</mat-icon>
+          @if (selectedAgent()) {
+            <button mat-icon-button matSuffix (click)="resetAgent()">
+              <mat-icon>clear</mat-icon>
+            </button>
+          } @else {
+            <button mat-icon-button matSuffix (click)="updateContent()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+          }
+
           <mat-autocomplete
             #personAutocomplete="matAutocomplete"
             [displayWith]="displayPersonName"
             (optionSelected)="selectAgent($event.option)"
           >
             @for (person of filteredAgents(); track person) {
-              <mat-option [value]="person">
+              <mat-option [value]="person.id">
                 <app-autocomplete-option [optionItem]="person" />
               </mat-option>
             }
           </mat-autocomplete>
+          @if (selectedAgent(); as ref) {
+            <app-autocomplete-option [optionItem]="ref" />
+          }
         </mat-form-field>
 
         @if (isUpdatingContent()) {
@@ -181,19 +193,31 @@
             [formField]="searchForm.technique"
             [matAutocomplete]="techniqueAutocomplete"
           />
-          <mat-icon matSuffix>search</mat-icon>
+          @if (selectedTechnique()) {
+            <button mat-icon-button matSuffix (click)="resetTechnique()">
+              <mat-icon>clear</mat-icon>
+            </button>
+          } @else {
+            <button mat-icon-button matSuffix (click)="updateContent()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+          }
           <mat-autocomplete
             #techniqueAutocomplete="matAutocomplete"
             [displayWith]="displayWikibaseItemLabel"
             (optionSelected)="selectTechnique($event.option)"
           >
             @for (technique of filteredTechniques(); track technique) {
-              <mat-option [value]="technique">
+              <mat-option [value]="technique.id">
                 <app-autocomplete-option [optionItem]="technique" />
               </mat-option>
             }
           </mat-autocomplete>
+          @if (selectedTechnique(); as ref) {
+            <app-autocomplete-option [optionItem]="ref" />
+          }
         </mat-form-field>
+
         <!-- Software Search -->
         <mat-form-field>
           <mat-label>Add software:</mat-label>
@@ -204,19 +228,31 @@
             [formField]="searchForm.software"
             [matAutocomplete]="softwareAutocomplete"
           />
-          <mat-icon matSuffix>search</mat-icon>
+          @if (selectedSoftware()) {
+            <button mat-icon-button matSuffix (click)="resetSoftware()">
+              <mat-icon>clear</mat-icon>
+            </button>
+          } @else {
+            <button mat-icon-button matSuffix (click)="updateContent()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+          }
           <mat-autocomplete
             #softwareAutocomplete="matAutocomplete"
             [displayWith]="displayWikibaseItemLabel"
             (optionSelected)="selectSoftware($event.option)"
           >
             @for (software of filteredSoftware(); track software) {
-              <mat-option [value]="software">
+              <mat-option [value]="software.id">
                 <app-autocomplete-option [optionItem]="software" />
               </mat-option>
             }
           </mat-autocomplete>
+          @if (selectedSoftware(); as ref) {
+            <app-autocomplete-option [optionItem]="ref" />
+          }
         </mat-form-field>
+
         <!-- Equipment Field -->
         <mat-form-field>
           <mat-label>Add equipment:</mat-label>
@@ -380,19 +416,31 @@
             [formField]="searchForm.bibref"
             [matAutocomplete]="bibRefAutocomplete"
           />
-          <mat-icon matSuffix>search</mat-icon>
+          @if (selectedBibRef()) {
+            <button mat-icon-button matSuffix (click)="resetBibRef()">
+              <mat-icon>clear</mat-icon>
+            </button>
+          } @else {
+            <button mat-icon-button matSuffix (click)="updateContent()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+          }
           <mat-autocomplete
             #bibRefAutocomplete="matAutocomplete"
             [displayWith]="displayWikibaseItemLabel"
             (optionSelected)="selectBibRef($event.option)"
           >
             @for (ref of filteredBibRefs(); track ref) {
-              <mat-option [value]="ref">
+              <mat-option [value]="ref.id">
                 <app-autocomplete-option [optionItem]="ref" />
               </mat-option>
             }
           </mat-autocomplete>
+          @if (selectedBibRef(); as ref) {
+            <app-autocomplete-option [optionItem]="ref" />
+          }
         </mat-form-field>
+
         <button
           mat-flat-button
           color="primary"
@@ -437,19 +485,31 @@
             [formField]="searchForm.phyObj"
             [matAutocomplete]="phyObjsAutocomplete"
           />
-          <mat-icon matSuffix>search</mat-icon>
+          @if (selectedPhyObj()) {
+            <button mat-icon-button matSuffix (click)="resetPhyObj()">
+              <mat-icon>clear</mat-icon>
+            </button>
+          } @else {
+            <button mat-icon-button matSuffix (click)="updateContent()">
+              <mat-icon>refresh</mat-icon>
+            </button>
+          }
           <mat-autocomplete
             #phyObjsAutocomplete="matAutocomplete"
             [displayWith]="displayWikibaseItemLabel"
             (optionSelected)="selectPhyObj($event.option)"
           >
             @for (obj of filteredPhyObjs(); track obj) {
-              <mat-option [value]="obj">
+              <mat-option [value]="obj.id">
                 <app-autocomplete-option [optionItem]="obj" />
               </mat-option>
             }
           </mat-autocomplete>
+          @if (selectedPhyObj(); as ref) {
+            <app-autocomplete-option [optionItem]="ref" />
+          }
         </mat-form-field>
+
         <button
           mat-flat-button
           color="primary"

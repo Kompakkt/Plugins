@@ -32,6 +32,7 @@ import { ContentProviderService } from '../../content-provider.service';
 import { getLabel, GetLabelPipe } from '../../get-label.pipe';
 import { emptyDigitalEntity, mergeExistingEntityWikibaseExtension } from '../metadata';
 import {
+  disabled,
   form,
   FormField,
   maxLength,
@@ -112,19 +113,21 @@ export class EntityComponent extends createExtenderComponent() implements OnInit
         };
       const errors = new Array<ValidationError>();
 
-      if (!wikibase.label?.['en'])
+      const title = wikibase.label?.['en'] ?? '';
+      const description = wikibase.description?.['en'] ?? '';
+      if (!title)
         errors.push({
           kind: 'General Information',
           message: 'Title is required',
         });
 
-      if (!wikibase.description?.['en'])
+      if (!description)
         errors.push({
           kind: 'General Information',
           message: 'Description is required',
         });
 
-      if (wikibase.description?.['en'] === wikibase.label?.['en'])
+      if (title.length > 0 && description === title)
         errors.push({
           kind: 'General Information',
           message: 'Title and description cannot be the same',
@@ -193,6 +196,16 @@ export class EntityComponent extends createExtenderComponent() implements OnInit
             console.log('Setting SK licence to K');
             merged.licence = merged.extensions.wikibase.licence;
           }
+          if (
+            this.dataForm().value().title !== merged.title ||
+            this.dataForm().value().description !== merged.description
+          ) {
+            this.dataModel.update(data => ({
+              ...data,
+              title: merged.title,
+              description: merged.description,
+            }));
+          }
         }
 
         this.entityModel.set({ ...emptyDigitalEntity(), ...merged });
@@ -260,30 +273,36 @@ export class EntityComponent extends createExtenderComponent() implements OnInit
     phyObj: '',
     software: '',
   });
-  searchForm = form(this.searchModel);
+  searchForm = form(this.searchModel, path => {
+    disabled(path.agent, { when: ctx => ctx.value().length > 0 });
+    disabled(path.technique, { when: ctx => ctx.value().length > 0 });
+    disabled(path.bibref, { when: ctx => ctx.value().length > 0 });
+    disabled(path.phyObj, { when: ctx => ctx.value().length > 0 });
+    disabled(path.software, { when: ctx => ctx.value().length > 0 });
+  });
 
   filteredAgents = computed(() => {
-    const search = (this.searchForm.agent().value() ?? '').trim().toLowerCase();
+    const search = this.searchForm.agent().value().trim().toLowerCase();
     const content = this.#content.agents();
     return content.filter(filterWikibaseItem(search));
   });
   filteredTechniques = computed(() => {
-    const search = (this.searchForm.technique().value() ?? '').trim().toLowerCase();
+    const search = this.searchForm.technique().value().trim().toLowerCase();
     const content = this.#content.techniques();
     return content.filter(filterWikibaseItem(search));
   });
   filteredSoftware = computed(() => {
-    const search = (this.searchForm.software().value() ?? '').trim().toLowerCase();
+    const search = this.searchForm.software().value().trim().toLowerCase();
     const content = this.#content.software();
     return content.filter(filterWikibaseItem(search));
   });
   filteredBibRefs = computed(() => {
-    const search = (this.searchForm.bibref().value() ?? '').trim().toLowerCase();
+    const search = this.searchForm.bibref().value().trim().toLowerCase();
     const content = this.#content.bibrefs();
     return content.filter(filterWikibaseItem(search));
   });
   filteredPhyObjs = computed(() => {
-    const search = (this.searchForm.phyObj().value() ?? '').trim().toLowerCase();
+    const search = this.searchForm.phyObj().value().trim().toLowerCase();
     const content = this.#content.physicalobjects();
     return content.filter(filterWikibaseItem(search));
   });
@@ -361,20 +380,50 @@ export class EntityComponent extends createExtenderComponent() implements OnInit
     });
   }
 
-  selectAgent(option: MatOption<IMediaAgent>) {
-    this.selectedAgent.set(option.value);
+  selectAgent({ value }: MatOption<string>) {
+    const item = this.#content.agents().find(b => b.id === value);
+    if (!item) return;
+    this.selectedAgent.set(item);
   }
-  selectTechnique(option: MatOption<IWikibaseItem>) {
-    this.selectedTechnique.set(option.value);
+  resetAgent() {
+    this.selectedAgent.set(undefined);
+    this.searchForm.agent().value.set('');
   }
-  selectSoftware(option: MatOption<IWikibaseItem>) {
-    this.selectedSoftware.set(option.value);
+  selectTechnique({ value }: MatOption<string>) {
+    const item = this.#content.techniques().find(b => b.id === value);
+    if (!item) return;
+    this.selectedTechnique.set(item);
   }
-  selectBibRef(option: MatOption<IWikibaseItem>) {
-    this.selectedBibRef.set(option.value);
+  resetTechnique() {
+    this.selectedTechnique.set(undefined);
+    this.searchForm.technique().value.set('');
   }
-  selectPhyObj(option: MatOption<IWikibaseItem>) {
-    this.selectedPhyObj.set(option.value);
+  selectSoftware({ value }: MatOption<string>) {
+    const item = this.#content.software().find(b => b.id === value);
+    if (!item) return;
+    this.selectedSoftware.set(item);
+  }
+  resetSoftware() {
+    this.selectedSoftware.set(undefined);
+    this.searchForm.software().value.set('');
+  }
+  selectBibRef({ value }: MatOption<string>) {
+    const item = this.#content.bibrefs().find(b => b.id === value);
+    if (!item) return;
+    this.selectedBibRef.set(item);
+  }
+  resetBibRef() {
+    this.selectedBibRef.set(undefined);
+    this.searchForm.bibref().value.set('');
+  }
+  selectPhyObj({ value }: MatOption<string>) {
+    const item = this.#content.physicalobjects().find(b => b.id === value);
+    if (!item) return;
+    this.selectedPhyObj.set(item);
+  }
+  resetPhyObj() {
+    this.selectedPhyObj.set(undefined);
+    this.searchForm.phyObj().value.set('');
   }
 
   isUpdatingContent = signal(false);

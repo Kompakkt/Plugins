@@ -1,4 +1,4 @@
-import { inject, Service } from '@angular/core';
+import { computed, inject, Service } from '@angular/core';
 import { EXTENDER_BACKEND_SERVICE } from '@kompakkt/plugins/extender';
 import { BehaviorSubject } from 'rxjs';
 import {
@@ -42,6 +42,27 @@ export class ContentProviderService {
   concepts = toSignal(this.#serverConcepts, { initialValue: [] });
   media = toSignal(this.#serverMedia, { initialValue: [] });
   licenses = toSignal(this.#serverLicenses, { initialValue: [] });
+  combined = computed(() => {
+    const agents = this.agents();
+    const techniques = this.techniques();
+    const software = this.software();
+    const bibrefs = this.bibrefs();
+    const physicalobjects = this.physicalobjects();
+    const concepts = this.concepts();
+    const media = this.media();
+    const licenses = this.licenses();
+    return [
+      ...agents,
+      ...techniques,
+      ...software,
+      ...bibrefs,
+      ...physicalobjects,
+      ...concepts,
+      ...media,
+      ...licenses,
+    ];
+  });
+
   instanceInfo = toSignal(this.#instanceInfo$, { initialValue: undefined });
 
   constructor() {
