@@ -5,6 +5,7 @@ import {
   Type,
   makeEnvironmentProviders,
 } from '@angular/core';
+import { FluentResource } from '@fluent/bundle';
 import { ExtenderPluginManager } from './plugin-manager';
 import { ExtenderPlugin } from './provider';
 
@@ -14,6 +15,13 @@ abstract class BackendServiceClass {
 }
 
 export type BackendService = Type<BackendServiceClass>;
+
+abstract class TranslateServiceClass {
+  public abstract getTranslation(key: string, args: any): string;
+  public abstract addResource(locale: string, resource: FluentResource): void;
+}
+
+export type TranslateService = Type<TranslateServiceClass>;
 
 abstract class TranslatePipeClass implements PipeTransform {
   public abstract transform(key: string): string;
@@ -26,6 +34,7 @@ export type ExtenderOptions = {
   plugins: ExtenderPlugin[];
   services: Record<string, Type<unknown>> & {
     backendService: BackendService;
+    translateService: TranslateService;
   };
   pipes: Record<string, Type<unknown>> & {
     translatePipe: TranslatePipe;
@@ -39,6 +48,10 @@ export interface ExtenderPluginConstructor {
 
 export const EXTENDER_BACKEND_SERVICE = new InjectionToken<BackendServiceClass>(
   'KOMPAKKT_EXTENDER_BACKEND_SERVICE',
+);
+
+export const EXTENDER_TRANSLATE_SERVICE = new InjectionToken<TranslateServiceClass>(
+  'KOMPAKKT_EXTENDER_TRANSLATE_SERVICE',
 );
 
 export const EXTENDER_TRANSLATE_PIPE = new InjectionToken<TranslatePipeClass>(
@@ -72,6 +85,10 @@ export const provideExtender = ({
     {
       provide: EXTENDER_BACKEND_SERVICE,
       useClass: services.backendService,
+    },
+    {
+      provide: EXTENDER_TRANSLATE_SERVICE,
+      useClass: services.translateService,
     },
     {
       provide: EXTENDER_TRANSLATE_PIPE,

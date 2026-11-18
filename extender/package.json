@@ -5,6 +5,7 @@
     "@angular/common": "22.2.3",
     "@angular/core": "22.2.3",
     "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#49b7d222f9d6edd719ae7183ba53c96acedd9d0f",
+    "@fluent/bundle": "^0.19.1",
     "uuid": "^14.0.0"
   },
   "dependencies": {

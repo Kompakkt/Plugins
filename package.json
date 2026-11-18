@@ -32,6 +32,7 @@
     "@angular/platform-browser": "22.2.3",
     "@angular/platform-browser-dynamic": "22.2.3",
     "@angular/router": "22.2.3",
+    "@fluent/bundle": "^0.19.1",
     "@kompakkt/common": "git+https://github.com/Kompakkt/Common.git#49b7d222f9d6edd719ae7183ba53c96acedd9d0f",
     "@kompakkt/komponents": "git+https://github.com/Kompakkt/Komponents.git#a8299aa77713b01270aa43d2a69a3a6ba26959e7",
     "bson": "^7.2.0",
